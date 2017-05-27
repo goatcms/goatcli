@@ -1,0 +1,13 @@
+vendors
+
+main
+npm-debug.log
+*.test
+*~
+*.exe
+debug
+*.db
+*.db-journal
+
+.idea/
+*.log
