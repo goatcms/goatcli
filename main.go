@@ -12,7 +12,7 @@ import (
 
 func main() {
 	errLogs := log.New(os.Stderr, "", 0)
-	app, err := goatapp.NewGoatApp("GoatCMD", "0.0.1", "./")
+	app, err := goatapp.NewGoatApp("GoatCLI", "0.0.1", "./")
 	if err != nil {
 		errLogs.Println(err)
 		return
