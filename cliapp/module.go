@@ -3,6 +3,7 @@ package cmdapp
 import (
 	"github.com/goatcms/goatcli/cliapp/commands"
 	"github.com/goatcms/goatcli/cliapp/commands/clonec"
+	"github.com/goatcms/goatcli/cliapp/services/repositiories"
 	"github.com/goatcms/goatcore/app"
 )
 
@@ -33,10 +34,10 @@ func (m *Module) RegisterDependencies(a app.App) error {
 		return err
 	}
 	// services
-	/*dp := a.DependencyProvider()
-	if err := database.RegisterDependencies(dp); err != nil {
+	dp := a.DependencyProvider()
+	if err := repositories.RegisterDependencies(dp); err != nil {
 		return err
-	}*/
+	}
 	return nil
 }
 
