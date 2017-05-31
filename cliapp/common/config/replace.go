@@ -48,8 +48,14 @@ func NewReplace(json []byte) (*Replace, error) {
 	if err = jsonparser.ObjectEach(json, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
 		switch strings.ToLower(string(key)) {
 		case "from":
+			if dataType != jsonparser.String {
+				return fmt.Errorf("expected string and take %s", value)
+			}
 			r.From = string(value)
 		case "to":
+			if dataType != jsonparser.String {
+				return fmt.Errorf("expected string and take %s", value)
+			}
 			r.To = string(value)
 		case "suffix":
 			if dataType == jsonparser.String {
