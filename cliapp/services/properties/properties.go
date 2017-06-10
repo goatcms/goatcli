@@ -101,6 +101,7 @@ func (p *Properties) init() (err error) {
 		}
 	}
 	if isChanged {
+		json, err := plainmap.PlainStringMapToJSON(p.data)
 		if err != nil {
 			return err
 		}
