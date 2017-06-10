@@ -100,6 +100,12 @@ func (p *Properties) init() (err error) {
 			}
 		}
 	}
+	if isChanged {
+		if err != nil {
+			return err
+		}
+		p.deps.FS.WriteFile("properties.json", []byte(json), 0766)
+	}
 	return nil
 }
 
