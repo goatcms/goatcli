@@ -1,6 +1,9 @@
 package services
 
-import "github.com/goatcms/goatcore/filesystem"
+import (
+	"github.com/goatcms/goatcli/cliapp/common/config"
+	"github.com/goatcms/goatcore/filesystem"
+)
 
 const (
 	// RepositoriesService provide git repository access
@@ -19,6 +22,12 @@ type Project interface {
 	Filespace() (filesystem.Filespace, error)
 }
 
+// Properties provide project properties data
 type Properties interface {
 	Get(key string) (string, error)
+}
+
+type Modules interface {
+	Init() error
+	ModulesConfig() ([]*config.Module, error)
 }
