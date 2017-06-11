@@ -31,7 +31,7 @@ func TestProperties(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile("properties.def.json", []byte(testPropJSON), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/properties.def.json", []byte(testPropJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -71,7 +71,7 @@ func TestGenerateProperty(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile("properties.def.json", []byte(testPropJSON), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/properties.def.json", []byte(testPropJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -96,7 +96,7 @@ func TestGenerateProperty(t *testing.T) {
 	}
 	var dataJSON []byte
 	var saved map[string]string
-	if dataJSON, err = mapp.RootFilespace().ReadFile("properties.json"); err != nil {
+	if dataJSON, err = mapp.RootFilespace().ReadFile(".goat/properties.json"); err != nil {
 		t.Error(err)
 		return
 	}
@@ -125,11 +125,11 @@ func TestPropertiesReadFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile("properties.def.json", []byte(testPropJSON), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/properties.def.json", []byte(testPropJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile("properties.json", []byte(testPropDataJSON), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/properties.json", []byte(testPropDataJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}

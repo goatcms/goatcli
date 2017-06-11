@@ -38,7 +38,7 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 }
 
 func (p *Properties) init() (err error) {
-	defJSON, err := p.deps.FS.ReadFile("properties.def.json")
+	defJSON, err := p.deps.FS.ReadFile(".goat/properties.def.json")
 	if err != nil {
 		return err
 	}
@@ -46,8 +46,8 @@ func (p *Properties) init() (err error) {
 	if err != nil {
 		return err
 	}
-	if p.deps.FS.IsFile("properties.json") {
-		dataJSON, err := p.deps.FS.ReadFile("properties.json")
+	if p.deps.FS.IsFile(".goat/properties.json") {
+		dataJSON, err := p.deps.FS.ReadFile(".goat/properties.json")
 		if err != nil {
 			return err
 		}
@@ -105,7 +105,7 @@ func (p *Properties) init() (err error) {
 		if err != nil {
 			return err
 		}
-		p.deps.FS.WriteFile("properties.json", []byte(json), 0766)
+		p.deps.FS.WriteFile(".goat/properties.json", []byte(json), 0766)
 	}
 	return nil
 }
