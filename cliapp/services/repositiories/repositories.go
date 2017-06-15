@@ -3,6 +3,7 @@ package repositories
 import (
 	"os"
 
+	homedir "github.com/mitchellh/go-homedir"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/disk"
-	"github.com/mitchellh/go-homedir"
 )
 
 // Repositories provide access to repositories
