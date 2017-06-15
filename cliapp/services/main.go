@@ -5,13 +5,6 @@ import (
 	"github.com/goatcms/goatcore/filesystem"
 )
 
-const (
-	// RepositoriesService provide git repository access
-	RepositoriesService = "Repositories"
-	// ProjectService provide git repository access
-	ProjectService = "Project"
-)
-
 // Repositories provide git repository access
 type Repositories interface {
 	Filespace(repository, rev string) (filesystem.Filespace, error)
@@ -30,4 +23,7 @@ type Properties interface {
 type Modules interface {
 	Init() error
 	ModulesConfig() ([]*config.Module, error)
+}
+
+type Cloner interface {
 }
