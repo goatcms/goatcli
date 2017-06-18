@@ -23,11 +23,11 @@ func TestProperty(t *testing.T) {
 		return
 	}
 	if property.Min != 1 {
-		t.Errorf("incorrect min value parsing (expected 1 and take %s)", property.Min)
+		t.Errorf("incorrect min value parsing (expected 1 and take %d)", property.Min)
 		return
 	}
 	if property.Max != 22 {
-		t.Errorf("incorrect max value parsing (expected 22 and take %s)", property.Max)
+		t.Errorf("incorrect max value parsing (expected 22 and take %d)", property.Max)
 		return
 	}
 }
