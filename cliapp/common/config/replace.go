@@ -2,20 +2,22 @@ package config
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/buger/jsonparser"
+	"github.com/goatcms/goatcli/cliapp/common"
 )
 
 // Replace is configuration container for one replace description
 type Replace struct {
-	From   string
-	To     string
-	Suffix []string
+	From    *regexp.Regexp
+	To      string
+	Pattern *regexp.Regexp
 }
 
 // NewReplaces parse json and return Replace array instance
-func NewReplaces(json []byte) ([]*Replace, error) {
+func NewReplaces(json []byte, si common.StringInjector) ([]*Replace, error) {
 	var de error = nil
 	replaces := []*Replace{}
 	if _, err := jsonparser.ArrayEach(json, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
@@ -26,7 +28,7 @@ func NewReplaces(json []byte) ([]*Replace, error) {
 			de = fmt.Errorf("NewReplaces array  must contains replace objects only")
 			return
 		}
-		replace, err2 := NewReplace(value)
+		replace, err2 := NewReplace(value, si)
 		if err2 != nil {
 			de = err2
 			return
@@ -42,31 +44,31 @@ func NewReplaces(json []byte) ([]*Replace, error) {
 }
 
 // NewReplace parse replace data and return Replace object instance
-func NewReplace(json []byte) (*Replace, error) {
+func NewReplace(json []byte, si common.StringInjector) (*Replace, error) {
 	var err error
 	r := &Replace{}
 	if err = jsonparser.ObjectEach(json, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
 		switch strings.ToLower(string(key)) {
 		case "from":
 			if dataType != jsonparser.String {
-				return fmt.Errorf("expected string and take %s", value)
+				return fmt.Errorf("Replace.From expected string and take %s", value)
 			}
-			r.From = string(value)
+			if r.From, err = regexp.Compile(string(value)); err != nil {
+				return err
+			}
 		case "to":
 			if dataType != jsonparser.String {
-				return fmt.Errorf("expected string and take %s", value)
+				return fmt.Errorf(" Replace.To expected string and take %s", value)
 			}
-			r.To = string(value)
-		case "suffix":
-			if dataType == jsonparser.String {
-				r.Suffix = []string{string(value)}
-			} else if dataType == jsonparser.Array {
-				r.Suffix, err = parseStringArray(value)
-				if err != nil {
-					return err
-				}
-			} else {
-				return fmt.Errorf("Incorrect Replace.Suffix type (allow strings array or single string value)")
+			if r.To, err = si.InjectToString(string(value)); err != nil {
+				return err
+			}
+		case "pattern":
+			if dataType != jsonparser.String {
+				return fmt.Errorf("Replace.Pattern must be a string")
+			}
+			if r.Pattern, err = regexp.Compile(string(value)); err != nil {
+				return err
 			}
 		case "comment":
 			// ignore all comments
@@ -78,25 +80,4 @@ func NewReplace(json []byte) (*Replace, error) {
 		return nil, err
 	}
 	return r, nil
-}
-
-func parseStringArray(json []byte) ([]string, error) {
-	var de error
-	sr := []string{}
-	if _, err := jsonparser.ArrayEach(json, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		if err != nil || de != nil {
-			return
-		}
-		if dataType != jsonparser.String {
-			de = fmt.Errorf("parseStringArray support only string array")
-			return
-		}
-		sr = append(sr, string(value))
-	}); err != nil {
-		return nil, err
-	}
-	if de != nil {
-		return nil, de
-	}
-	return sr, nil
 }

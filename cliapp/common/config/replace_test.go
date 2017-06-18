@@ -3,77 +3,41 @@ package config
 import "testing"
 
 const (
-	replaceTestDataSuffixAsString = `{"from":"fromvalue", "to":"tovalue", "suffix":"suffix1"}`
-	replaceTestDataSuffixAsArray  = `{"from":"fromvalue", "to":"tovalue", "suffix":["suffix1", "suffix2"]}`
-	replacesTestArray             = `[{"from":"fromvalue", "to":"tovalue", "suffix":"suffix1"},{"from":"fromvalue", "to":"tovalue", "suffix":["suffix1", "suffix2"]}]`
-	replacesTestFailArray         = `[{"from":"fromvalue", "to":"tovalue", "suffix":"suffix1"},"error"]`
+	replaceTestData       = `{"from":"fromvalue", "to":"tovalue", "pattern":"[A-Za-z0-9_/]*.go"}`
+	replacesTestArray     = `[{"from":"fromvalue", "to":"tovalue", "pattern":"[A-Za-z0-9_/]*.go"},{"from":"fromvalue", "to":"tovalue", "pattern":"[A-Za-z0-9_/]*.css"}]`
+	replacesTestFailArray = `[{"from":"fromvalue", "to":"tovalue", "pattern":"[A-Za-z0-9_/]*.go"},"error"]`
 )
 
-func TestReplaceSuffixAsString(t *testing.T) {
+func TestReplace(t *testing.T) {
 	t.Parallel()
-	rc, err := NewReplace([]byte(replaceTestDataSuffixAsString))
+	ti := NewTestStringInjector()
+	rc, err := NewReplace([]byte(replaceTestData), ti)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	if rc.From != "fromvalue" {
-		t.Errorf("incorrect from value parsing (expected fromvalue and take %s)", rc.From)
+	if !rc.From.MatchString("fromvalue") {
+		t.Errorf("fromvalue is not match")
 		return
 	}
 	if rc.To != "tovalue" {
 		t.Errorf("incorrect to value parsing (expected tovalue and take %s)", rc.To)
 		return
 	}
-	if rc.Suffix == nil {
-		t.Errorf("suffix is nil")
+	if rc.Pattern.MatchString("path/to/main/file.go") != true {
+		t.Errorf("path/to/main/file.go is *.go file")
 		return
 	}
-	if len(rc.Suffix) != 1 {
-		t.Errorf("suffix shoult have one element (and it have %d)", len(rc.Suffix))
-		return
-	}
-	if rc.Suffix[0] != "suffix1" {
-		t.Errorf("incorrect from Suffix[0] (expected suffix1 and take %s)", rc.Suffix[0])
-		return
-	}
-}
-
-func TestReplaceSuffixAsArray(t *testing.T) {
-	t.Parallel()
-	rc, err := NewReplace([]byte(replaceTestDataSuffixAsArray))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	if rc.From != "fromvalue" {
-		t.Errorf("incorrect from value parsing (expected fromvalue and take %s)", rc.From)
-		return
-	}
-	if rc.To != "tovalue" {
-		t.Errorf("incorrect to value parsing (expected tovalue and take %s)", rc.To)
-		return
-	}
-	if rc.Suffix == nil {
-		t.Errorf("suffix is nil")
-		return
-	}
-	if len(rc.Suffix) != 2 {
-		t.Errorf("suffix shoult have two elements (and it have %d)", len(rc.Suffix))
-		return
-	}
-	if rc.Suffix[0] != "suffix1" {
-		t.Errorf("incorrect from Suffix[0] (expected suffix1 and take %s)", rc.Suffix[0])
-		return
-	}
-	if rc.Suffix[1] != "suffix2" {
-		t.Errorf("incorrect from Suffix[1] (expected suffix2 and take %s)", rc.Suffix[1])
+	if rc.Pattern.MatchString("path/to/main/file.css") == true {
+		t.Errorf("path/to/main/file.css is not *.go file")
 		return
 	}
 }
 
 func TestNewReplaces(t *testing.T) {
 	t.Parallel()
-	replaces, err := NewReplaces([]byte(replacesTestArray))
+	ti := NewTestStringInjector()
+	replaces, err := NewReplaces([]byte(replacesTestArray), ti)
 	if err != nil {
 		t.Error(err)
 		return
@@ -82,31 +46,36 @@ func TestNewReplaces(t *testing.T) {
 		t.Errorf("replaces array should contains 2 elements (and it have %d)", len(replaces))
 		return
 	}
-	if replaces[0].From != "fromvalue" {
-		t.Errorf("incorrect from value parsing (expected fromvalue and take %s)", replaces[0].From)
+	if !replaces[0].From.MatchString("fromvalue") {
+		t.Errorf("fromvalue is not match")
 		return
 	}
 	if replaces[0].To != "tovalue" {
 		t.Errorf("incorrect to value parsing (expected tovalue and take %s)", replaces[0].To)
 		return
 	}
-	if replaces[0].Suffix == nil {
-		t.Errorf("suffix is nil")
+	if replaces[0].Pattern.MatchString("path/to/main/file.go") != true {
+		t.Errorf("path/to/main/file.go is *.go file")
 		return
 	}
-	if len(replaces[0].Suffix) != 1 {
-		t.Errorf("suffix shoult have one element (and it have %d)", len(replaces[0].Suffix))
+	if replaces[0].Pattern.MatchString("path/to/main/file.css") == true {
+		t.Errorf("path/to/main/file.css is not *.go file")
 		return
 	}
-	if replaces[0].Suffix[0] != "suffix1" {
-		t.Errorf("incorrect from Suffix[0] (expected suffix1 and take %s)", replaces[0].Suffix[0])
+	if replaces[1].Pattern.MatchString("path/to/main/file.go") == true {
+		t.Errorf("path/to/main/file.go is not *.css file")
+		return
+	}
+	if replaces[1].Pattern.MatchString("path/to/main/file.css") != true {
+		t.Errorf("path/to/main/file.css is *.css file")
 		return
 	}
 }
 
 func TestNewReplacesFail(t *testing.T) {
 	t.Parallel()
-	_, err := NewReplaces([]byte(replacesTestFailArray))
+	ti := NewTestStringInjector()
+	_, err := NewReplaces([]byte(replacesTestFailArray), ti)
 	if err.Error() != "NewReplaces array  must contains replace objects only" {
 		t.Error(err)
 		return
