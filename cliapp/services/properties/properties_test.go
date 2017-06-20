@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
@@ -18,8 +19,9 @@ const (
 
 func TestProperties(t *testing.T) {
 	var (
-		value string
-		err   error
+		value            string
+		err              error
+		propertiesResult common.PropertiesResult
 	)
 	t.Parallel()
 	output := new(bytes.Buffer)
@@ -46,7 +48,11 @@ func TestProperties(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if value, err = deps.Properties.Get("my.config.key"); err != nil {
+	if propertiesResult, err = deps.Properties.Get(mapp.RootFilespace()); err != nil {
+		t.Error(err)
+		return
+	}
+	if value, err = propertiesResult.Get("my.config.key"); err != nil {
 		t.Error(err)
 		return
 	}
@@ -58,8 +64,9 @@ func TestProperties(t *testing.T) {
 
 func TestGenerateProperty(t *testing.T) {
 	var (
-		value string
-		err   error
+		value            string
+		err              error
+		propertiesResult common.PropertiesResult
 	)
 	t.Parallel()
 	output := new(bytes.Buffer)
@@ -86,7 +93,11 @@ func TestGenerateProperty(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if value, err = deps.Properties.Get("my.config.key"); err != nil {
+	if propertiesResult, err = deps.Properties.Get(mapp.RootFilespace()); err != nil {
+		t.Error(err)
+		return
+	}
+	if value, err = propertiesResult.Get("my.config.key"); err != nil {
 		t.Error(err)
 		return
 	}
@@ -112,8 +123,9 @@ func TestGenerateProperty(t *testing.T) {
 
 func TestPropertiesReadFromFile(t *testing.T) {
 	var (
-		value string
-		err   error
+		value            string
+		err              error
+		propertiesResult common.PropertiesResult
 	)
 	t.Parallel()
 	output := new(bytes.Buffer)
@@ -144,7 +156,11 @@ func TestPropertiesReadFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if value, err = deps.Properties.Get("my.config.key"); err != nil {
+	if propertiesResult, err = deps.Properties.Get(mapp.RootFilespace()); err != nil {
+		t.Error(err)
+		return
+	}
+	if value, err = propertiesResult.Get("my.config.key"); err != nil {
 		t.Error(err)
 		return
 	}
