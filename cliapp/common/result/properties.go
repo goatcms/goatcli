@@ -1,4 +1,4 @@
-package properties
+package result
 
 import (
 	"fmt"
@@ -6,14 +6,14 @@ import (
 	"strings"
 )
 
-// Properties is a properties set
-type Properties struct {
+// PropertiesResult is a properties set
+type PropertiesResult struct {
 	data map[string]string
 }
 
-// NewProperties parse json and return Property array instance
-func NewProperties(data map[string]string) *Properties {
-	return &Properties{
+// NewPropertiesResult parse json and return Property array instance
+func NewPropertiesResult(data map[string]string) *PropertiesResult {
+	return &PropertiesResult{
 		data: data,
 	}
 }
@@ -21,7 +21,7 @@ func NewProperties(data map[string]string) *Properties {
 // InjectToString inject properties values to string
 // All property key is start with '{{' and end with '}}'
 // For example: "property value: {{my_property_key}}"
-func (properties *Properties) InjectToString(s string) (out string, err error) {
+func (result *PropertiesResult) InjectToString(s string) (out string, err error) {
 	pattern := regexp.MustCompile("\\{\\{[A-Za-z_]+\\}\\}")
 	indexes := pattern.FindAllStringIndex(s, -1)
 	parts := make([]string, len(indexes)*2+1)
@@ -29,7 +29,7 @@ func (properties *Properties) InjectToString(s string) (out string, err error) {
 	for i, index := range indexes {
 		parts[i*2] = s[last:index[0]]
 		key := s[index[0]+2 : index[1]-2]
-		value, ok := properties.data[key]
+		value, ok := result.data[key]
 		if !ok {
 			return "", fmt.Errorf("unknow property for '%s' key", key)
 		}
@@ -38,4 +38,13 @@ func (properties *Properties) InjectToString(s string) (out string, err error) {
 	}
 	parts[len(indexes)*2] = s[last:len(s)]
 	return strings.Join(parts, ""), nil
+}
+
+// Get return property value for key
+func (result *PropertiesResult) Get(key string) (string, error) {
+	value, ok := result.data[key]
+	if !ok {
+		return "", fmt.Errorf("Unknow property value for %s key", key)
+	}
+	return value, nil
 }
