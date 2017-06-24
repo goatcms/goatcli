@@ -16,7 +16,6 @@ type Repositories interface {
 
 // Cloner clone an repository
 type Cloner interface {
-	Clone(repository, rev string, destfs filesystem.Filespace, replaces []*config.Replace) (err error)
 }
 
 // Project provide project api

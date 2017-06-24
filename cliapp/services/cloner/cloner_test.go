@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/goatcms/goatcli/cliapp/common/config"
+	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
@@ -17,9 +17,10 @@ func TestModulesFromFile(t *testing.T) {
 	var (
 		destFS              filesystem.Filespace
 		repositoriesService services.Repositories
-		replaces            []*config.Replace
+		propertiesResult    *result.PropertiesResult
 		err                 error
 		mapp                app.App
+		content             []byte
 		deps                struct {
 			Cloner services.Cloner `dependency:"ClonerService"`
 		}
@@ -34,8 +35,7 @@ func TestModulesFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	replaces = buildReplaces()
-	//propertiesResult = buildPropertiesResult()
+	propertiesResult = buildPropertiesResult()
 	// new app
 	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
 		Input:  gio.NewInput(strings.NewReader("  \t\n")),
@@ -56,7 +56,7 @@ func TestModulesFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = deps.Cloner.Clone("https://github.com/goatcms/mockup", "master", destFS, replaces); err != nil {
+	if err = deps.Cloner.Clone("https://github.com/goatcms/mockup", "master", destFS, propertiesResult); err != nil {
 		t.Error(err)
 		return
 	}
@@ -70,6 +70,14 @@ func TestModulesFromFile(t *testing.T) {
 	}
 	if !destFS.IsFile("docs/main.md") {
 		t.Errorf("Clone should clone docs/main.md")
+		return
+	}
+	if content, err = destFS.ReadFile("docs/main.md"); err != nil {
+		t.Error(err)
+		return
+	}
+	if string(content) != "Description your my_project" {
+		t.Errorf("should inject project name to {{project_name}} (result is: %s)", content)
 		return
 	}
 }

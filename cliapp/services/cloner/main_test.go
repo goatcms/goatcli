@@ -1,10 +1,6 @@
 package cloner
 
 import (
-	"regexp"
-
-	"github.com/goatcms/goatcli/cliapp/common"
-	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/mockups"
 	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/services"
@@ -17,6 +13,9 @@ func buildSrcFilespace() (fs filesystem.Filespace, err error) {
 		return nil, err
 	}
 	if err = fs.WriteFile(".git/noCopyGitDir.md", []byte(""), 0766); err != nil {
+		return nil, err
+	}
+	if err = fs.WriteFile(".goat/replace.json", []byte(`[{"from":"\{\{project_name\}\}", "to":"{{property_project_name}}", "pattern":"[A-Za-z0-9_/]*.(md|txt)"}]`), 0766); err != nil {
 		return nil, err
 	}
 	if err = fs.WriteFile("main.go", []byte("package main\n/*Main package*/\n"), 0766); err != nil {
@@ -35,18 +34,10 @@ func buildDestFilespace() (fs filesystem.Filespace, err error) {
 	return memfs.NewFilespace()
 }
 
-func buildPropertiesResult() common.PropertiesResult {
-	return result.NewPropertiesResult(map[string]string{})
-}
-
-func buildReplaces() []*config.Replace {
-	return []*config.Replace{
-		&config.Replace{
-			From:    regexp.MustCompile("\\{\\{project_name\\}\\}"),
-			To:      "my_project_name",
-			Pattern: regexp.MustCompile("(.+\\.md)|(.+\\.go)"),
-		},
-	}
+func buildPropertiesResult() *result.PropertiesResult {
+	return result.NewPropertiesResult(map[string]string{
+		"property_project_name": "my_project",
+	})
 }
 
 func buildRepositoriesService() (services.Repositories, error) {

@@ -7,6 +7,11 @@ import (
 	"github.com/goatcms/goatcore/filesystem"
 )
 
+const (
+	// ReplaceConfigFile is path to replaces config file
+	ReplaceConfigFile = "./.goat/replace.json"
+)
+
 func copy(sourcefs, destfs filesystem.Filespace, subPath string, replaces []*config.Replace) error {
 	for i, replace := range replaces {
 		if replace.Pattern.MatchString(subPath) {

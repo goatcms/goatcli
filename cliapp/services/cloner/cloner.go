@@ -3,6 +3,7 @@ package cloner
 import (
 	"os"
 
+	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/dependency"
@@ -28,10 +29,22 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 }
 
 // Clone clone repository
-func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace, replaces []*config.Replace) (err error) {
-	var sourcefs filesystem.Filespace
+func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace, si common.StringInjector) (err error) {
+	var (
+		sourcefs filesystem.Filespace
+		replaces []*config.Replace
+	)
 	if sourcefs, err = cloner.deps.Repositories.Filespace(repository, rev); err != nil {
 		return err
+	}
+	if sourcefs.IsFile(ReplaceConfigFile) {
+		var json []byte
+		if json, err = sourcefs.ReadFile(ReplaceConfigFile); err != nil {
+			return err
+		}
+		if replaces, err = config.NewReplaces(json, si); err != nil {
+			return err
+		}
 	}
 	cleanRequired := false
 	loop := fsloop.NewLoop(&fsloop.LoopData{
