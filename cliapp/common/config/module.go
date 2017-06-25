@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/buger/jsonparser"
-	"github.com/goatcms/goatcli/cliapp/common"
 )
 
 // Module is configuration container for one module
@@ -16,11 +15,10 @@ type Module struct {
 	TestURL   string
 	TestRev   string
 	TestDir   string
-	Replaces  []*Replace
 }
 
 // NewModules parse json and return Modules array instance
-func NewModules(json []byte, si common.StringInjector) ([]*Module, error) {
+func NewModules(json []byte) ([]*Module, error) {
 	var de error = nil
 	modules := []*Module{}
 	if _, err := jsonparser.ArrayEach(json, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
@@ -31,7 +29,7 @@ func NewModules(json []byte, si common.StringInjector) ([]*Module, error) {
 			de = fmt.Errorf("NewModules array must contains replace objects only")
 			return
 		}
-		m, err2 := NewModule(value, si)
+		m, err2 := NewModule(value)
 		if err2 != nil {
 			de = err2
 			return
@@ -47,7 +45,7 @@ func NewModules(json []byte, si common.StringInjector) ([]*Module, error) {
 }
 
 // NewModule parse module data and return module object instance
-func NewModule(json []byte, si common.StringInjector) (*Module, error) {
+func NewModule(json []byte) (*Module, error) {
 	var err error
 	c := &Module{}
 	if err = jsonparser.ObjectEach(json, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
@@ -83,14 +81,6 @@ func NewModule(json []byte, si common.StringInjector) (*Module, error) {
 				return fmt.Errorf("expected string and take %s", value)
 			}
 			c.TestDir = string(value)
-		case "replaces":
-			if dataType != jsonparser.Array {
-				return fmt.Errorf("expected replaces array and take %s", value)
-			}
-			c.Replaces, err = NewReplaces(value, si)
-			if err != nil {
-				return err
-			}
 		case "comment":
 			// ignore all comments
 		default:

@@ -16,8 +16,7 @@ const (
 
 func TestModules(t *testing.T) {
 	t.Parallel()
-	ti := NewTestStringInjector()
-	c, err := NewModules([]byte(moduleTestDataModules), ti)
+	c, err := NewModules([]byte(moduleTestDataModules))
 	if err != nil {
 		t.Error(err)
 		return
@@ -38,8 +37,7 @@ func TestModules(t *testing.T) {
 
 func TestModuleSuffixAsString(t *testing.T) {
 	t.Parallel()
-	ti := NewTestStringInjector()
-	c, err := NewModule([]byte(moduleTestDataEmptyReplaces), ti)
+	c, err := NewModule([]byte(moduleTestDataEmptyReplaces))
 	if err != nil {
 		t.Error(err)
 		return
@@ -70,28 +68,9 @@ func TestModuleSuffixAsString(t *testing.T) {
 	}
 }
 
-func TestModuleReplaces(t *testing.T) {
-	t.Parallel()
-	ti := NewTestStringInjector()
-	c, err := NewModule([]byte(moduleTestDataReplaces), ti)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	if c.Replaces == nil {
-		t.Errorf("replaces musn't be nil (and it is %v)", c.Replaces)
-		return
-	}
-	if len(c.Replaces) != 1 {
-		t.Errorf("replaces must contains 1 element (and length of array is %v)", len(c.Replaces))
-		return
-	}
-}
-
 func TestModuleSrcCloneFail(t *testing.T) {
 	t.Parallel()
-	ti := NewTestStringInjector()
-	_, err := NewModule([]byte(moduleTestDataSrcCloneFail), ti)
+	_, err := NewModule([]byte(moduleTestDataSrcCloneFail))
 	if err.Error() != "expected string and take [\"srcCloneValue\"]" {
 		t.Error(err)
 		return
@@ -100,8 +79,7 @@ func TestModuleSrcCloneFail(t *testing.T) {
 
 func TestModuleSrcRevFail(t *testing.T) {
 	t.Parallel()
-	ti := NewTestStringInjector()
-	_, err := NewModule([]byte(moduleTestDataSrcRevFail), ti)
+	_, err := NewModule([]byte(moduleTestDataSrcRevFail))
 	if err.Error() != "expected string and take [\"srcRevValue\"]" {
 		t.Error(err)
 		return
@@ -110,8 +88,7 @@ func TestModuleSrcRevFail(t *testing.T) {
 
 func TestModuleSrcDirFail(t *testing.T) {
 	t.Parallel()
-	ti := NewTestStringInjector()
-	_, err := NewModule([]byte(moduleTestDataSrcDirFail), ti)
+	_, err := NewModule([]byte(moduleTestDataSrcDirFail))
 	if err.Error() != "expected string and take [\"srcDirValue\"]" {
 		t.Error(err)
 		return
@@ -120,8 +97,7 @@ func TestModuleSrcDirFail(t *testing.T) {
 
 func TestModuleTestCloneFail(t *testing.T) {
 	t.Parallel()
-	ti := NewTestStringInjector()
-	_, err := NewModule([]byte(moduleTestDataTestCloneFail), ti)
+	_, err := NewModule([]byte(moduleTestDataTestCloneFail))
 	if err.Error() != "expected string and take [\"testCloneValue\"]" {
 		t.Error(err)
 		return
@@ -130,8 +106,7 @@ func TestModuleTestCloneFail(t *testing.T) {
 
 func TestModuleTestRevFail(t *testing.T) {
 	t.Parallel()
-	ti := NewTestStringInjector()
-	_, err := NewModule([]byte(moduleTestDataTestRevFail), ti)
+	_, err := NewModule([]byte(moduleTestDataTestRevFail))
 	if err.Error() != "expected string and take [\"testRevValue\"]" {
 		t.Error(err)
 		return
@@ -140,8 +115,7 @@ func TestModuleTestRevFail(t *testing.T) {
 
 func TestModuleTestDirFail(t *testing.T) {
 	t.Parallel()
-	ti := NewTestStringInjector()
-	_, err := NewModule([]byte(moduleTestDataTestDirFail), ti)
+	_, err := NewModule([]byte(moduleTestDataTestDirFail))
 	if err.Error() != "expected string and take [\"testDirValue\"]" {
 		t.Error(err)
 		return

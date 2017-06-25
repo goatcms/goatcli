@@ -7,6 +7,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
@@ -48,6 +49,10 @@ func TestModulesFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	if err = modules.RegisterDependencies(mapp.DependencyProvider()); err != nil {
+		t.Error(err)
+		return
+	}
 	if err = RegisterDependencies(mapp.DependencyProvider()); err != nil {
 		t.Error(err)
 		return
@@ -70,6 +75,10 @@ func TestModulesFromFile(t *testing.T) {
 	}
 	if !destFS.IsFile("docs/main.md") {
 		t.Errorf("Clone should clone docs/main.md")
+		return
+	}
+	if !destFS.IsFile("module/module.go") {
+		t.Errorf("Clone should clone module/module.go")
 		return
 	}
 	if content, err = destFS.ReadFile("docs/main.md"); err != nil {

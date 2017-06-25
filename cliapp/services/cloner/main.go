@@ -9,7 +9,7 @@ import (
 
 const (
 	// ReplaceConfigFile is path to replaces config file
-	ReplaceConfigFile = "./.goat/replace.json"
+	ReplaceConfigFile = ".goat/replaces.def.json"
 )
 
 func copy(sourcefs, destfs filesystem.Filespace, subPath string, replaces []*config.Replace) error {

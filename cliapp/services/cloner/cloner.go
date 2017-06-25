@@ -15,6 +15,7 @@ import (
 type Cloner struct {
 	deps struct {
 		Repositories services.Repositories `dependency:"RepositoriesService"`
+		Modules      services.Modules      `dependency:"ModulesService"`
 	}
 }
 
@@ -33,9 +34,25 @@ func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace,
 	var (
 		sourcefs filesystem.Filespace
 		replaces []*config.Replace
+		modules  []*config.Module
 	)
 	if sourcefs, err = cloner.deps.Repositories.Filespace(repository, rev); err != nil {
 		return err
+	}
+	if modules, err = cloner.deps.Modules.ReadDefFromFS(sourcefs); err != nil {
+		return err
+	}
+	for _, module := range modules {
+		var modulefs filesystem.Filespace
+		if err = destfs.MkdirAll(module.SourceDir, 0766); err != nil {
+			return err
+		}
+		if modulefs, err = destfs.Filespace(module.SourceDir); err != nil {
+			return err
+		}
+		if err = cloner.Clone(module.SourceURL, module.SourceRev, modulefs, si); err != nil {
+			return err
+		}
 	}
 	if sourcefs.IsFile(ReplaceConfigFile) {
 		var json []byte

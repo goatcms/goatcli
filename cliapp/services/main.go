@@ -1,11 +1,8 @@
 package services
 
 import (
-	"html/template"
-
 	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
-	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 )
 
@@ -16,28 +13,18 @@ type Repositories interface {
 
 // Cloner clone an repository
 type Cloner interface {
-}
-
-// Project provide project api
-type Project interface {
-	Filespace() (filesystem.Filespace, error)
+	Clone(repository, rev string, destfs filesystem.Filespace, si common.StringInjector) (err error)
 }
 
 // Properties provide project properties data
 type Properties interface {
-	Get(fs filesystem.Filespace) (common.PropertiesResult, error)
+	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Property, error)
+	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
+	FillData(def []*config.Property, data map[string]string, defaultData map[string]string) (bool, error)
+	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
 }
 
+// Modules proccess and return modules
 type Modules interface {
-	Init() error
-	ModulesConfig() ([]*config.Module, error)
+	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Module, error)
 }
-
-type Template interface {
-	AddFunc(name string, f interface{}) error
-	View(layoutName, viewName string, eventScope app.EventScope) (*template.Template, error)
-}
-
-type Compiler interface{}
-type FileCompiler interface{}
-type TemplateCompiler interface{}

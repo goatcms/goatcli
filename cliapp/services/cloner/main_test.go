@@ -8,6 +8,11 @@ import (
 	"github.com/goatcms/goatcore/filesystem/filespace/memfs"
 )
 
+const (
+	testReplacesJSON = `[{"from":"\{\{project_name\}\}", "to":"{{property_project_name}}", "pattern":"[A-Za-z0-9_/]*.(md|txt)"}]`
+	testModulesJSON  = `[{"srcClone":"https://github.com/goatcms/mockupmodule", "srcRev":"master", "srcDir":"module"}]`
+)
+
 func buildSrcFilespace() (fs filesystem.Filespace, err error) {
 	if fs, err = memfs.NewFilespace(); err != nil {
 		return nil, err
@@ -15,7 +20,10 @@ func buildSrcFilespace() (fs filesystem.Filespace, err error) {
 	if err = fs.WriteFile(".git/noCopyGitDir.md", []byte(""), 0766); err != nil {
 		return nil, err
 	}
-	if err = fs.WriteFile(".goat/replace.json", []byte(`[{"from":"\{\{project_name\}\}", "to":"{{property_project_name}}", "pattern":"[A-Za-z0-9_/]*.(md|txt)"}]`), 0766); err != nil {
+	if err = fs.WriteFile(".goat/replaces.def.json", []byte(testReplacesJSON), 0766); err != nil {
+		return nil, err
+	}
+	if err = fs.WriteFile(".goat/modules.def.json", []byte(testModulesJSON), 0766); err != nil {
 		return nil, err
 	}
 	if err = fs.WriteFile("main.go", []byte("package main\n/*Main package*/\n"), 0766); err != nil {
@@ -25,6 +33,19 @@ func buildSrcFilespace() (fs filesystem.Filespace, err error) {
 		return nil, err
 	}
 	if err = fs.WriteFile("docs/main.txt", []byte("No proccess this file {{project_name}}"), 0766); err != nil {
+		return nil, err
+	}
+	return fs, nil
+}
+
+func buildModuleSrcFilespace() (fs filesystem.Filespace, err error) {
+	if fs, err = memfs.NewFilespace(); err != nil {
+		return nil, err
+	}
+	if err = fs.WriteFile(".git/noCopyGitDir.md", []byte(""), 0766); err != nil {
+		return nil, err
+	}
+	if err = fs.WriteFile("module.go", []byte("package main\n/*Main package*/\n"), 0766); err != nil {
 		return nil, err
 	}
 	return fs, nil
@@ -42,13 +63,18 @@ func buildPropertiesResult() *result.PropertiesResult {
 
 func buildRepositoriesService() (services.Repositories, error) {
 	var (
-		fs  filesystem.Filespace
-		err error
+		moduleFS filesystem.Filespace
+		rootFS   filesystem.Filespace
+		err      error
 	)
-	if fs, err = buildSrcFilespace(); err != nil {
+	if rootFS, err = buildSrcFilespace(); err != nil {
+		return nil, err
+	}
+	if moduleFS, err = buildModuleSrcFilespace(); err != nil {
 		return nil, err
 	}
 	return mockups.NewRepositoriesService(map[string]filesystem.Filespace{
-		"https://github.com/goatcms/mockup!master": fs,
+		"https://github.com/goatcms/mockup!master":       rootFS,
+		"https://github.com/goatcms/mockupmodule!master": moduleFS,
 	}), nil
 }

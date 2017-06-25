@@ -1,16 +1,6 @@
-package modules
+package compiler
 
-import (
-	"bytes"
-	"strings"
-	"testing"
-
-	"github.com/goatcms/goatcli/cliapp/common/config"
-	"github.com/goatcms/goatcli/cliapp/services"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
-)
-
+/*
 const (
 	testModulesDefJSON = `[{"srcClone":"srcCloneValue", "srcRev":"srcRevValue", "srcDir":"srcDirValue", "testClone":"testCloneValue", "testRev":"testRevValue", "testDir":"testDirValue"}]`
 )
@@ -28,7 +18,7 @@ func TestModulesFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(ModulesDefPath, []byte(testModulesDefJSON), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(modulesDefPath, []byte(testModulesDefJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -44,13 +34,17 @@ func TestModulesFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	var modules []*config.Module
-	if modules, err = deps.Modules.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if err = deps.Modules.Init(); err != nil {
 		t.Error(err)
 		return
 	}
-	if len(modules) != 1 {
-		t.Errorf("expected one module and take %d", len(modules))
+	var modulesConfig []*config.Module
+	if modulesConfig, err = deps.Modules.ModulesConfig(); err != nil {
+		t.Error(err)
+		return
+	}
+	if len(modulesConfig) != 1 {
+		t.Errorf("expected one module and take %d", len(modulesConfig))
 		return
 	}
 }
@@ -80,13 +74,18 @@ func TestModulesDefaultEmpty(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	var modules []*config.Module
-	if modules, err = deps.Modules.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if err = deps.Modules.Init(); err != nil {
 		t.Error(err)
 		return
 	}
-	if len(modules) != 0 {
-		t.Errorf("expected no modules and take %d", len(modules))
+	var modulesConfig []*config.Module
+	if modulesConfig, err = deps.Modules.ModulesConfig(); err != nil {
+		t.Error(err)
+		return
+	}
+	if len(modulesConfig) != 0 {
+		t.Errorf("expected no modules and take %d", len(modulesConfig))
 		return
 	}
 }
+*/
