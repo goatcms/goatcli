@@ -3,8 +3,8 @@ package config
 import "testing"
 
 const (
-	propertyTestData      = `{"key":"key", "type":"alnum", "min":1, "max":22}`
-	propertyTestArrayData = `[{"key":"key", "type":"alnum", "min":1, "max":22},{}]`
+	propertyTestData      = `{"key":"key", "prompt":"insert new value", "type":"alnum", "min":1, "max":22}`
+	propertyTestArrayData = `[{"key":"key", "prompt":"insert new value", "type":"alnum", "min":1, "max":22},{}]`
 )
 
 func TestProperty(t *testing.T) {
@@ -20,6 +20,10 @@ func TestProperty(t *testing.T) {
 	}
 	if property.Type != "alnum" {
 		t.Errorf("incorrect type value parsing (expected alnum and take %s)", property.Type)
+		return
+	}
+	if property.Prompt != "insert new value" {
+		t.Errorf("incorrect prompt value (expected 'insert new value' text and take '%s')", property.Prompt)
 		return
 	}
 	if property.Min != 1 {

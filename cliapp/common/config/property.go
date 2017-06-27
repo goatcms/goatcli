@@ -10,10 +10,11 @@ import (
 
 // Property is a record describe one property
 type Property struct {
-	Key  string
-	Type string
-	Min  int
-	Max  int
+	Key    string
+	Type   string
+	Prompt string
+	Min    int
+	Max    int
 }
 
 // NewProperties parse json and return Property array instance
@@ -73,6 +74,11 @@ func NewProperty(json []byte) (*Property, error) {
 			if p.Max, err = totype.StringToInt(string(value)); err != nil {
 				return err
 			}
+		case "prompt":
+			if dataType != jsonparser.String {
+				return fmt.Errorf("property.prompt expected string and take %s", value)
+			}
+			p.Prompt = string(value)
 		case "comment":
 			// ignore all comments
 		default:

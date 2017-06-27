@@ -28,3 +28,10 @@ type Properties interface {
 type Modules interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Module, error)
 }
+
+// Data provide data api
+type Data interface {
+	ReadDefFromFS(fs filesystem.Filespace) ([]*config.DataSet, error)
+	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
+	ConsoleReadData(def *config.DataSet) (map[string]string, error)
+}
