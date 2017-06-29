@@ -31,7 +31,7 @@ func BuilderFactory(dp dependency.Provider) (interface{}, error) {
 	if err = dp.InjectTo(&instance.deps); err != nil {
 		return nil, err
 	}
-	return services.Data(instance), nil
+	return services.DataService(instance), nil
 }
 
 // ReadDefFromFS return data definition

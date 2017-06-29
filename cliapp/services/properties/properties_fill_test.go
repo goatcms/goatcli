@@ -10,7 +10,7 @@ import (
 func TestPropertieFillDataFile(t *testing.T) {
 	var (
 		err       error
-		service   services.Properties
+		service   services.PropertiesService
 		data      = map[string]string{}
 		isChanged bool
 	)
@@ -52,7 +52,7 @@ func TestPropertieFillDataFile(t *testing.T) {
 func TestPropertieFillDataFileOmnit(t *testing.T) {
 	var (
 		err     error
-		service services.Properties
+		service services.PropertiesService
 		data    = map[string]string{
 			"key1": "value1",
 			"key2": "value2",

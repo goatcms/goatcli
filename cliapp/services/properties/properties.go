@@ -30,7 +30,7 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 	if err = dp.InjectTo(&instance.deps); err != nil {
 		return nil, err
 	}
-	return services.Properties(instance), nil
+	return services.PropertiesService(instance), nil
 }
 
 // ReadDefFromFS read properties definitions from filespace

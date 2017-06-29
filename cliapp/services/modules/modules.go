@@ -33,7 +33,7 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 	if err = dp.InjectTo(&instance.deps); err != nil {
 		return nil, err
 	}
-	return services.Modules(instance), nil
+	return services.ModulesService(instance), nil
 }
 
 // ReadDefFromFS read modules definitions from filesystem

@@ -16,7 +16,7 @@ const (
 	testPropFullDataJSON = `{"key1":"value1","key2":"value2"}`
 )
 
-func buildMockupApp(input string) (p services.Properties, mapp app.App, err error) {
+func buildMockupApp(input string) (p services.PropertiesService, mapp app.App, err error) {
 	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
 		Input:  gio.NewInput(strings.NewReader(input)),
 		Output: gio.NewOutput(new(bytes.Buffer)),
@@ -27,7 +27,7 @@ func buildMockupApp(input string) (p services.Properties, mapp app.App, err erro
 		return nil, nil, err
 	}
 	var deps struct {
-		Properties services.Properties `dependency:"PropertiesService"`
+		Properties services.PropertiesService `dependency:"PropertiesService"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		return nil, nil, err

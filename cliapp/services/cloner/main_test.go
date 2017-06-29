@@ -61,7 +61,7 @@ func buildPropertiesResult() *result.PropertiesResult {
 	})
 }
 
-func buildRepositoriesService() (services.Repositories, error) {
+func buildRepositoriesService() (services.RepositoriesService, error) {
 	var (
 		moduleFS filesystem.Filespace
 		rootFS   filesystem.Filespace

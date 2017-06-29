@@ -28,7 +28,7 @@ func TestDataSets(t *testing.T) {
 	}
 }
 
-func TesttestDataSet(t *testing.T) {
+func TestDataSet(t *testing.T) {
 	t.Parallel()
 	c, err := NewDataSet([]byte(testDataSetJSON))
 	if err != nil {

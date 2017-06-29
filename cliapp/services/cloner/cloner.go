@@ -14,8 +14,8 @@ import (
 // Cloner clone and process new project
 type Cloner struct {
 	deps struct {
-		Repositories services.Repositories `dependency:"RepositoriesService"`
-		Modules      services.Modules      `dependency:"ModulesService"`
+		Repositories services.RepositoriesService `dependency:"RepositoriesService"`
+		Modules      services.ModulesService      `dependency:"ModulesService"`
 	}
 }
 
@@ -26,7 +26,7 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 	if err = dp.InjectTo(&instance.deps); err != nil {
 		return nil, err
 	}
-	return services.Cloner(instance), nil
+	return services.ClonerService(instance), nil
 }
 
 // Clone clone repository

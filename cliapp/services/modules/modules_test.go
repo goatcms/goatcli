@@ -38,7 +38,7 @@ func TestModulesFromFile(t *testing.T) {
 	}
 	// test
 	var deps struct {
-		Modules services.Modules `dependency:"ModulesService"`
+		Modules services.ModulesService `dependency:"ModulesService"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)
@@ -74,7 +74,7 @@ func TestModulesDefaultEmpty(t *testing.T) {
 	}
 	// test
 	var deps struct {
-		Modules services.Modules `dependency:"ModulesService"`
+		Modules services.ModulesService `dependency:"ModulesService"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)

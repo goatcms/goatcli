@@ -25,7 +25,7 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 	if err := dp.InjectTo(&r.deps); err != nil {
 		return nil, err
 	}
-	return services.Repositories(r), nil
+	return services.RepositoriesService(r), nil
 }
 
 // Filespace return filespace for repository

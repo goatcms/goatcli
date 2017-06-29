@@ -50,7 +50,7 @@ func TestDataFromFile(t *testing.T) {
 	}
 	// test
 	var deps struct {
-		Data services.Data `dependency:"DataService"`
+		Data services.DataService `dependency:"DataService"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)

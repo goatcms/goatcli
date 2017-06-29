@@ -17,13 +17,13 @@ import (
 func TestModulesFromFile(t *testing.T) {
 	var (
 		destFS              filesystem.Filespace
-		repositoriesService services.Repositories
+		repositoriesService services.RepositoriesService
 		propertiesResult    *result.PropertiesResult
 		err                 error
 		mapp                app.App
 		content             []byte
 		deps                struct {
-			Cloner services.Cloner `dependency:"ClonerService"`
+			Cloner services.ClonerService `dependency:"ClonerService"`
 		}
 	)
 	t.Parallel()

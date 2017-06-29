@@ -11,7 +11,7 @@ import (
 func TestPropertiesReadDefFromDataFile(t *testing.T) {
 	var (
 		err     error
-		service services.Properties
+		service services.PropertiesService
 		mapp    app.App
 		def     []*config.Property
 	)
@@ -45,7 +45,7 @@ func TestPropertiesReadDefFromDataFile(t *testing.T) {
 func TestPropertiesReaDefFromNoFile(t *testing.T) {
 	var (
 		err     error
-		service services.Properties
+		service services.PropertiesService
 		mapp    app.App
 		def     []*config.Property
 	)

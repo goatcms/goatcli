@@ -13,7 +13,7 @@ type RepositoriesService struct {
 }
 
 // NewRepositoriesService create mockup for services.Repositories
-func NewRepositoriesService(data map[string]filesystem.Filespace) services.Repositories {
+func NewRepositoriesService(data map[string]filesystem.Filespace) services.RepositoriesService {
 	return RepositoriesService{
 		data: data,
 	}
