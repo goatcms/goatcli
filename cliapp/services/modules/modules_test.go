@@ -28,7 +28,7 @@ func TestModulesFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(modulesDefPath, []byte(testModulesDefJSON), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(ModulesDefPath, []byte(testModulesDefJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -38,23 +38,19 @@ func TestModulesFromFile(t *testing.T) {
 	}
 	// test
 	var deps struct {
-		Modules services.Modules `dependency:"ModulesService"`
+		Modules services.ModulesService `dependency:"ModulesService"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = deps.Modules.Init(); err != nil {
+	var modules []*config.Module
+	if modules, err = deps.Modules.ReadDefFromFS(mapp.RootFilespace()); err != nil {
 		t.Error(err)
 		return
 	}
-	var modulesConfig []*config.Module
-	if modulesConfig, err = deps.Modules.ModulesConfig(); err != nil {
-		t.Error(err)
-		return
-	}
-	if len(modulesConfig) != 1 {
-		t.Errorf("expected one module and take %d", len(modulesConfig))
+	if len(modules) != 1 {
+		t.Errorf("expected one module and take %d", len(modules))
 		return
 	}
 }
@@ -78,23 +74,19 @@ func TestModulesDefaultEmpty(t *testing.T) {
 	}
 	// test
 	var deps struct {
-		Modules services.Modules `dependency:"ModulesService"`
+		Modules services.ModulesService `dependency:"ModulesService"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = deps.Modules.Init(); err != nil {
+	var modules []*config.Module
+	if modules, err = deps.Modules.ReadDefFromFS(mapp.RootFilespace()); err != nil {
 		t.Error(err)
 		return
 	}
-	var modulesConfig []*config.Module
-	if modulesConfig, err = deps.Modules.ModulesConfig(); err != nil {
-		t.Error(err)
-		return
-	}
-	if len(modulesConfig) != 0 {
-		t.Errorf("expected no modules and take %d", len(modulesConfig))
+	if len(modules) != 0 {
+		t.Errorf("expected no modules and take %d", len(modules))
 		return
 	}
 }

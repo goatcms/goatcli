@@ -68,23 +68,6 @@ func TestModuleSuffixAsString(t *testing.T) {
 	}
 }
 
-func TestModuleReplaces(t *testing.T) {
-	t.Parallel()
-	c, err := NewModule([]byte(moduleTestDataReplaces))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	if c.Replaces == nil {
-		t.Errorf("replaces musn't be nil (and it is %v)", c.Replaces)
-		return
-	}
-	if len(c.Replaces) != 1 {
-		t.Errorf("replaces must contains 1 element (and length of array is %v)", len(c.Replaces))
-		return
-	}
-}
-
 func TestModuleSrcCloneFail(t *testing.T) {
 	t.Parallel()
 	_, err := NewModule([]byte(moduleTestDataSrcCloneFail))

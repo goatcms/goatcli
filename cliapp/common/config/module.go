@@ -15,7 +15,6 @@ type Module struct {
 	TestURL   string
 	TestRev   string
 	TestDir   string
-	Replaces  []*Replace
 }
 
 // NewModules parse json and return Modules array instance
@@ -82,14 +81,6 @@ func NewModule(json []byte) (*Module, error) {
 				return fmt.Errorf("expected string and take %s", value)
 			}
 			c.TestDir = string(value)
-		case "replaces":
-			if dataType != jsonparser.Array {
-				return fmt.Errorf("expected replaces array and take %s", value)
-			}
-			c.Replaces, err = NewReplaces(value)
-			if err != nil {
-				return err
-			}
 		case "comment":
 			// ignore all comments
 		default:
