@@ -1,6 +1,7 @@
 package template
 
 import (
+	"github.com/goatcms/goatcli/cliapp/services/template/tfunc"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/dependency"
 )
@@ -15,5 +16,5 @@ func RegisterDependencies(dp dependency.Provider) error {
 
 // InitDependencies is init callback to inject dependencies inside module
 func InitDependencies(a app.App) (err error) {
-	return RegisterFunctions(a.DependencyProvider())
+	return tfunc.RegisterFunctions(a.DependencyProvider())
 }

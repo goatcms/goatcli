@@ -47,8 +47,9 @@ func (s *Service) AddFunc(name string, f interface{}) error {
 
 // Build create new template based on layout
 func (s *Service) Build(fs filesystem.Filespace) (services.TemplateExecutor, error) {
-	provider := ghprovider.NewProvider(fs, LayoutPath, ViewPath, FileExtension, s.funcs)
 	s.isUsed = true
+	// prepare executor
+	provider := ghprovider.NewProvider(fs, LayoutPath, ViewPath, FileExtension, s.funcs)
 	return &Executor{
 		provider: provider,
 	}, nil

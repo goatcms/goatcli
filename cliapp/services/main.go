@@ -8,6 +8,11 @@ import (
 	"github.com/goatcms/goatcore/filesystem"
 )
 
+const (
+	// StremDataSeparator separates data in streams
+	StremDataSeparator = ":"
+)
+
 // RepositoriesService provide git repository access
 type RepositoriesService interface {
 	Filespace(repository, rev string) (filesystem.Filespace, error)
@@ -47,4 +52,9 @@ type TemplateService interface {
 // TemplateExecutor render data
 type TemplateExecutor interface {
 	Execute(layoutName, TemplatePath string, wr io.Writer, data interface{}) error
+}
+
+// BuilderService build project structure
+type BuilderService interface {
+	Build(fs filesystem.Filespace, buildConfigs []*config.Build, data map[string]string) error
 }
