@@ -38,9 +38,6 @@ func Run(a app.App) (err error) {
 		deps.Output.Printf("Unknown url to clone")
 		return nil
 	}
-	if deps.RepositoryRev == "" {
-		deps.RepositoryRev = "master"
-	}
 	if deps.DestPath == "" {
 		deps.Output.Printf("Unknown destination path")
 		return nil

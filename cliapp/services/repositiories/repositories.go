@@ -67,8 +67,8 @@ func (repos *Repositories) clone(url, rev, destPath string) error {
 	}
 	if err = tree.Checkout(&git.CheckoutOptions{
 		Force:  true,
-		Branch: plumbing.ReferenceName(rev),
-	}); err != nil {
+		Branch: plumbing.ReferenceName("refs/heads/" + rev),
+	}); err != nil && err != git.NoErrAlreadyUpToDate {
 		return err
 	}
 	return nil
@@ -82,7 +82,7 @@ func (repos *Repositories) update(destPath string) error {
 	if repo, err = git.PlainOpen(destPath); err != nil {
 		return err
 	}
-	if err = repo.Pull(&git.PullOptions{}); err != nil {
+	if err = repo.Pull(&git.PullOptions{}); err != nil && err != git.NoErrAlreadyUpToDate {
 		return err
 	}
 	return nil
