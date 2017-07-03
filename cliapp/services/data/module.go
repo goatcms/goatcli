@@ -1,4 +1,4 @@
-package compiler
+package data
 
 import "github.com/goatcms/goatcore/dependency"
 
