@@ -79,7 +79,6 @@ func TestBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	//TODO: Add generation files and test it
 	if !fs.IsFile("out/file.txt") {
 		t.Errorf("out/file.txt is not exist")
 		return
