@@ -6,13 +6,12 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp"
 	"github.com/goatcms/goatcore/app/bootstrap"
-	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/app/modules/terminal"
 )
 
 func main() {
 	errLogs := log.New(os.Stderr, "", 0)
-	app, err := goatapp.NewGoatApp("GoatCLI", "0.0.1", "./")
+	app, err := cliapp.NewCLIApp(cliapp.AppName, cliapp.AppVersion)
 	if err != nil {
 		errLogs.Println(err)
 		return
@@ -22,7 +21,7 @@ func main() {
 		errLogs.Println(err)
 		return
 	}
-	if err = bootstrap.Register(cmdapp.NewModule()); err != nil {
+	if err = bootstrap.Register(cliapp.NewModule()); err != nil {
 		errLogs.Println(err)
 		return
 	}
