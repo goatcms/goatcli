@@ -17,7 +17,7 @@ func Run(a app.App) (err error) {
 			RepositoryRev string `argument:"?rev"`
 			DestPath      string `argument:"?$3"`
 
-			RootFilespace filesystem.Filespace `filesystem:"system"`
+			RootFilespace filesystem.Filespace `filespace:"root"`
 
 			RepositoriesService services.RepositoriesService `dependency:"RepositoriesService"`
 			PropertiesService   services.PropertiesService   `dependency:"PropertiesService"`
@@ -58,10 +58,13 @@ func Run(a app.App) (err error) {
 		deps.Output.Printf("%s", err)
 		return nil
 	}
+	if err = deps.RootFilespace.MkdirAll(deps.DestPath, 0766); err != nil {
+		return err
+	}
+	if destfs, err = deps.RootFilespace.Filespace(deps.DestPath); err != nil {
+		return err
+	}
 	if isChanged {
-		if destfs, err = deps.RootFilespace.Filespace(deps.DestPath); err != nil {
-			return err
-		}
 		if err = deps.PropertiesService.WriteDataToFS(destfs, propertiesData); err != nil {
 			deps.Output.Printf("%s", err)
 			return nil
