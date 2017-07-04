@@ -40,8 +40,8 @@ func replaceLoop(subPath string, content []byte, replaces []*config.Replace) []b
 
 func streamCopy(sourcefs, destfs filesystem.Filespace, subPath string) error {
 	var (
-		reader io.Reader
-		writer io.Writer
+		reader filesystem.Reader
+		writer filesystem.Writer
 		err    error
 	)
 	if reader, err = sourcefs.Reader(subPath); err != nil {
@@ -51,6 +51,9 @@ func streamCopy(sourcefs, destfs filesystem.Filespace, subPath string) error {
 		return err
 	}
 	if _, err = io.Copy(writer, reader); err != nil {
+		return err
+	}
+	if err = writer.Close(); err != nil {
 		return err
 	}
 	return nil
