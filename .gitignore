@@ -11,3 +11,5 @@ debug
 
 .idea/
 *.log
+
+configuration.json
