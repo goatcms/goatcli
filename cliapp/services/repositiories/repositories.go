@@ -11,6 +11,7 @@ import (
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/disk"
+	"github.com/goatcms/goatcore/filesystem/filespace/diskfs"
 )
 
 // Repositories provide access to repositories
@@ -48,7 +49,7 @@ func (repos *Repositories) Filespace(repoURL, rev string) (filesystem.Filespace,
 			return nil, err
 		}
 	}
-	return nil, nil
+	return diskfs.NewFilespace(destPath)
 }
 
 func (repos *Repositories) clone(url, rev, destPath string) error {
