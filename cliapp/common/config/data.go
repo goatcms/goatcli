@@ -9,7 +9,7 @@ import (
 
 // DataSet is data definition structure
 type DataSet struct {
-	Name       string
+	TypeName   string
 	Properties []*Property
 }
 
@@ -44,11 +44,11 @@ func NewDataSet(json []byte) (dataSet *DataSet, err error) {
 	dataSet = &DataSet{}
 	if err = jsonparser.ObjectEach(json, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
 		switch strings.ToLower(string(key)) {
-		case "name":
+		case "type":
 			if dataType != jsonparser.String {
-				return fmt.Errorf("DataSet.Name expected string and take %s", value)
+				return fmt.Errorf("DataSet.TypeName expected string and take %s", value)
 			}
-			dataSet.Name = string(value)
+			dataSet.TypeName = string(value)
 		case "properties":
 			if dataType != jsonparser.Array {
 				return fmt.Errorf("DataSet.Properties expected array and take %s", value)

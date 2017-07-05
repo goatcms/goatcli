@@ -1,13 +1,16 @@
 package data
 
 import (
+	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/varutil/plainmap"
 )
 
 var (
@@ -52,7 +55,7 @@ func (d *Data) ReadDefFromFS(fs filesystem.Filespace) (dataSets []*config.DataSe
 // ReadDataFromFS return data
 func (d *Data) ReadDataFromFS(fs filesystem.Filespace) (data map[string]string, err error) {
 	data = make(map[string]string)
-	if err = readDataFromFS(data, fs, ".goat/data/"); err != nil {
+	if err = readDataFromFS(data, fs, BaseDataPath); err != nil {
 		return nil, err
 	}
 	return data, nil
@@ -93,4 +96,25 @@ func (d *Data) ConsoleReadData(def *config.DataSet) (data map[string]string, err
 		}
 	}
 	return data, nil
+}
+
+// WriteDataToFS write data to filespace
+func (d *Data) WriteDataToFS(fs filesystem.Filespace, prefix string, data map[string]string) (err error) {
+	var json string
+	outmap := map[string]string{}
+	path := BaseDataPath + strings.Replace(prefix, ".", "/", -1) + ".json"
+	prefix += "."
+	for key, value := range data {
+		outmap[prefix+key] = value
+	}
+	if json, err = plainmap.PlainStringMapToJSON(outmap); err != nil {
+		return err
+	}
+	if fs.IsExist(path) {
+		return fmt.Errorf("DataService.WriteDataToFS: %s exists", path)
+	}
+	if err = fs.WriteFile(path, []byte(json), 0766); err != nil {
+		return err
+	}
+	return nil
 }

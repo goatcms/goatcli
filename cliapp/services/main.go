@@ -40,6 +40,7 @@ type ModulesService interface {
 type DataService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.DataSet, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
+	WriteDataToFS(fs filesystem.Filespace, prefix string, data map[string]string) error
 	ConsoleReadData(def *config.DataSet) (map[string]string, error)
 }
 

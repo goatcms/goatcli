@@ -11,6 +11,8 @@ import (
 const (
 	// DataDefPath is path to data definitions
 	DataDefPath = ".goat/data.def.json"
+	// BaseDataPath is base directory for data files
+	BaseDataPath = ".goat/data/"
 )
 
 func mergeMap(dest, src map[string]string) (err error) {

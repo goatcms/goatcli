@@ -33,7 +33,7 @@ func TestConsoleRead(t *testing.T) {
 		return
 	}
 	dataSet = &config.DataSet{
-		Name: "UserFixture",
+		TypeName: "UserFixture",
 		Properties: []*config.Property{
 			&config.Property{
 				Key:    "id",

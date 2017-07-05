@@ -1,9 +1,8 @@
 package commands
 
 const (
-	// Clone represent clone command help
-	Clone = "cone clone project adn its modules"
-
-	// DefaultFixtureDir is default path to fixtures directory
-	DefaultFixtureDir = "database/fixtures"
+	// Clone is a clone command help
+	Clone = "[git_url, destination_path, [--rev=rev]] clone project (and modules)"
+	// DataAdd is a data:add command help
+	DataAdd = "[type_name, data_name] add new data set to project scaffolding data"
 )

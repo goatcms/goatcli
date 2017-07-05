@@ -3,6 +3,7 @@ package cliapp
 import (
 	"github.com/goatcms/goatcli/cliapp/commands"
 	"github.com/goatcms/goatcli/cliapp/commands/clonec"
+	"github.com/goatcms/goatcli/cliapp/commands/datac"
 	"github.com/goatcms/goatcli/cliapp/services/builder"
 	"github.com/goatcms/goatcli/cliapp/services/cloner"
 	"github.com/goatcms/goatcli/cliapp/services/data"
@@ -56,9 +57,10 @@ func (m *Module) RegisterDependencies(a app.App) error {
 
 func (m *Module) registerCommands(a app.App) error {
 	commandScope := a.CommandScope()
-	// serve
 	commandScope.Set("help.command.clone", commands.Clone)
 	commandScope.Set("command.clone", clonec.Run)
+	commandScope.Set("help.command.data:add", commands.DataAdd)
+	commandScope.Set("command.data:add", datac.RunAdd)
 	return nil
 }
 

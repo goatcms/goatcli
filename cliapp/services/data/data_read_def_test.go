@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	testDataDefJSON = `[{"name":"data_name", "properties":[{"key":"key", "type":"alnum", "min":1, "max":22}]}]`
+	testDataDefJSON = `[{"type":"data_name", "properties":[{"key":"key", "type":"alnum", "min":1, "max":22}]}]`
 )
 
 func TestDataDefFromFile(t *testing.T) {
