@@ -27,13 +27,13 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 }
 
 // Build project files and directories from data
-func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, data map[string]string) (err error) {
+func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties map[string]string) (err error) {
 	var (
 		templateExecutor services.TemplateExecutor
 		writer           *FSWriter
 		hash             string
 	)
-	hash = varutil.RandString(20, varutil.AlphaNumericBytes)
+	hash = varutil.RandString(30, varutil.AlphaNumericBytes)
 	if templateExecutor, err = s.deps.TemplateService.Build(fs); err != nil {
 		return err
 	}
@@ -46,7 +46,8 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 			Data: data,
 			Hash: hash,
 			Properties: bcontext.PropertieOptions{
-				Build: c.Properties,
+				Project: properties,
+				Build:   c.Properties,
 			},
 		})
 		if err = templateExecutor.Execute(c.Layout, c.View, writer, context); err != nil {
@@ -54,4 +55,19 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 		}
 	}
 	return nil
+}
+
+// ReadDefFromFS return data definition
+func (s *Service) ReadDefFromFS(fs filesystem.Filespace) (builds []*config.Build, err error) {
+	var json []byte
+	if !fs.IsFile(BuildDefPath) {
+		return make([]*config.Build, 0), nil
+	}
+	if json, err = fs.ReadFile(BuildDefPath); err != nil {
+		return nil, err
+	}
+	if builds, err = config.NewBuilds(json); err != nil {
+		return nil, err
+	}
+	return builds, nil
 }

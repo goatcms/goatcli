@@ -75,7 +75,7 @@ func TestBuilder(t *testing.T) {
 		},
 	}
 	fs := mapp.RootFilespace()
-	if err = deps.BuilderService.Build(fs, buildConfig, map[string]string{}); err != nil {
+	if err = deps.BuilderService.Build(fs, buildConfig, map[string]string{}, map[string]string{}); err != nil {
 		t.Error(err)
 		return
 	}

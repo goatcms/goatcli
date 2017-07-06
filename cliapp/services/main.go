@@ -57,5 +57,6 @@ type TemplateExecutor interface {
 
 // BuilderService build project structure
 type BuilderService interface {
-	Build(fs filesystem.Filespace, buildConfigs []*config.Build, data map[string]string) error
+	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Build, error)
+	Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties map[string]string) error
 }
