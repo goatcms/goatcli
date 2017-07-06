@@ -55,6 +55,9 @@ func (d *Data) ReadDefFromFS(fs filesystem.Filespace) (dataSets []*config.DataSe
 // ReadDataFromFS return data
 func (d *Data) ReadDataFromFS(fs filesystem.Filespace) (data map[string]string, err error) {
 	data = make(map[string]string)
+	if !fs.IsDir(BaseDataPath) {
+		return map[string]string{}, nil
+	}
 	if err = readDataFromFS(data, fs, BaseDataPath); err != nil {
 		return nil, err
 	}
