@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
-	"github.com/goatcms/goatcli/cliapp/common/project"
+	"github.com/goatcms/goatcli/cliapp/common/prevents"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
@@ -34,8 +34,8 @@ func RunAdd(a app.App) (err error) {
 	if deps.DataName == "" {
 		return fmt.Errorf("Second argument data name is required")
 	}
-	if !project.IsProjectFilespace(deps.CurrentFS) {
-		return fmt.Errorf("Current directory is not goat project directory")
+	if err = prevents.RequireGoatProject(deps.CurrentFS); err != nil {
+		return err
 	}
 	if defs, err = deps.DataService.ReadDefFromFS(deps.CurrentFS); err != nil {
 		return err
