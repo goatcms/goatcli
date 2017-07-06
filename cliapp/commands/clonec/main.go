@@ -1,6 +1,8 @@
 package clonec
 
 import (
+	"fmt"
+
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/services"
@@ -35,28 +37,22 @@ func Run(a app.App) (err error) {
 		return err
 	}
 	if deps.RepositoryURL == "" {
-		deps.Output.Printf("Unknown url to clone")
-		return nil
+		return fmt.Errorf("First argument repository url is required")
 	}
 	if deps.DestPath == "" {
-		deps.Output.Printf("Unknown destination path")
-		return nil
+		return fmt.Errorf("Second argument destination path is required")
 	}
 	if repofs, err = deps.RepositoriesService.Filespace(deps.RepositoryURL, deps.RepositoryRev); err != nil {
-		deps.Output.Printf("%s", err)
-		return nil
+		return err
 	}
 	if propertiesDef, err = deps.PropertiesService.ReadDefFromFS(repofs); err != nil {
-		deps.Output.Printf("%s", err)
-		return nil
+		return err
 	}
 	if propertiesData, err = deps.PropertiesService.ReadDataFromFS(repofs); err != nil {
-		deps.Output.Printf("%s", err)
-		return nil
+		return err
 	}
 	if isChanged, err = deps.PropertiesService.FillData(propertiesDef, propertiesData, map[string]string{}); err != nil {
-		deps.Output.Printf("%s", err)
-		return nil
+		return err
 	}
 	if err = deps.RootFilespace.MkdirAll(deps.DestPath, 0766); err != nil {
 		return err
@@ -66,14 +62,12 @@ func Run(a app.App) (err error) {
 	}
 	if isChanged {
 		if err = deps.PropertiesService.WriteDataToFS(destfs, propertiesData); err != nil {
-			deps.Output.Printf("%s", err)
-			return nil
+			return err
 		}
 	}
 	propertiesResult := result.NewPropertiesResult(propertiesData)
 	if err = deps.CloneService.Clone(deps.RepositoryURL, deps.RepositoryRev, destfs, propertiesResult); err != nil {
-		deps.Output.Printf("%s", err)
-		return nil
+		return err
 	}
 	deps.Output.Printf("cloned")
 	return nil
