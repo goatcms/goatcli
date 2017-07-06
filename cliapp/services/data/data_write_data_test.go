@@ -40,7 +40,6 @@ func TestWriteDataToFS(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	//TODO: add test
 	datamap := map[string]string{
 		"title":   "Tytuł strony",
 		"content": "Treść strony",
@@ -64,6 +63,10 @@ func TestWriteDataToFS(t *testing.T) {
 	}
 	if resultdata["pages.home.title"] != "Tytuł strony" {
 		t.Errorf("expected pages.home.title equals to 'Tytuł strony' and it is '%s'", resultdata["pages.home.title"])
+		return
+	}
+	if resultdata["pages.home.content"] != "Treść strony" {
+		t.Errorf("expected pages.home.content equals to 'Treść strony' and it is '%s'", resultdata["pages.home.content"])
 		return
 	}
 }
