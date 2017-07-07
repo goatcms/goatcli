@@ -59,6 +59,7 @@ func (m *Module) RegisterDependencies(a app.App) error {
 
 func (m *Module) registerCommands(a app.App) error {
 	commandScope := a.CommandScope()
+	// commands
 	commandScope.Set("help.command.clone", commands.Clone)
 	commandScope.Set("command.clone", clonec.Run)
 	commandScope.Set("help.command.data:add", commands.DataAdd)
@@ -67,6 +68,8 @@ func (m *Module) registerCommands(a app.App) error {
 	commandScope.Set("command.build", buildc.Run)
 	commandScope.Set("help.command.init", commands.Init)
 	commandScope.Set("command.init", initc.Run)
+	// arguments
+	commandScope.Set("help.argument.cwd", commands.CWDArg)
 	return nil
 }
 

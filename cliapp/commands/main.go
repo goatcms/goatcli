@@ -9,4 +9,6 @@ const (
 	Build = "build goat project in current directory"
 	// Init is a init command help
 	Init = "initialize new goat project"
+	// CWDArg is a cwd argument description
+	CWDArg = "set Current Working Dirctory"
 )

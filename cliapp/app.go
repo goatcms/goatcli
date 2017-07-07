@@ -94,11 +94,22 @@ func (capp *CLIApp) initArgsScope() (err error) {
 }
 
 func (capp *CLIApp) initFilespaceScope() (err error) {
-	var currentfs filesystem.Filespace
+	var (
+		currentfs filesystem.Filespace
+		deps      struct {
+			CWD string `argument:"?cwd"`
+		}
+	)
 	if capp.rootFilespace, err = diskfs.NewFilespace(RootPath); err != nil {
 		return err
 	}
-	if currentfs, err = diskfs.NewFilespace(RootPath); err != nil {
+	if err = capp.argsScope.InjectTo(&deps); err != nil {
+		return err
+	}
+	if deps.CWD == "" {
+		deps.CWD = CurrentPath
+	}
+	if currentfs, err = diskfs.NewFilespace(deps.CWD); err != nil {
 		return err
 	}
 	capp.filespaceScope = scope.NewScope(app.FilespaceTagName)
