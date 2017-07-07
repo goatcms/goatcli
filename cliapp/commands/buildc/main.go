@@ -33,6 +33,9 @@ func Run(a app.App) (err error) {
 		return err
 	}
 	// load properties
+	if propertiesDef, err = deps.PropertiesService.ReadDefFromFS(deps.CurrentFS); err != nil {
+		return err
+	}
 	if propertiesData, err = deps.PropertiesService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
