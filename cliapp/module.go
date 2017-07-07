@@ -5,6 +5,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/commands/buildc"
 	"github.com/goatcms/goatcli/cliapp/commands/clonec"
 	"github.com/goatcms/goatcli/cliapp/commands/datac"
+	"github.com/goatcms/goatcli/cliapp/commands/initc"
 	"github.com/goatcms/goatcli/cliapp/services/builder"
 	"github.com/goatcms/goatcli/cliapp/services/cloner"
 	"github.com/goatcms/goatcli/cliapp/services/data"
@@ -64,6 +65,8 @@ func (m *Module) registerCommands(a app.App) error {
 	commandScope.Set("command.data:add", datac.RunAdd)
 	commandScope.Set("help.command.build", commands.Build)
 	commandScope.Set("command.build", buildc.Run)
+	commandScope.Set("help.command.init", commands.Init)
+	commandScope.Set("command.init", initc.Run)
 	return nil
 }
 
