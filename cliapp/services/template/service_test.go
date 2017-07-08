@@ -31,11 +31,11 @@ func TestServiceExecute(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/templates/layouts/default/main.tmpl", []byte(testLayoutContent), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testLayoutContent), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/templates/views/app/main.tmpl", []byte(testTemplateContent), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/build/templates/app/main.tmpl", []byte(testTemplateContent), 0766); err != nil {
 		t.Error(err)
 		return
 	}

@@ -38,11 +38,11 @@ func TestBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/templates/layouts/default/main.tmpl", []byte(testBuilderLayout), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testBuilderLayout), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/templates/views/names/main.tmpl", []byte(testBuilderTemplate), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/build/templates/names/main.tmpl", []byte(testBuilderTemplate), 0766); err != nil {
 		t.Error(err)
 		return
 	}

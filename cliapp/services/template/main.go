@@ -2,9 +2,9 @@ package template
 
 const (
 	// LayoutPath is a path to layout files
-	LayoutPath = ".goat/templates/layouts/{name}/"
+	LayoutPath = ".goat/build/layouts/{name}/"
 	// ViewPath is a path to specifiec view files
-	ViewPath = ".goat/templates/views/{name}/"
+	ViewPath = ".goat/build/templates/{name}/"
 	// FileExtension is a default template file extension
 	FileExtension = ".tmpl"
 )
