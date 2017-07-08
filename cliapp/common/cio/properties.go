@@ -39,10 +39,14 @@ func ReadProperties(baseKey string, in app.Input, out app.Output, def []*config.
 			}
 		}
 		for {
+			prompt := property.Prompt
+			if prompt == "" {
+				prompt = "Insert property"
+			}
 			if defaultValue != "" {
-				out.Printf("Insert property %s [%s]: ", property.Key, defaultValue)
+				out.Printf("(%s) %s [%s]: ", property.Key, prompt, defaultValue)
 			} else {
-				out.Printf("Insert property %s: ", property.Key)
+				out.Printf("(%s) %s: ", property.Key, prompt)
 			}
 			if input, err = in.ReadLine(); err != nil && err != io.EOF {
 				return isChanged, err
