@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -115,6 +116,9 @@ func (d *Data) WriteDataToFS(fs filesystem.Filespace, prefix string, data map[st
 	}
 	if fs.IsExist(path) {
 		return fmt.Errorf("DataService.WriteDataToFS: %s exists", path)
+	}
+	if err = fs.MkdirAll(filepath.Dir(path), 0766); err != nil {
+		return err
 	}
 	if err = fs.WriteFile(path, []byte(json), 0766); err != nil {
 		return err
