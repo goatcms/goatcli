@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/buger/jsonparser"
@@ -10,11 +11,12 @@ import (
 
 // Property is a record describe one property
 type Property struct {
-	Key    string
-	Type   string
-	Prompt string
-	Min    int
-	Max    int
+	Key     string
+	Type    string
+	Prompt  string
+	Min     int
+	Max     int
+	Pattern *regexp.Regexp
 }
 
 // NewProperties parse json and return Property array instance
@@ -72,6 +74,13 @@ func NewProperty(json []byte) (*Property, error) {
 				return fmt.Errorf("expected int and take %s", value)
 			}
 			if p.Max, err = totype.StringToInt(string(value)); err != nil {
+				return err
+			}
+		case "pattern":
+			if dataType != jsonparser.String {
+				return fmt.Errorf("property.pattern expected string and take %s", value)
+			}
+			if p.Pattern, err = regexp.Compile(string(value)); err != nil {
 				return err
 			}
 		case "prompt":

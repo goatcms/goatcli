@@ -72,6 +72,10 @@ func ReadProperties(baseKey string, in app.Input, out app.Output, def []*config.
 				out.Printf("Require alpha-numeric value ('%s' is incorrect)\n", input)
 				continue
 			}
+			if property.Pattern != nil && !property.Pattern.MatchString(input) {
+				out.Printf("Invalid value. Value must be matched by '%s' regexp. ", property.Pattern.String())
+				continue
+			}
 			isChanged = true
 			data[baseKey+property.Key] = input
 			break

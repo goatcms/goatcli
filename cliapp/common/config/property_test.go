@@ -3,13 +3,14 @@ package config
 import "testing"
 
 const (
-	propertyTestData      = `{"key":"key", "prompt":"insert new value", "type":"alnum", "min":1, "max":22}`
-	propertyTestArrayData = `[{"key":"key", "prompt":"insert new value", "type":"alnum", "min":1, "max":22},{}]`
+	testPropertyJSON            = `{"key":"key", "prompt":"insert new value", "type":"alnum", "min":1, "max":22}`
+	testPropertyBoolPatternJSON = `{"key":"key", "pattern": "(yes|no)", "prompt":"insert new value", "type":"line", "min":1, "max":4}`
+	testPropertyArrayJSON       = `[{"key":"key", "prompt":"insert new value", "type":"alnum", "min":1, "max":22},{}]`
 )
 
 func TestProperty(t *testing.T) {
 	t.Parallel()
-	property, err := NewProperty([]byte(propertyTestData))
+	property, err := NewProperty([]byte(testPropertyJSON))
 	if err != nil {
 		t.Error(err)
 		return
@@ -38,7 +39,7 @@ func TestProperty(t *testing.T) {
 
 func TestNewProperties(t *testing.T) {
 	t.Parallel()
-	properties, err := NewProperties([]byte(propertyTestArrayData))
+	properties, err := NewProperties([]byte(testPropertyArrayJSON))
 	if err != nil {
 		t.Error(err)
 		return
@@ -49,6 +50,31 @@ func TestNewProperties(t *testing.T) {
 	}
 	if properties[0].Key != "key" {
 		t.Errorf("incorrect key value parsing (expected key and take %s)", properties[0].Key)
+		return
+	}
+}
+
+func TestNewPatternProperty(t *testing.T) {
+	t.Parallel()
+	property, err := NewProperty([]byte(testPropertyBoolPatternJSON))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if property.Pattern == nil {
+		t.Errorf("pattern is defined (and can not be nil)")
+		return
+	}
+	if property.Pattern.MatchString("yes") != true {
+		t.Errorf("yes is correct pattern value")
+		return
+	}
+	if property.Pattern.MatchString("no") != true {
+		t.Errorf("no is correct pattern value")
+		return
+	}
+	if property.Pattern.MatchString("nil") != false {
+		t.Errorf("nil is incorrect pattern value")
 		return
 	}
 }
