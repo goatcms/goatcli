@@ -57,6 +57,13 @@ func NewDataSet(json []byte) (dataSet *DataSet, err error) {
 			if dataSet.Properties, err = NewProperties(value); err != nil {
 				return err
 			}
+		case "collections":
+			if dataType != jsonparser.Array {
+				return fmt.Errorf("DataSet.Collections expected array and take %s", value)
+			}
+			if dataSet.Collections, err = NewCollections(value); err != nil {
+				return err
+			}
 		case "comment":
 			// ignore all comments
 		default:
