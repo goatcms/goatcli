@@ -73,7 +73,7 @@ func ReadProperties(baseKey string, in app.Input, out app.Output, def []*config.
 				continue
 			}
 			if property.Pattern != nil && !property.Pattern.MatchString(input) {
-				out.Printf("Invalid value. Value must be matched by '%s' regexp. ", property.Pattern.String())
+				out.Printf("Invalid value. Value must be matched by '%s' regexp\n", property.Pattern.String())
 				continue
 			}
 			isChanged = true
