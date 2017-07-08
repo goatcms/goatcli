@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/goatcms/goatcli/cliapp/common/cio"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
@@ -67,37 +68,9 @@ func (d *Data) ReadDataFromFS(fs filesystem.Filespace) (data map[string]string, 
 
 // ConsoleReadData create new data from Filespace
 func (d *Data) ConsoleReadData(def *config.DataSet) (data map[string]string, err error) {
-	var line string
 	data = make(map[string]string)
-	for _, property := range def.Properties {
-		for {
-			d.deps.Output.Printf("%s: ", property.Prompt)
-			if line, err = d.deps.Input.ReadLine(); err != nil {
-				return nil, err
-			}
-			if len(line) > property.Max {
-				d.deps.Output.Printf("Max value length is %d (value length is %d)\n", property.Max, len(line))
-				continue
-			}
-			if len(line) < property.Min {
-				d.deps.Output.Printf("Min value length is %d (value length is %d)\n", property.Min, len(line))
-				continue
-			}
-			if property.Type == "numeric" && !numericReg.MatchString(line) {
-				d.deps.Output.Printf("Require numeric value\n")
-				continue
-			}
-			if property.Type == "alpha" && !alphaReg.MatchString(line) {
-				d.deps.Output.Printf("Require alpha-numeric value\n")
-				continue
-			}
-			if property.Type == "alnum" && !alnumReg.MatchString(line) {
-				d.deps.Output.Printf("Require alpha-numeric value\n")
-				continue
-			}
-			data[property.Key] = line
-			break
-		}
+	if _, err = cio.ReadDataSet("", d.deps.Input, d.deps.Output, def, data); err != nil {
+		return nil, err
 	}
 	return data, nil
 }

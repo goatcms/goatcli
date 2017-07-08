@@ -1,16 +1,12 @@
 package properties
 
 import (
-	"fmt"
-	"io"
-	"strings"
-
+	"github.com/goatcms/goatcli/cliapp/common/cio"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
-	"github.com/goatcms/goatcore/varutil"
 	"github.com/goatcms/goatcore/varutil/plainmap"
 )
 
@@ -65,53 +61,7 @@ func (p *Properties) ReadDataFromFS(fs filesystem.Filespace) (data map[string]st
 
 // FillData read lost properties data to curent data map
 func (p *Properties) FillData(def []*config.Property, data map[string]string, defaultData map[string]string) (isChanged bool, err error) {
-	var (
-		ok           bool
-		defaultValue string
-		input        string
-	)
-	for _, property := range def {
-		if _, ok = data[property.Key]; ok {
-			continue
-		}
-		if defaultValue, ok = data[property.Key]; !ok {
-			switch strings.ToLower(property.Type) {
-			case "numeric":
-				defaultValue = varutil.RandString(property.Max, varutil.NumericBytes)
-			case "alpha":
-				defaultValue = varutil.RandString(property.Max, varutil.AlphaBytes)
-			case "alnum":
-				defaultValue = varutil.RandString(property.Max, varutil.AlphaNumericBytes)
-			case "strong":
-				defaultValue = varutil.RandString(property.Max, varutil.StrongBytes)
-			default:
-				return isChanged, fmt.Errorf("wrong property type %s (for property %s)", property.Type, property.Key)
-			}
-		}
-		for {
-			p.deps.Output.Printf("Insert property %s [%s]: ", property.Key, defaultValue)
-			if input, err = p.deps.Input.ReadLine(); err != nil && err != io.EOF {
-				return isChanged, err
-			}
-			if input == "" {
-				isChanged = true
-				data[property.Key] = defaultValue
-				break
-			}
-			if len(input) < property.Min {
-				p.deps.Output.Printf("Value is too short. Minimum length of the property value is %d characters.\n", property.Min)
-				continue
-			}
-			if len(input) > property.Max {
-				p.deps.Output.Printf("Value is too long. Maximum length of the property value is %d characters.\n", property.Max)
-				continue
-			}
-			isChanged = true
-			data[property.Key] = input
-			break
-		}
-	}
-	return isChanged, nil
+	return cio.ReadProperties("", p.deps.Input, p.deps.Output, def, data, defaultData)
 }
 
 // WriteDataToFS write properties data to fs file

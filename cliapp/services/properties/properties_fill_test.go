@@ -19,19 +19,20 @@ func TestPropertieFillDataFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if isChanged, err = service.FillData([]*config.Property{
+	propertiesDef := []*config.Property{
 		&config.Property{
 			Key:  "key1",
-			Type: "alnum",
+			Type: "line",
 			Min:  1,
 			Max:  22,
 		},
 		&config.Property{
 			Key:  "key2",
-			Type: "alnum",
+			Type: "line",
 			Min:  1,
 			Max:  22,
-		}}, data, map[string]string{}); err != nil {
+		}}
+	if isChanged, err = service.FillData(propertiesDef, data, map[string]string{}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -40,11 +41,11 @@ func TestPropertieFillDataFile(t *testing.T) {
 		return
 	}
 	if data["key1"] != "my_insert_value1" {
-		t.Errorf("incorrect key1 value")
+		t.Errorf("expect key1 value equals to my_insert_value1 and it is '%s'", data["key1"])
 		return
 	}
 	if data["key2"] != "my_insert_value2" {
-		t.Errorf("incorrect key2 value")
+		t.Errorf("expect key2 value equals to my_insert_value2 and it is '%s'", data["key2"])
 		return
 	}
 }

@@ -9,8 +9,9 @@ import (
 
 // DataSet is data definition structure
 type DataSet struct {
-	TypeName   string
-	Properties []*Property
+	TypeName    string
+	Properties  []*Property
+	Collections []*Collection
 }
 
 // NewDataSets parse json and return DataSet array instance
