@@ -39,6 +39,12 @@ func BuilderFactory(dp dependency.Provider) (interface{}, error) {
 	return services.DataService(instance), nil
 }
 
+// HasDataFromFS return true if storage data by prefix
+func (d *Data) HasDataFromFS(fs filesystem.Filespace, prefix string) bool {
+	path := BaseDataPath + strings.Replace(prefix, ".", "/", -1) + ".json"
+	return fs.IsExist(path)
+}
+
 // ReadDefFromFS return data definition
 func (d *Data) ReadDefFromFS(fs filesystem.Filespace) (dataSets []*config.DataSet, err error) {
 	var json []byte

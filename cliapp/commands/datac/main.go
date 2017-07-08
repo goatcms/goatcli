@@ -29,13 +29,17 @@ func RunAdd(a app.App) (err error) {
 		return err
 	}
 	if deps.TypeName == "" {
-		return fmt.Errorf("First argument type name is required")
+		return fmt.Errorf("First argument type is required")
 	}
 	if deps.DataName == "" {
-		return fmt.Errorf("Second argument data name is required")
+		return fmt.Errorf("Second argument name is required")
 	}
 	if err = prevents.RequireGoatProject(deps.CurrentFS); err != nil {
 		return err
+	}
+	prefix := deps.TypeName + "." + deps.DataName
+	if deps.DataService.HasDataFromFS(deps.CurrentFS, prefix) {
+		return fmt.Errorf("Data exists")
 	}
 	if defs, err = deps.DataService.ReadDefFromFS(deps.CurrentFS); err != nil {
 		return err
@@ -52,7 +56,6 @@ func RunAdd(a app.App) (err error) {
 	if datamap, err = deps.DataService.ConsoleReadData(def); err != nil {
 		return err
 	}
-	prefix := deps.TypeName + "." + deps.DataName
 	if err = deps.DataService.WriteDataToFS(deps.CurrentFS, prefix, datamap); err != nil {
 		return err
 	}

@@ -38,6 +38,7 @@ type ModulesService interface {
 
 // DataService provide data api
 type DataService interface {
+	HasDataFromFS(fs filesystem.Filespace, prefix string) bool
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.DataSet, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
 	WriteDataToFS(fs filesystem.Filespace, prefix string, data map[string]string) error
