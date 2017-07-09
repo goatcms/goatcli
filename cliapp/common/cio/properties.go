@@ -51,7 +51,7 @@ func ReadProperties(baseKey string, in app.Input, out app.Output, def []*config.
 			if input, err = in.ReadLine(); err != nil && err != io.EOF {
 				return isChanged, err
 			}
-			if input == "" {
+			if input == "" && defaultValue != "" {
 				isChanged = true
 				data[property.Key] = defaultValue
 				break
