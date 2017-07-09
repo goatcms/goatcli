@@ -4,7 +4,7 @@ package bcontext
 type BuildContext struct {
 	From, To    string
 	Out         *Out
-	Data        *Data
+	Data        map[string]string
 	Filesystem  *Filesystem
 	Propertsies PropertieOptions
 }
@@ -18,9 +18,7 @@ func NewBuildContext(options *Options) *BuildContext {
 			hash:       options.Hash,
 			isFileOpen: false,
 		},
-		Data: &Data{
-			data: options.Data,
-		},
+		Data: options.Data,
 		Filesystem: &Filesystem{
 			fs: options.FS,
 		},
