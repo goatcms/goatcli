@@ -16,3 +16,8 @@ func (f *Filesystem) IsFile(path string) bool {
 func (f *Filesystem) IsDir(path string) bool {
 	return f.fs.IsDir(path)
 }
+
+// IsExist check if node exists
+func (f *Filesystem) IsExist(path string) bool {
+	return f.fs.IsExist(path)
+}
