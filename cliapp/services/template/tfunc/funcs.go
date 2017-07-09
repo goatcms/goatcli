@@ -1,6 +1,8 @@
 package tfunc
 
 import (
+	"strings"
+
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/dependency"
 )
@@ -13,8 +15,11 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	if err = di.InjectTo(&deps); err != nil {
 		return err
 	}
-	//deps.TemplateService.AddFunc("IsFile", IsFile)
-	//deps.TemplateService.AddFunc("ISDir", IsDir)
-	//deps.TemplateService.AddFunc("IsExist", IsExist)
+	deps.TemplateService.AddFunc("join", strings.Join)
+	deps.TemplateService.AddFunc("hasPrefix", strings.HasPrefix)
+	deps.TemplateService.AddFunc("hasSuffix", strings.HasSuffix)
+	deps.TemplateService.AddFunc("regexp", Regexp)
+	deps.TemplateService.AddFunc("strainMap", StrainMap)
+	deps.TemplateService.AddFunc("keys", Keys)
 	return nil
 }
