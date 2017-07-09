@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	testBuildDefJSON = `[{"from":"fromv","to":"tov","layout":"layoutv","view":"viewv", "properties":{"key1":"value1"}}]`
+	testBuildDefJSON = `[{"from":"fromv","to":"tov","layout":"layoutv","template":"templatev", "properties":{"key1":"value1"}}]`
 )
 
 func TestDataDefFromFile(t *testing.T) {

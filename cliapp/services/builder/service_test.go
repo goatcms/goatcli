@@ -68,10 +68,10 @@ func TestBuilder(t *testing.T) {
 	}
 	buildConfig := []*config.Build{
 		&config.Build{
-			From:   "ignore",
-			To:     "ignore",
-			View:   "names",
-			Layout: "default",
+			From:     "ignore",
+			To:       "ignore",
+			Template: "names",
+			Layout:   "default",
 		},
 	}
 	fs := mapp.RootFilespace()

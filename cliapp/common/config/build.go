@@ -13,7 +13,7 @@ type Build struct {
 	From       string
 	To         string
 	Layout     string
-	View       string
+	Template   string
 	Properties map[string]string
 }
 
@@ -63,11 +63,11 @@ func NewBuild(json []byte) (build *Build, err error) {
 				return fmt.Errorf("Builder.Layout expected string and take %s", value)
 			}
 			build.Layout = string(value)
-		case "view":
+		case "template":
 			if dataType != jsonparser.String {
 				return fmt.Errorf("Builder.view expected string and take %s", value)
 			}
-			build.View = string(value)
+			build.Template = string(value)
 		case "properties":
 			if dataType != jsonparser.Object {
 				return fmt.Errorf("DataSet.Properties expected map and take %s", value)

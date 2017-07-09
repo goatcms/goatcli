@@ -50,7 +50,7 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 				Build:   c.Properties,
 			},
 		})
-		if err = templateExecutor.Execute(c.Layout, c.View, writer, context); err != nil {
+		if err = templateExecutor.Execute(c.Layout, c.Template, writer, context); err != nil {
 			return err
 		}
 	}

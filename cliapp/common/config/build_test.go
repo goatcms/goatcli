@@ -3,8 +3,8 @@ package config
 import "testing"
 
 const (
-	testBuildJSON  = `{"from":"fromv","to":"tov","layout":"layoutv","view":"viewv", "properties":{"key1":"value1"}}`
-	testBuildsJSON = `[{"from":"fromv","to":"tov","layout":"layoutv","view":"viewv", "properties":{"key1":"value1"}}]`
+	testBuildJSON  = `{"from":"fromv","to":"tov","layout":"layoutv","template":"templatev", "properties":{"key1":"value1"}}`
+	testBuildsJSON = `[{"from":"fromv","to":"tov","layout":"layoutv","template":"templatev", "properties":{"key1":"value1"}}]`
 )
 
 func TestBuilds(t *testing.T) {
@@ -30,8 +30,8 @@ func TestBuilds(t *testing.T) {
 		t.Errorf("wrong Layout value (expected layout and take %s)", c[0].Layout)
 		return
 	}
-	if c[0].View != "viewv" {
-		t.Errorf("wrong View value (expected viewv and take %s)", c[0].From)
+	if c[0].Template != "templatev" {
+		t.Errorf("wrong Template value (expected templatev and take %s)", c[0].Template)
 		return
 	}
 	if len(c[0].Properties) != 1 {
@@ -59,8 +59,8 @@ func TestBuild(t *testing.T) {
 		t.Errorf("wrong Layout value (expected layout and take %s)", c.Layout)
 		return
 	}
-	if c.View != "viewv" {
-		t.Errorf("wrong View value (expected viewv and take %s)", c.From)
+	if c.Template != "templatev" {
+		t.Errorf("wrong Template value (expected templatev and take %s)", c.Template)
 		return
 	}
 	if len(c.Properties) != 1 {
