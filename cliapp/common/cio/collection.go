@@ -12,7 +12,13 @@ import (
 func ReadCollections(baseKey string, in app.Input, out app.Output, def []*config.Collection, data map[string]string) (isChanged bool, err error) {
 	var isCollChanged bool
 	for _, coll := range def {
-		if isCollChanged, err = ReadCollection(baseKey, in, out, coll, data); err != nil {
+		var subKey string
+		if coll.Key == "" {
+			subKey = baseKey
+		} else {
+			subKey = baseKey + coll.Key + "."
+		}
+		if isCollChanged, err = ReadCollection(subKey, in, out, coll, data); err != nil {
 			return isChanged, err
 		}
 		isChanged = isChanged || isCollChanged
