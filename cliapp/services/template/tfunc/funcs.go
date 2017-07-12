@@ -32,5 +32,6 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("strainMap", StrainMap)
 	deps.TemplateService.AddFunc("keys", Keys)
 	deps.TemplateService.AddFunc("ctx", NewContext)
+	deps.TemplateService.AddFunc("error", ToError)
 	return nil
 }
