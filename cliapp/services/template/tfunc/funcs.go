@@ -23,6 +23,7 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("lowerFirst", ToLowerFirst)
 	deps.TemplateService.AddFunc("upper", strings.ToUpper)
 	deps.TemplateService.AddFunc("upperFirst", ToUpperFirst)
+	deps.TemplateService.AddFunc("underscore", ToUnderscore)
 	deps.TemplateService.AddFunc("camelcase", ToCamelCase)
 	deps.TemplateService.AddFunc("camelcaself", ToCamelCaseLF)
 	deps.TemplateService.AddFunc("camelcaseuf", ToCamelCaseUF)
