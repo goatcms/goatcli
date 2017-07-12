@@ -2,11 +2,11 @@ package bcontext
 
 // BuildContext contains helpers and context data
 type BuildContext struct {
-	From, To    string
-	Out         *Out
-	Data        map[string]string
-	Filesystem  *Filesystem
-	Propertsies PropertieOptions
+	From, To   string
+	Out        *Out
+	Data       map[string]string
+	Filesystem *Filesystem
+	Properties PropertieOptions
 }
 
 // NewBuildContext create new build context
@@ -22,6 +22,6 @@ func NewBuildContext(options *Options) *BuildContext {
 		Filesystem: &Filesystem{
 			fs: options.FS,
 		},
-		Propertsies: options.Properties,
+		Properties: options.Properties,
 	}
 }
