@@ -6,7 +6,7 @@ import (
 )
 
 // Keys return sub keys for key
-func Keys(prefix string, plainmap map[string]string) (keys []string) {
+func Keys(plainmap map[string]string, prefix string) (keys []string) {
 	m := map[string]bool{}
 	for k := range plainmap {
 		if strings.HasPrefix(k, prefix) {

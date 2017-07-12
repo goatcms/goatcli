@@ -18,8 +18,18 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("join", strings.Join)
 	deps.TemplateService.AddFunc("hasPrefix", strings.HasPrefix)
 	deps.TemplateService.AddFunc("hasSuffix", strings.HasSuffix)
+	deps.TemplateService.AddFunc("hasSuffix", strings.ToLower)
+	deps.TemplateService.AddFunc("lower", strings.ToLower)
+	deps.TemplateService.AddFunc("lowerFirst", ToLowerFirst)
+	deps.TemplateService.AddFunc("upper", strings.ToUpper)
+	deps.TemplateService.AddFunc("upperFirst", ToUpperFirst)
+	deps.TemplateService.AddFunc("camelcase", ToCamelCase)
+	deps.TemplateService.AddFunc("camelcaself", ToCamelCaseLF)
+	deps.TemplateService.AddFunc("camelcaseuf", ToCamelCaseUF)
+	deps.TemplateService.AddFunc("title", strings.ToTitle)
 	deps.TemplateService.AddFunc("regexp", Regexp)
 	deps.TemplateService.AddFunc("strainMap", StrainMap)
 	deps.TemplateService.AddFunc("keys", Keys)
+	deps.TemplateService.AddFunc("ctx", NewContext)
 	return nil
 }

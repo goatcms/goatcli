@@ -16,7 +16,7 @@ func TestKeys(t *testing.T) {
 		"basekey.key4":             "somevalue4",
 		"otherbasekey.key5.subkey": "somevalue5",
 	}
-	k := Keys("basekey.", m)
+	k := Keys(m, "basekey.")
 	if len(k) != 4 {
 		t.Errorf("expected result array contains 4 elements (and take %v)", k)
 		return
