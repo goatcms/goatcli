@@ -15,6 +15,7 @@ type Build struct {
 	Layout     string
 	Template   string
 	Properties map[string]string
+	AfterBuild string
 }
 
 // NewBuilds parse json and return Build array instance
@@ -65,9 +66,14 @@ func NewBuild(json []byte) (build *Build, err error) {
 			build.Layout = string(value)
 		case "template":
 			if dataType != jsonparser.String {
-				return fmt.Errorf("Builder.view expected string and take %s", value)
+				return fmt.Errorf("Builder.Template expected string and take %s", value)
 			}
 			build.Template = string(value)
+		case "afterbuild":
+			if dataType != jsonparser.String {
+				return fmt.Errorf("Builder.AfterBuild expected string and take %s", value)
+			}
+			build.AfterBuild = string(value)
 		case "properties":
 			if dataType != jsonparser.Object {
 				return fmt.Errorf("DataSet.Properties expected map and take %s", value)

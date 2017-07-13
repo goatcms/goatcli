@@ -1,6 +1,9 @@
 package builder
 
 import (
+	"os/exec"
+	"strings"
+
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcli/cliapp/services/builder/bcontext"
@@ -12,6 +15,7 @@ import (
 // Service build structure
 type Service struct {
 	deps struct {
+		CWD             string                   `argument:"?cwd"`
 		TemplateService services.TemplateService `dependency:"TemplateService"`
 	}
 }
@@ -22,6 +26,9 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 	instance := &Service{}
 	if err = dp.InjectTo(&instance.deps); err != nil {
 		return nil, err
+	}
+	if instance.deps.CWD == "" {
+		instance.deps.CWD = "./"
 	}
 	return services.BuilderService(instance), nil
 }
@@ -52,6 +59,14 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 		})
 		if err = templateExecutor.Execute(c.Layout, c.Template, writer, context); err != nil {
 			return err
+		}
+		if c.AfterBuild != "" {
+			command := strings.Replace(c.AfterBuild, "{{argument.cwd}}", s.deps.CWD, -1)
+			args := strings.Split(command, " ")
+			cmd := exec.Command(args[0], args[1:]...)
+			if err = cmd.Run(); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

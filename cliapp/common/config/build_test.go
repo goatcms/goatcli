@@ -3,8 +3,8 @@ package config
 import "testing"
 
 const (
-	testBuildJSON  = `{"from":"fromv","to":"tov","layout":"layoutv","template":"templatev", "properties":{"key1":"value1"}}`
-	testBuildsJSON = `[{"from":"fromv","to":"tov","layout":"layoutv","template":"templatev", "properties":{"key1":"value1"}}]`
+	testBuildJSON  = `{"from":"fromv", "afterBuild":"afterBuildV", "to":"tov","layout":"layoutv","template":"templatev", "properties":{"key1":"value1"}}`
+	testBuildsJSON = `[{"from":"fromv", "afterBuild":"afterBuildV", "to":"tov","layout":"layoutv","template":"templatev", "properties":{"key1":"value1"}}]`
 )
 
 func TestBuilds(t *testing.T) {
@@ -34,6 +34,10 @@ func TestBuilds(t *testing.T) {
 		t.Errorf("wrong Template value (expected templatev and take %s)", c[0].Template)
 		return
 	}
+	if c[0].AfterBuild != "afterBuildV" {
+		t.Errorf("wrong AfterBuild value (expected 'afterBuildV' and take %s)", c[0].AfterBuild)
+		return
+	}
 	if len(c[0].Properties) != 1 {
 		t.Errorf("expected one property")
 		return
@@ -61,6 +65,10 @@ func TestBuild(t *testing.T) {
 	}
 	if c.Template != "templatev" {
 		t.Errorf("wrong Template value (expected templatev and take %s)", c.Template)
+		return
+	}
+	if c.AfterBuild != "afterBuildV" {
+		t.Errorf("wrong AfterBuild value (expected 'afterBuildV' and take %s)", c.AfterBuild)
 		return
 	}
 	if len(c.Properties) != 1 {
