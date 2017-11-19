@@ -5,6 +5,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/varutil"
 )
 
 // RegisterFunctions add default helper functions for templates
@@ -30,6 +31,7 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("title", strings.ToTitle)
 	deps.TemplateService.AddFunc("regexp", Regexp)
 	deps.TemplateService.AddFunc("strainMap", StrainMap)
+	deps.TemplateService.AddFunc("random", varutil.RandString)
 	deps.TemplateService.AddFunc("keys", Keys)
 	deps.TemplateService.AddFunc("ctx", NewContext)
 	deps.TemplateService.AddFunc("error", ToError)
