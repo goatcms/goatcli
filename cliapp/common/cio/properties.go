@@ -19,7 +19,7 @@ func ReadProperties(baseKey string, in app.Input, out app.Output, def []*config.
 		input        string
 	)
 	for _, property := range def {
-		if _, ok = data[property.Key]; ok {
+		if _, ok = data[baseKey+property.Key]; ok {
 			continue
 		}
 		if defaultValue, ok = defaultData[property.Key]; !ok {
