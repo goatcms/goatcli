@@ -17,6 +17,7 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 		return err
 	}
 	deps.TemplateService.AddFunc("join", strings.Join)
+	deps.TemplateService.AddFunc("split", strings.Split)
 	deps.TemplateService.AddFunc("hasPrefix", strings.HasPrefix)
 	deps.TemplateService.AddFunc("hasSuffix", strings.HasSuffix)
 	deps.TemplateService.AddFunc("hasSuffix", strings.ToLower)
@@ -35,5 +36,8 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("keys", Keys)
 	deps.TemplateService.AddFunc("ctx", NewContext)
 	deps.TemplateService.AddFunc("error", ToError)
+	deps.TemplateService.AddFunc("uniqueReduce", UniqueReduce)
+	deps.TemplateService.AddFunc("valuesFor", ValuesFor)
+	deps.TemplateService.AddFunc("findRow", FindRow)
 	return nil
 }
