@@ -32,5 +32,5 @@ func FindRow(prefix, pattern, suffix, expectedValue string, source map[string]st
 		}
 		return result
 	}
-	panic("FindRow: can not find record " + prefix + " " + pattern + " " + suffix + " = " + expectedValue)
+	return ""
 }

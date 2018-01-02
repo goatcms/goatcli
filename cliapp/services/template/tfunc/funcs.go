@@ -39,5 +39,6 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("uniqueReduce", UniqueReduce)
 	deps.TemplateService.AddFunc("valuesFor", ValuesFor)
 	deps.TemplateService.AddFunc("findRow", FindRow)
+	deps.TemplateService.AddFunc("noescape", Noescape)
 	return nil
 }

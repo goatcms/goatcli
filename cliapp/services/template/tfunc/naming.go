@@ -47,10 +47,16 @@ func ToCamelCaseUF(s string) string {
 
 // ToLowerFirst make first letter lower
 func ToLowerFirst(s string) string {
+	if s == "" {
+		return ""
+	}
 	return strings.ToLower(s[:1]) + s[1:]
 }
 
 // ToUpperFirst make first letter upper
 func ToUpperFirst(s string) string {
+	if s == "" {
+		return ""
+	}
 	return strings.ToUpper(s[:1]) + s[1:]
 }

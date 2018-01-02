@@ -45,4 +45,9 @@ func TestFindRow(t *testing.T) {
 		t.Errorf("expeccted key2 for value 'v2' (and result is %v)", result)
 		return
 	}
+	result = FindRow("model.", "^[A-Za-z0-9]+$", ".name", "no_exist_key", soure)
+	if result != "" {
+		t.Errorf("expeccted empty string for value 'no_exist_key' (and result is %v)", result)
+		return
+	}
 }
