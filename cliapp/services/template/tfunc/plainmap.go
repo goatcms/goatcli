@@ -34,3 +34,20 @@ func FindRow(prefix, pattern, suffix, expectedValue string, source map[string]st
 	}
 	return ""
 }
+
+func FindRows(prefix, pattern, suffix, expectedValue string, source map[string]string) (result []string) {
+	var reg *regexp.Regexp
+	result = []string{}
+	reg = regexp.MustCompile(pattern)
+	for key, value := range source {
+		if !strings.HasPrefix(key, prefix) || !strings.HasSuffix(key, suffix) || value != expectedValue {
+			continue
+		}
+		key := key[len(prefix) : len(key)-len(suffix)]
+		if !reg.MatchString(key) {
+			continue
+		}
+		result = append(result, key)
+	}
+	return result
+}

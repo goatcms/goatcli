@@ -51,3 +51,27 @@ func TestFindRow(t *testing.T) {
 		return
 	}
 }
+
+func TestFindRows(t *testing.T) {
+	t.Parallel()
+	var result []string
+	soure := map[string]string{
+		"model.key1.name": "v1",
+		"any.key1.name":   "err",
+		"model.key2.name": "v2",
+		"model.key3.name": "v1",
+	}
+	result = FindRows("model.", "^[A-Za-z0-9]+$", ".name", "v1", soure)
+	if len(result) != 2 {
+		t.Errorf("result should contains 2 elements and it is %v", result)
+		return
+	}
+	if !varutil.IsArrContainStr(result, "key1") {
+		t.Errorf("result should contains 'key1' and it is %v", result)
+		return
+	}
+	if !varutil.IsArrContainStr(result, "key3") {
+		t.Errorf("result should contains 'key3' and it is %v", result)
+		return
+	}
+}
