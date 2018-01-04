@@ -90,7 +90,7 @@ func (d *Data) WriteDataToFS(fs filesystem.Filespace, prefix string, data map[st
 	for key, value := range data {
 		outmap[prefix+key] = value
 	}
-	if json, err = plainmap.PlainStringMapToJSON(outmap); err != nil {
+	if json, err = plainmap.PlainStringMapToFormattedJSON(outmap); err != nil {
 		return err
 	}
 	if fs.IsExist(path) {
