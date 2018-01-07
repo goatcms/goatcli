@@ -39,6 +39,7 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("union", Union)
 	deps.TemplateService.AddFunc("unique", Unique)
 	deps.TemplateService.AddFunc("except", Except)
+	deps.TemplateService.AddFunc("sort", Sort)
 	deps.TemplateService.AddFunc("intersect", Intersect)
 	deps.TemplateService.AddFunc("randomValue", RandomValue)
 	deps.TemplateService.AddFunc("valuesFor", ValuesFor)

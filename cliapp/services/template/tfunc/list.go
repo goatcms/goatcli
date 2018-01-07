@@ -2,6 +2,7 @@ package tfunc
 
 import (
 	"math/rand"
+	"sort"
 
 	"github.com/goatcms/goatcore/varutil"
 )
@@ -67,6 +68,13 @@ func Intersect(base, intersect []string) (result []string) {
 			result = append(result, value)
 		}
 	}
+	return result
+}
+
+// Sort order strings array
+func Sort(base []string) (result []string) {
+	result = append(base)
+	sort.Strings(result)
 	return result
 }
 

@@ -93,6 +93,32 @@ func TestIntersect(t *testing.T) {
 	}
 }
 
+func TestSort(t *testing.T) {
+	t.Parallel()
+	source1 := []string{"v2", "v1", "v4", "v3"}
+	result := Sort(source1)
+	if len(result) != 4 {
+		t.Errorf("expected result array should contains 4 elements (and result is contain %v element)", len(result))
+		return
+	}
+	if result[0] != "v1" {
+		t.Errorf("result[0] shound be equals to 'v1' (and it is %v)", result[0])
+		return
+	}
+	if result[1] != "v2" {
+		t.Errorf("result[0] shound be equals to 'v2' (and it is %v)", result[1])
+		return
+	}
+	if result[2] != "v3" {
+		t.Errorf("result[0] shound be equals to 'v3' (and it is %v)", result[2])
+		return
+	}
+	if result[3] != "v4" {
+		t.Errorf("result[0] shound be equals to 'v4' (and it is %v)", result[3])
+		return
+	}
+}
+
 func TestRandomValue(t *testing.T) {
 	t.Parallel()
 	expectedValues := []string{"v1", "v2", "v2", "v3"}
