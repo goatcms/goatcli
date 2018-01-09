@@ -2,6 +2,7 @@ package tfunc
 
 import (
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -25,6 +26,7 @@ func Keys(plainmap map[string]string, prefix string) (keys []string) {
 		keys[i] = k
 		i++
 	}
+	sort.Strings(keys)
 	return keys
 }
 
