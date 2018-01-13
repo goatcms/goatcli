@@ -49,5 +49,7 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("findRows", FindRows)
 	deps.TemplateService.AddFunc("noescape", Noescape)
 	deps.TemplateService.AddFunc("dict", Dict)
+	deps.TemplateService.AddFunc("sum", Sum)
+	deps.TemplateService.AddFunc("minus", Minus)
 	return nil
 }
