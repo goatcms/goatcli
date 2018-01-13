@@ -16,6 +16,8 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	if err = di.InjectTo(&deps); err != nil {
 		return err
 	}
+	deps.TemplateService.AddFunc("replace", Replace)
+	deps.TemplateService.AddFunc("injectValues", InjectValues)
 	deps.TemplateService.AddFunc("join", strings.Join)
 	deps.TemplateService.AddFunc("split", strings.Split)
 	deps.TemplateService.AddFunc("hasPrefix", strings.HasPrefix)
