@@ -67,7 +67,7 @@ func (p *Properties) FillData(def []*config.Property, data map[string]string, de
 // WriteDataToFS write properties data to fs file
 func (p *Properties) WriteDataToFS(fs filesystem.Filespace, data map[string]string) (err error) {
 	var json string
-	if json, err = plainmap.PlainStringMapToJSON(data); err != nil {
+	if json, err = plainmap.PlainStringMapToFormattedJSON(data); err != nil {
 		return err
 	}
 	if err = fs.WriteFile(".goat/properties.json", []byte(json), 0766); err != nil {
