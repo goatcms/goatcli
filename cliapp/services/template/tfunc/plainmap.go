@@ -51,3 +51,15 @@ func FindRows(prefix, pattern, suffix, expectedValue string, source map[string]s
 	}
 	return result
 }
+
+func SubMap(baseKey, newBaseKey string, source map[string]string) (result map[string]string) {
+	result = map[string]string{}
+	for key, value := range source {
+		if !strings.HasPrefix(key, baseKey) {
+			continue
+		}
+		key := newBaseKey + key[len(baseKey):len(key)]
+		result[key] = value
+	}
+	return result
+}

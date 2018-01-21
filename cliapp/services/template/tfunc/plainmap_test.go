@@ -75,3 +75,28 @@ func TestFindRows(t *testing.T) {
 		return
 	}
 }
+
+func TestSubMap(t *testing.T) {
+	t.Parallel()
+	var result map[string]string
+	soure := map[string]string{
+		"model.key1.name1": "v1",
+		"model.key1.name2": "v2",
+		"any.key1.name":    "err",
+		"model.key2.name":  "v2",
+		"model.key3.name":  "v1",
+	}
+	result = SubMap("model.key1.", "newmap.", soure)
+	if len(result) != 2 {
+		t.Errorf("result should contains 2 elements and it is %v", result)
+		return
+	}
+	if result["newmap.name1"] != "v1" {
+		t.Errorf("newmap.name1 key should contains 'v1' value and it is %v (%v)", result["newmap.name1"], result)
+		return
+	}
+	if result["newmap.name2"] != "v2" {
+		t.Errorf("newmap.name2 key should contains 'v2' value and it is %v (%v)", result["newmap.name2"], result)
+		return
+	}
+}
