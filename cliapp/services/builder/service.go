@@ -78,8 +78,7 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 			cmd.Stdout = &out
 			cmd.Stderr = &out
 			if err = cmd.Run(); err != nil {
-				fmt.Printf("external app fail %v: %v %v\n", args, err, string(out.Bytes()))
-				// ignore errors from external apps (only show it)
+				return fmt.Errorf("external app fail %v: %v %v\n", args, err, string(out.Bytes()))
 			}
 		}
 	}
