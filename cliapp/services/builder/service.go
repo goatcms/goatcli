@@ -1,6 +1,8 @@
 package builder
 
 import (
+	"bytes"
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -61,11 +63,23 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 			return err
 		}
 		if c.AfterBuild != "" {
-			command := strings.Replace(c.AfterBuild, "{{argument.cwd}}", s.deps.CWD, -1)
-			args := strings.Split(command, " ")
+			var (
+				command string
+				out     bytes.Buffer
+				args    []string
+			)
+			command = strings.Replace(c.AfterBuild, "\\\"", "\"", -1)
+			args = strings.Split(command, " ")
+			for i, _ := range args {
+				// replace it here because argument.cwd can contains space (for example in home directory name)
+				args[i] = strings.Replace(args[i], "{{argument.cwd}}", s.deps.CWD, -1)
+			}
 			cmd := exec.Command(args[0], args[1:]...)
+			cmd.Stdout = &out
+			cmd.Stderr = &out
 			if err = cmd.Run(); err != nil {
-				return err
+				fmt.Printf("external app fail %v: %v %v\n", args, err, string(out.Bytes()))
+				// ignore errors from external apps (only show it)
 			}
 		}
 	}
