@@ -49,7 +49,7 @@ func (s *Service) AddFunc(name string, f interface{}) error {
 func (s *Service) Build(fs filesystem.Filespace) (services.TemplateExecutor, error) {
 	s.isUsed = true
 	// prepare executor
-	provider := ghprovider.NewProvider(fs, LayoutPath, ViewPath, FileExtension, s.funcs)
+	provider := ghprovider.NewProvider(fs, HelpersPath, LayoutPath, ViewPath, FileExtension, s.funcs)
 	return &Executor{
 		provider: provider,
 	}, nil
