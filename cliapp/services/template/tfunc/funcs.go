@@ -1,6 +1,7 @@
 package tfunc
 
 import (
+	"math/rand"
 	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/services"
@@ -59,5 +60,8 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("logBuildFail", LogBuildFail)
 	deps.TemplateService.AddFunc("logBuildSuccess", LogBuildSuccess)
 	deps.TemplateService.AddFunc("logWarning", LogWarning)
+	deps.TemplateService.AddFunc("contains", varutil.IsArrContainStr)
+	deps.TemplateService.AddFunc("repeatNTimes", RepeatNTimes)
+	deps.TemplateService.AddFunc("randIntn", rand.Intn)
 	return nil
 }
