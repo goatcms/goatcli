@@ -12,6 +12,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcli/cliapp/services/properties"
 	"github.com/goatcms/goatcli/cliapp/services/repositiories"
+	"github.com/goatcms/goatcli/cliapp/services/secrets"
 	"github.com/goatcms/goatcli/cliapp/services/template"
 	"github.com/goatcms/goatcore/app"
 )
@@ -46,6 +47,9 @@ func (m *Module) RegisterDependencies(a app.App) error {
 		return err
 	}
 	if err := properties.RegisterDependencies(dp); err != nil {
+		return err
+	}
+	if err := secrets.RegisterDependencies(dp); err != nil {
 		return err
 	}
 	if err := repositories.RegisterDependencies(dp); err != nil {

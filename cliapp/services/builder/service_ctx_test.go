@@ -13,16 +13,18 @@ import (
 )
 
 const (
-	testBuilderLayout   = `{{define "list"}} {{range .}}{{println "," .}}{{end}} {{end}}`
-	testBuilderTemplate = `
+	testCTXBuilderLayout   = `{{define "list"}} {{range .}}{{println "," .}}{{end}} {{end}}`
+	testCTXBuilderTemplate = `
 	{{if not (.Filesystem.IsFile "out/file.txt")}}
 		{{.Out.File "out/file.txt"}}
-		File Content
+			{{- index .Data "datakey" -}}
+			{{- index .Properties.Project "propkey" -}}
+			{{- index .Properties.Secrets "secretkey" -}}
 		{{.Out.EOF}}
 	{{end}}`
 )
 
-func TestBuilder(t *testing.T) {
+func TestCTXBuilder(t *testing.T) {
 	var (
 		err     error
 		context []byte
@@ -38,11 +40,11 @@ func TestBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testBuilderLayout), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXBuilderLayout), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/templates/names/main.tmpl", []byte(testBuilderTemplate), 0766); err != nil {
+	if err = mapp.RootFilespace().WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXBuilderTemplate), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -75,7 +77,13 @@ func TestBuilder(t *testing.T) {
 		},
 	}
 	fs := mapp.RootFilespace()
-	if err = deps.BuilderService.Build(fs, buildConfig, map[string]string{}, map[string]string{}, map[string]string{}); err != nil {
+	if err = deps.BuilderService.Build(fs, buildConfig, map[string]string{
+		"datakey": "Ala",
+	}, map[string]string{
+		"propkey": " ma",
+	}, map[string]string{
+		"secretkey": " kota",
+	}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -87,8 +95,8 @@ func TestBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if strings.Index(string(context), "File Content") == -1 {
-		t.Errorf("File must contains 'File Content' and it is '%s'", context)
+	if string(context) != "Ala ma kota" {
+		t.Errorf("File content must be equals to 'Ala ma kota' and it is '%s'", context)
 		return
 	}
 }

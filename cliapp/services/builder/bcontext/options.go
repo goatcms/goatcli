@@ -15,4 +15,5 @@ type Options struct {
 type PropertieOptions struct {
 	Build   map[string]string
 	Project map[string]string
+	Secrets map[string]string
 }

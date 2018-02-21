@@ -1,4 +1,4 @@
-package properties
+package secrets
 
 import (
 	"github.com/goatcms/goatcli/cliapp/common/cio"
@@ -10,8 +10,8 @@ import (
 	"github.com/goatcms/goatcore/varutil/plainmap"
 )
 
-// Properties provide project properties data
-type Properties struct {
+// Secrets provide project secrets data
+type Secrets struct {
 	deps struct {
 		FS     filesystem.Filespace `filespace:"root"`
 		Input  app.Input            `dependency:"InputService"`
@@ -22,35 +22,35 @@ type Properties struct {
 // Factory create new repositories instance
 func Factory(dp dependency.Provider) (interface{}, error) {
 	var err error
-	instance := &Properties{}
+	instance := &Secrets{}
 	if err = dp.InjectTo(&instance.deps); err != nil {
 		return nil, err
 	}
-	return services.PropertiesService(instance), nil
+	return services.SecretsService(instance), nil
 }
 
-// ReadDefFromFS read properties definitions from filespace
-func (p *Properties) ReadDefFromFS(fs filesystem.Filespace) (properties []*config.Property, err error) {
+// ReadDefFromFS read secrets definitions from filespace
+func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace) (secrets []*config.Property, err error) {
 	var json []byte
-	if !fs.IsFile(PropertiesDefPath) {
+	if !fs.IsFile(SecretsDefPath) {
 		return make([]*config.Property, 0), nil
 	}
-	if json, err = fs.ReadFile(PropertiesDefPath); err != nil {
+	if json, err = fs.ReadFile(SecretsDefPath); err != nil {
 		return nil, err
 	}
-	if properties, err = config.NewProperties(json); err != nil {
+	if secrets, err = config.NewProperties(json); err != nil {
 		return nil, err
 	}
-	return properties, nil
+	return secrets, nil
 }
 
-// ReadDataFromFS read properties data from filespace
-func (p *Properties) ReadDataFromFS(fs filesystem.Filespace) (data map[string]string, err error) {
+// ReadDataFromFS read secrets data from filespace
+func (p *Secrets) ReadDataFromFS(fs filesystem.Filespace) (data map[string]string, err error) {
 	var json []byte
-	if !fs.IsFile(PropertiesDataPath) {
+	if !fs.IsFile(SecretsDataPath) {
 		return make(map[string]string, 0), nil
 	}
-	if json, err = fs.ReadFile(PropertiesDataPath); err != nil {
+	if json, err = fs.ReadFile(SecretsDataPath); err != nil {
 		return nil, err
 	}
 	if data, err = plainmap.JSONToPlainStringMap(json); err != nil {
@@ -59,18 +59,18 @@ func (p *Properties) ReadDataFromFS(fs filesystem.Filespace) (data map[string]st
 	return data, nil
 }
 
-// FillData read lost properties data to curent data map
-func (p *Properties) FillData(def []*config.Property, data map[string]string, defaultData map[string]string) (isChanged bool, err error) {
+// FillData read lost secrets data to curent data map
+func (p *Secrets) FillData(def []*config.Property, data map[string]string, defaultData map[string]string) (isChanged bool, err error) {
 	return cio.ReadProperties("", p.deps.Input, p.deps.Output, def, data, defaultData)
 }
 
-// WriteDataToFS write properties data to fs file
-func (p *Properties) WriteDataToFS(fs filesystem.Filespace, data map[string]string) (err error) {
+// WriteDataToFS write secrets data to fs file
+func (p *Secrets) WriteDataToFS(fs filesystem.Filespace, data map[string]string) (err error) {
 	var json string
 	if json, err = plainmap.PlainStringMapToFormattedJSON(data); err != nil {
 		return err
 	}
-	if err = fs.WriteFile(PropertiesDataPath, []byte(json), 0766); err != nil {
+	if err = fs.WriteFile(SecretsDataPath, []byte(json), 0766); err != nil {
 		return err
 	}
 	return nil

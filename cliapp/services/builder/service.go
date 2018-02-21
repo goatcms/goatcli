@@ -36,7 +36,7 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 }
 
 // Build project files and directories from data
-func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties map[string]string) (err error) {
+func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) (err error) {
 	var (
 		templateExecutor services.TemplateExecutor
 		writer           *FSWriter
@@ -56,6 +56,7 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 			Hash: hash,
 			Properties: bcontext.PropertieOptions{
 				Project: properties,
+				Secrets: secrets,
 				Build:   c.Properties,
 			},
 		})

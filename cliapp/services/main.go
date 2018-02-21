@@ -31,6 +31,14 @@ type PropertiesService interface {
 	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
 }
 
+// SecretsService provide project secret properties data (like passwords, credentials etc)
+type SecretsService interface {
+	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Property, error)
+	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
+	FillData(def []*config.Property, data map[string]string, defaultData map[string]string) (bool, error)
+	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
+}
+
 // ModulesService proccess and return modules
 type ModulesService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Module, error)
@@ -59,5 +67,5 @@ type TemplateExecutor interface {
 // BuilderService build project structure
 type BuilderService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Build, error)
-	Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties map[string]string) error
+	Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) error
 }
