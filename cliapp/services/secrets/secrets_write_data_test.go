@@ -7,7 +7,7 @@ import (
 	"github.com/goatcms/goatcore/app"
 )
 
-func TestPropertiesWriteDataFromDataFile(t *testing.T) {
+func TestSecretsWriteDataFromDataFile(t *testing.T) {
 	var (
 		err     error
 		service services.PropertiesService

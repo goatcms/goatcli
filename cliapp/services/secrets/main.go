@@ -1,8 +1,8 @@
 package secrets
 
 const (
-	// PropertiesDefPath is path to properties definition
+	// SecretsDefPath is path to secrets definition
 	SecretsDefPath = ".goat/secrets.def.json"
-	// PropertiesDataPath is path to properties data file
+	// SecretsDataPath is path to secrets data file
 	SecretsDataPath = ".goat/secrets.json"
 )

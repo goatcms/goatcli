@@ -1,7 +1,7 @@
 package template
 
 const (
-	// LayoutPath is a path to layout files
+	// HelpersPath is a path to helpers files
 	HelpersPath = ".goat/build/helpers/"
 	// LayoutPath is a path to layout files
 	LayoutPath = ".goat/build/layouts/{name}/"

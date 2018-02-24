@@ -18,7 +18,7 @@ type Replace struct {
 
 // NewReplaces parse json and return Replace array instance
 func NewReplaces(json []byte, si common.StringInjector) ([]*Replace, error) {
-	var de error = nil
+	var de error
 	replaces := []*Replace{}
 	if _, err := jsonparser.ArrayEach(json, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		if err != nil || de != nil {

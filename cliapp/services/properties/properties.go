@@ -70,8 +70,5 @@ func (p *Properties) WriteDataToFS(fs filesystem.Filespace, data map[string]stri
 	if json, err = plainmap.PlainStringMapToFormattedJSON(data); err != nil {
 		return err
 	}
-	if err = fs.WriteFile(PropertiesDataPath, []byte(json), 0766); err != nil {
-		return err
-	}
-	return nil
+	return fs.WriteFile(PropertiesDataPath, []byte(json), 0766)
 }

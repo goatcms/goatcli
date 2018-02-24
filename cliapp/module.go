@@ -27,38 +27,35 @@ func NewModule() app.Module {
 }
 
 //RegisterDependencies is init callback to register module dependencies
-func (m *Module) RegisterDependencies(a app.App) error {
+func (m *Module) RegisterDependencies(a app.App) (err error) {
 	// commands
 	if err := m.registerCommands(a); err != nil {
 		return err
 	}
 	// services
 	dp := a.DependencyProvider()
-	if err := builder.RegisterDependencies(dp); err != nil {
+	if err = builder.RegisterDependencies(dp); err != nil {
 		return err
 	}
-	if err := cloner.RegisterDependencies(dp); err != nil {
+	if err = cloner.RegisterDependencies(dp); err != nil {
 		return err
 	}
-	if err := data.RegisterDependencies(dp); err != nil {
+	if err = data.RegisterDependencies(dp); err != nil {
 		return err
 	}
-	if err := modules.RegisterDependencies(dp); err != nil {
+	if err = modules.RegisterDependencies(dp); err != nil {
 		return err
 	}
-	if err := properties.RegisterDependencies(dp); err != nil {
+	if err = properties.RegisterDependencies(dp); err != nil {
 		return err
 	}
-	if err := secrets.RegisterDependencies(dp); err != nil {
+	if err = secrets.RegisterDependencies(dp); err != nil {
 		return err
 	}
-	if err := repositories.RegisterDependencies(dp); err != nil {
+	if err = repositories.RegisterDependencies(dp); err != nil {
 		return err
 	}
-	if err := template.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	return nil
+	return template.RegisterDependencies(dp)
 }
 
 func (m *Module) registerCommands(a app.App) error {

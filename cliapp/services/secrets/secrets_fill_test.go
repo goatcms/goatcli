@@ -7,7 +7,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services"
 )
 
-func TestPropertieFillDataFile(t *testing.T) {
+func TesSecretsFillDataFile(t *testing.T) {
 	var (
 		err       error
 		service   services.PropertiesService

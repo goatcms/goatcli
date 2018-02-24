@@ -12,15 +12,16 @@ const (
 	ReplaceConfigFile = ".goat/replaces.def.json"
 )
 
-func copy(sourcefs, destfs filesystem.Filespace, subPath string, replaces []*config.Replace) error {
+func copy(sourcefs, destfs filesystem.Filespace, subPath string, replaces []*config.Replace) (err error) {
+	var content []byte
 	for i, replace := range replaces {
 		if replace.Pattern.MatchString(subPath) {
-			content, err := sourcefs.ReadFile(subPath)
+			content, err = sourcefs.ReadFile(subPath)
 			if err != nil {
 				return err
 			}
 			content = replaceLoop(subPath, content, replaces[i:])
-			if err := destfs.WriteFile(subPath, content, 0766); err != nil {
+			if err = destfs.WriteFile(subPath, content, 0766); err != nil {
 				return err
 			}
 			return nil
@@ -38,11 +39,10 @@ func replaceLoop(subPath string, content []byte, replaces []*config.Replace) []b
 	return content
 }
 
-func streamCopy(sourcefs, destfs filesystem.Filespace, subPath string) error {
+func streamCopy(sourcefs, destfs filesystem.Filespace, subPath string) (err error) {
 	var (
 		reader filesystem.Reader
 		writer filesystem.Writer
-		err    error
 	)
 	if reader, err = sourcefs.Reader(subPath); err != nil {
 		return err
@@ -53,8 +53,5 @@ func streamCopy(sourcefs, destfs filesystem.Filespace, subPath string) error {
 	if _, err = io.Copy(writer, reader); err != nil {
 		return err
 	}
-	if err = writer.Close(); err != nil {
-		return err
-	}
-	return nil
+	return writer.Close()
 }

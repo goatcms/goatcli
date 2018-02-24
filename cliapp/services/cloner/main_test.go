@@ -32,7 +32,7 @@ func buildSrcFilespace() (fs filesystem.Filespace, err error) {
 	if err = fs.WriteFile("docs/main.md", []byte("Description your {{project_name}}"), 0766); err != nil {
 		return nil, err
 	}
-	if err = fs.WriteFile("docs/main.txt", []byte("No proccess this file {{project_name}}"), 0766); err != nil {
+	if err = fs.WriteFile("docs/main.txt", []byte("No process this file {{project_name}}"), 0766); err != nil {
 		return nil, err
 	}
 	return fs, nil

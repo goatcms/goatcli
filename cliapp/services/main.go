@@ -39,7 +39,7 @@ type SecretsService interface {
 	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
 }
 
-// ModulesService proccess and return modules
+// ModulesService process and return modules
 type ModulesService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Module, error)
 }

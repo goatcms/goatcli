@@ -70,8 +70,5 @@ func (p *Secrets) WriteDataToFS(fs filesystem.Filespace, data map[string]string)
 	if json, err = plainmap.PlainStringMapToFormattedJSON(data); err != nil {
 		return err
 	}
-	if err = fs.WriteFile(SecretsDataPath, []byte(json), 0766); err != nil {
-		return err
-	}
-	return nil
+	return fs.WriteFile(SecretsDataPath, []byte(json), 0766)
 }

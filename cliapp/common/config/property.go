@@ -21,7 +21,7 @@ type Property struct {
 
 // NewProperties parse json and return Property array instance
 func NewProperties(json []byte) ([]*Property, error) {
-	var de error = nil
+	var de error
 	properties := []*Property{}
 	if _, err := jsonparser.ArrayEach(json, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		if err != nil || de != nil {

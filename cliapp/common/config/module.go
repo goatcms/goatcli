@@ -19,7 +19,7 @@ type Module struct {
 
 // NewModules parse json and return Modules array instance
 func NewModules(json []byte) ([]*Module, error) {
-	var de error = nil
+	var de error
 	modules := []*Module{}
 	if _, err := jsonparser.ArrayEach(json, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		if err != nil || de != nil {

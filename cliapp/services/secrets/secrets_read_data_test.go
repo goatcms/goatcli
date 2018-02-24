@@ -8,7 +8,7 @@ import (
 	"github.com/goatcms/goatcore/app"
 )
 
-func TestPropertiesReadDataFromDataFile(t *testing.T) {
+func TestSecretsReadDataFromDataFile(t *testing.T) {
 	var (
 		err     error
 		service services.PropertiesService

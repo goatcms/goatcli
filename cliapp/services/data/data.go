@@ -99,8 +99,5 @@ func (d *Data) WriteDataToFS(fs filesystem.Filespace, prefix string, data map[st
 	if err = fs.MkdirAll(filepath.Dir(path), 0766); err != nil {
 		return err
 	}
-	if err = fs.WriteFile(path, []byte(json), 0766); err != nil {
-		return err
-	}
-	return nil
+	return fs.WriteFile(path, []byte(json), 0766)
 }

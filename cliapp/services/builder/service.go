@@ -71,7 +71,7 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 			)
 			command = strings.Replace(c.AfterBuild, "\\\"", "\"", -1)
 			args = strings.Split(command, " ")
-			for i, _ := range args {
+			for i := range args {
 				// replace it here because argument.cwd can contains space (for example in home directory name)
 				args[i] = strings.Replace(args[i], "{{argument.cwd}}", s.deps.CWD, -1)
 			}
