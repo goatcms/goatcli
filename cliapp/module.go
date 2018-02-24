@@ -76,10 +76,7 @@ func (m *Module) registerCommands(a app.App) error {
 
 // InitDependencies is init callback to inject dependencies inside module
 func (m *Module) InitDependencies(a app.App) error {
-	if err := template.InitDependencies(a); err != nil {
-		return err
-	}
-	return nil
+	return template.InitDependencies(a)
 }
 
 // Run is run event callback

@@ -21,10 +21,7 @@ func copy(sourcefs, destfs filesystem.Filespace, subPath string, replaces []*con
 				return err
 			}
 			content = replaceLoop(subPath, content, replaces[i:])
-			if err = destfs.WriteFile(subPath, content, 0766); err != nil {
-				return err
-			}
-			return nil
+			return destfs.WriteFile(subPath, content, 0766)
 		}
 	}
 	return streamCopy(sourcefs, destfs, subPath)
