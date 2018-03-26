@@ -21,6 +21,7 @@ type RepositoriesService interface {
 // ClonerService clone an repository
 type ClonerService interface {
 	Clone(repository, rev string, destfs filesystem.Filespace, si common.StringInjector) (err error)
+	CloneModules(sourcefs, destfs filesystem.Filespace, si common.StringInjector) (err error)
 }
 
 // PropertiesService provide project properties data

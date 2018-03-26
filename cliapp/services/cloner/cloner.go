@@ -1,7 +1,7 @@
 package cloner
 
 import (
-	"os"
+	"path"
 
 	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
@@ -9,6 +9,7 @@ import (
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/fsloop"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 // Cloner clone and process new project
@@ -34,25 +35,12 @@ func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace,
 	var (
 		sourcefs filesystem.Filespace
 		replaces []*config.Replace
-		modules  []*config.Module
 	)
 	if sourcefs, err = cloner.deps.Repositories.Filespace(repository, rev); err != nil {
 		return err
 	}
-	if modules, err = cloner.deps.Modules.ReadDefFromFS(sourcefs); err != nil {
+	if err = cloner.CloneModules(sourcefs, destfs, si); err != nil {
 		return err
-	}
-	for _, module := range modules {
-		var modulefs filesystem.Filespace
-		if err = destfs.MkdirAll(module.SourceDir, 0766); err != nil {
-			return err
-		}
-		if modulefs, err = destfs.Filespace(module.SourceDir); err != nil {
-			return err
-		}
-		if err = cloner.Clone(module.SourceURL, module.SourceRev, modulefs, si); err != nil {
-			return err
-		}
 	}
 	if sourcefs.IsFile(ReplaceConfigFile) {
 		var json []byte
@@ -69,10 +57,14 @@ func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace,
 		DirFilter: func(fs filesystem.Filespace, subPath string) bool {
 			return subPath != "./.git"
 		},
-		OnDir: func(fs filesystem.Filespace, subPath string) error {
+		/*OnDir: func(fs filesystem.Filespace, subPath string) error {
+			subPath = strings.Replace(subPath, "./", "", -1)
 			return destfs.MkdirAll(subPath, 0777)
-		},
-		OnFile: func(fs filesystem.Filespace, subPath string) error {
+		},*/
+		OnFile: func(fs filesystem.Filespace, subPath string) (err error) {
+			if err = destfs.MkdirAll(path.Dir(subPath), 0777); err != nil {
+				return err
+			}
 			if err = copy(sourcefs, destfs, subPath, replaces); err != nil {
 				cleanRequired = true
 				return err
@@ -84,13 +76,43 @@ func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace,
 	}, nil)
 	loop.Run("")
 	loop.Wait()
-	if cleanRequired {
+	/*if cleanRequired {
 		var dirnodes []os.FileInfo
 		dirnodes, err = destfs.ReadDir("./")
 		for _, dirnode := range dirnodes {
 			if err = destfs.RemoveAll(dirnode.Name()); err != nil {
 				return err
 			}
+		}
+	}*/
+	if len(loop.Errors()) != 0 {
+		return goaterr.NewErrors(loop.Errors())
+	}
+	return err
+}
+
+// CloneModules clone project modules
+func (cloner *Cloner) CloneModules(sourcefs, destfs filesystem.Filespace, si common.StringInjector) (err error) {
+	var (
+		modules []*config.Module
+	)
+	if modules, err = cloner.deps.Modules.ReadDefFromFS(sourcefs); err != nil {
+		return err
+	}
+	for _, module := range modules {
+		var modulefs filesystem.Filespace
+		if destfs.IsExist(module.SourceDir) {
+			continue
+		}
+		if err = destfs.MkdirAll(module.SourceDir, 0766); err != nil {
+			return err
+		}
+		if modulefs, err = destfs.Filespace(module.SourceDir); err != nil {
+			return err
+		}
+		if err = cloner.Clone(module.SourceURL, module.SourceRev, modulefs, si); err != nil {
+			destfs.RemoveAll(module.SourceDir)
+			return err
 		}
 	}
 	return nil

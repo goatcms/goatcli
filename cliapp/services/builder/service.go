@@ -79,7 +79,7 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 			cmd.Stdout = &out
 			cmd.Stderr = &out
 			if err = cmd.Run(); err != nil {
-				return fmt.Errorf("external app fail %v: %v %v\n", args, err, string(out.Bytes()))
+				return fmt.Errorf("external app fail %v: %v %v", args, err, string(out.Bytes()))
 			}
 		}
 	}

@@ -3,6 +3,7 @@ package buildc
 import (
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/prevents"
+	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
@@ -17,6 +18,7 @@ func Run(a app.App) (err error) {
 			PropertiesService services.PropertiesService `dependency:"PropertiesService"`
 			SecretsService    services.SecretsService    `dependency:"SecretsService"`
 			BuilderService    services.BuilderService    `dependency:"BuilderService"`
+			ClonerService     services.ClonerService     `dependency:"ClonerService"`
 			DataService       services.DataService       `dependency:"DataService"`
 			Input             app.Input                  `dependency:"InputService"`
 			Output            app.Output                 `dependency:"OutputService"`
@@ -67,6 +69,11 @@ func Run(a app.App) (err error) {
 	}
 	// load data
 	if data, err = deps.DataService.ReadDataFromFS(deps.CurrentFS); err != nil {
+		return err
+	}
+	// Clone modules (if required)
+	propertiesResult := result.NewPropertiesResult(propertiesData)
+	if err = deps.ClonerService.CloneModules(deps.CurrentFS, deps.CurrentFS, propertiesResult); err != nil {
 		return err
 	}
 	// build
