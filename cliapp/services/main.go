@@ -6,6 +6,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/repositories"
 )
 
 const (
@@ -15,12 +16,12 @@ const (
 
 // RepositoriesService provide git repository access
 type RepositoriesService interface {
-	Filespace(repository, rev string) (filesystem.Filespace, error)
+	Filespace(repoURL string, version repositories.Version) (filesystem.Filespace, error)
 }
 
 // ClonerService clone an repository
 type ClonerService interface {
-	Clone(repository, rev string, destfs filesystem.Filespace, si common.StringInjector) (err error)
+	Clone(repoURL string, verion repositories.Version, destfs filesystem.Filespace, si common.StringInjector) (err error)
 	CloneModules(sourcefs, destfs filesystem.Filespace, si common.StringInjector) (err error)
 }
 

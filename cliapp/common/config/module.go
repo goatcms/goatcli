@@ -9,12 +9,14 @@ import (
 
 // Module is configuration container for one module
 type Module struct {
-	SourceURL string
-	SourceRev string
-	SourceDir string
-	TestURL   string
-	TestRev   string
-	TestDir   string
+	SourceURL    string
+	SourceBranch string
+	SourceRev    string
+	SourceDir    string
+	TestURL      string
+	TesteBranch  string
+	TestRev      string
+	TestDir      string
 }
 
 // NewModules parse json and return Modules array instance
@@ -60,6 +62,11 @@ func NewModule(json []byte) (*Module, error) {
 				return fmt.Errorf("expected string and take %s", value)
 			}
 			c.SourceRev = string(value)
+		case "srcbranch":
+			if dataType != jsonparser.String {
+				return fmt.Errorf("expected string and take %s", value)
+			}
+			c.SourceBranch = string(value)
 		case "srcdir":
 			if dataType != jsonparser.String {
 				return fmt.Errorf("expected string and take %s", value)
@@ -76,6 +83,11 @@ func NewModule(json []byte) (*Module, error) {
 				return fmt.Errorf("expected string and take %s", value)
 			}
 			c.TestRev = string(value)
+		case "testbranch":
+			if dataType != jsonparser.String {
+				return fmt.Errorf("expected string and take %s", value)
+			}
+			c.TesteBranch = string(value)
 		case "testdir":
 			if dataType != jsonparser.String {
 				return fmt.Errorf("expected string and take %s", value)

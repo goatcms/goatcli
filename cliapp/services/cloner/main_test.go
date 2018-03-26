@@ -10,7 +10,7 @@ import (
 
 const (
 	testReplacesJSON = `[{"from":"\{\{project_name\}\}", "to":"{{property_project_name}}", "pattern":"[A-Za-z0-9_/]*.(md|txt)"}]`
-	testModulesJSON  = `[{"srcClone":"https://github.com/goatcms/mockupmodule", "srcRev":"master", "srcDir":"module"}]`
+	testModulesJSON  = `[{"srcClone":"https://github.com/goatcms/mockupmodule", "srcBranch":"master", "srcDir":"module"}]`
 )
 
 func buildSrcFilespace() (fs filesystem.Filespace, err error) {
@@ -74,7 +74,7 @@ func buildRepositoriesService() (services.RepositoriesService, error) {
 		return nil, err
 	}
 	return mockups.NewRepositoriesService(map[string]filesystem.Filespace{
-		"https://github.com/goatcms/mockup!master":       rootFS,
-		"https://github.com/goatcms/mockupmodule!master": moduleFS,
+		"https://github.com/goatcms/mockup.master.":       rootFS,
+		"https://github.com/goatcms/mockupmodule.master.": moduleFS,
 	}), nil
 }

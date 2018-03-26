@@ -12,6 +12,7 @@ import (
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/repositories"
 )
 
 func TestModulesFromFile(t *testing.T) {
@@ -61,7 +62,9 @@ func TestModulesFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = deps.Cloner.Clone("https://github.com/goatcms/mockup", "master", destFS, propertiesResult); err != nil {
+	if err = deps.Cloner.Clone("https://github.com/goatcms/mockup", repositories.Version{
+		Branch: "master",
+	}, destFS, propertiesResult); err != nil {
 		t.Error(err)
 		return
 	}

@@ -3,7 +3,7 @@ package config
 import "testing"
 
 const (
-	moduleTestDataEmptyReplaces = `{"srcClone":"srcCloneValue", "srcRev":"srcRevValue", "srcDir":"srcDirValue", "testClone":"testCloneValue", "testRev":"testRevValue", "testDir":"testDirValue"}`
+	moduleTestDataEmptyReplaces = `{"srcClone":"srcCloneValue", "srcRev":"srcRevValue", "srcBranch":"srcBranchValue", "srcDir":"srcDirValue", "testClone":"testCloneValue", "testRev":"testRevValue", "testBranch":"testBranchValue", "testDir":"testDirValue"}`
 	moduleTestDataSrcCloneFail  = `{"srcClone":["srcCloneValue"]}`
 	moduleTestDataSrcRevFail    = `{"srcRev":["srcRevValue"]}`
 	moduleTestDataSrcDirFail    = `{"srcDir":["srcDirValue"]}`
@@ -50,6 +50,10 @@ func TestModuleSuffixAsString(t *testing.T) {
 		t.Errorf("incorrect SourceRev value parsing (expected srcRevValue and take %s)", c.SourceRev)
 		return
 	}
+	if c.SourceBranch != "srcBranchValue" {
+		t.Errorf("incorrect SourceBranch value parsing (expected srcBranchValue and take %s)", c.SourceRev)
+		return
+	}
 	if c.SourceDir != "srcDirValue" {
 		t.Errorf("incorrect SourceDir value parsing (expected srcDirValue and take %s)", c.SourceDir)
 		return
@@ -60,6 +64,10 @@ func TestModuleSuffixAsString(t *testing.T) {
 	}
 	if c.TestRev != "testRevValue" {
 		t.Errorf("incorrect TestRev value parsing (expected testRevValue and take %s)", c.TestRev)
+		return
+	}
+	if c.TesteBranch != "testBranchValue" {
+		t.Errorf("incorrect TesteBranch value parsing (expected testBranchValue and take %s)", c.TestRev)
 		return
 	}
 	if c.TestDir != "testDirValue" {

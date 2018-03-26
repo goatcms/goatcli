@@ -5,6 +5,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/repositories"
 )
 
 // RepositoriesService is a simple mockup for  services.Repositories
@@ -20,8 +21,8 @@ func NewRepositoriesService(data map[string]filesystem.Filespace) services.Repos
 }
 
 // Filespace return filespace for repository and revision
-func (r RepositoriesService) Filespace(repository, rev string) (filesystem.Filespace, error) {
-	key := repository + "!" + rev
+func (r RepositoriesService) Filespace(repoURL string, version repositories.Version) (filesystem.Filespace, error) {
+	key := repoURL + "." + version.Branch + "." + version.Revision
 	fs, ok := r.data[key]
 	if !ok {
 		return nil, fmt.Errorf("key not exist %s", key)

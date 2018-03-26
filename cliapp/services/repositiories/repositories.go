@@ -30,29 +30,37 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 }
 
 // Filespace return filespace for repository
-func (repos *Repositories) Filespace(repoURL, rev string) (filesystem.Filespace, error) {
+func (repos *Repositories) Filespace(repoURL string, version repositories.Version) (filesystem.Filespace, error) {
+	var (
+		destPath string
+	)
 	basepath, err := repos.srcpath()
 	if err != nil {
 		return nil, err
 	}
-	if rev == "" {
-		rev = "master"
+	if version.Branch != "" && version.Revision != "" {
+		destPath = basepath + reduceRepoURL(repoURL) + "." + version.Branch + "." + version.Revision
+	} else if version.Branch != "" {
+		destPath = basepath + reduceRepoURL(repoURL) + ".master." + version.Revision
+	} else if version.Branch != "" {
+		destPath = basepath + reduceRepoURL(repoURL) + "." + version.Branch
+	} else {
+		destPath = basepath + reduceRepoURL(repoURL)
 	}
-	destPath := basepath + reduceRepoURL(repoURL) + "." + rev
 	if disk.IsDir(destPath) {
 		if err = repos.update(destPath); err != nil {
 			return nil, err
 		}
 	} else {
 		os.RemoveAll(destPath)
-		if err = repos.clone(repoURL, rev, destPath); err != nil {
+		if err = repos.clone(repoURL, version, destPath); err != nil {
 			return nil, err
 		}
 	}
 	return diskfs.NewFilespace(destPath)
 }
 
-func (repos *Repositories) clone(url, version, destPath string) (err error) {
+func (repos *Repositories) clone(url string, version repositories.Version, destPath string) (err error) {
 	if _, err = repos.deps.Connector.Clone(url, version, destPath); err != nil {
 		return err
 	}

@@ -8,16 +8,18 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/repositories"
 )
 
 // Run run command in app.App context
 func Run(a app.App) (err error) {
 	var (
 		deps struct {
-			Command       string `argument:"$1"`
-			RepositoryURL string `argument:"?$2"`
-			RepositoryRev string `argument:"?rev"`
-			DestPath      string `argument:"?$3"`
+			Command            string `argument:"$1"`
+			RepositoryURL      string `argument:"?$2"`
+			RepositoryBranch   string `argument:"?branch"`
+			RepositoryRevision string `argument:"?rev"`
+			DestPath           string `argument:"?$3"`
 
 			RootFilespace filesystem.Filespace `filespace:"root"`
 
@@ -42,7 +44,11 @@ func Run(a app.App) (err error) {
 	if deps.DestPath == "" {
 		return fmt.Errorf("Second argument destination path is required")
 	}
-	if repofs, err = deps.RepositoriesService.Filespace(deps.RepositoryURL, deps.RepositoryRev); err != nil {
+	version := repositories.Version{
+		Branch:   deps.RepositoryBranch,
+		Revision: deps.RepositoryRevision,
+	}
+	if repofs, err = deps.RepositoriesService.Filespace(deps.RepositoryURL, version); err != nil {
 		return err
 	}
 	if propertiesDef, err = deps.PropertiesService.ReadDefFromFS(repofs); err != nil {
@@ -66,7 +72,7 @@ func Run(a app.App) (err error) {
 		}
 	}
 	propertiesResult := result.NewPropertiesResult(propertiesData)
-	if err = deps.CloneService.Clone(deps.RepositoryURL, deps.RepositoryRev, destfs, propertiesResult); err != nil {
+	if err = deps.CloneService.Clone(deps.RepositoryURL, version, destfs, propertiesResult); err != nil {
 		return err
 	}
 	deps.Output.Printf("cloned")

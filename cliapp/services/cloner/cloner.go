@@ -9,6 +9,7 @@ import (
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/fsloop"
+	"github.com/goatcms/goatcore/repositories"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -31,12 +32,12 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 }
 
 // Clone clone repository
-func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace, si common.StringInjector) (err error) {
+func (cloner *Cloner) Clone(repoURL string, verion repositories.Version, destfs filesystem.Filespace, si common.StringInjector) (err error) {
 	var (
 		sourcefs filesystem.Filespace
 		replaces []*config.Replace
 	)
-	if sourcefs, err = cloner.deps.Repositories.Filespace(repository, rev); err != nil {
+	if sourcefs, err = cloner.deps.Repositories.Filespace(repoURL, verion); err != nil {
 		return err
 	}
 	if err = cloner.CloneModules(sourcefs, destfs, si); err != nil {
@@ -57,10 +58,9 @@ func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace,
 		DirFilter: func(fs filesystem.Filespace, subPath string) bool {
 			return subPath != "./.git"
 		},
-		/*OnDir: func(fs filesystem.Filespace, subPath string) error {
-			subPath = strings.Replace(subPath, "./", "", -1)
+		OnDir: func(fs filesystem.Filespace, subPath string) error {
 			return destfs.MkdirAll(subPath, 0777)
-		},*/
+		},
 		OnFile: func(fs filesystem.Filespace, subPath string) (err error) {
 			if err = destfs.MkdirAll(path.Dir(subPath), 0777); err != nil {
 				return err
@@ -76,15 +76,6 @@ func (cloner *Cloner) Clone(repository, rev string, destfs filesystem.Filespace,
 	}, nil)
 	loop.Run("")
 	loop.Wait()
-	/*if cleanRequired {
-		var dirnodes []os.FileInfo
-		dirnodes, err = destfs.ReadDir("./")
-		for _, dirnode := range dirnodes {
-			if err = destfs.RemoveAll(dirnode.Name()); err != nil {
-				return err
-			}
-		}
-	}*/
 	if len(loop.Errors()) != 0 {
 		return goaterr.NewErrors(loop.Errors())
 	}
@@ -110,7 +101,10 @@ func (cloner *Cloner) CloneModules(sourcefs, destfs filesystem.Filespace, si com
 		if modulefs, err = destfs.Filespace(module.SourceDir); err != nil {
 			return err
 		}
-		if err = cloner.Clone(module.SourceURL, module.SourceRev, modulefs, si); err != nil {
+		if err = cloner.Clone(module.SourceURL, repositories.Version{
+			Branch:   module.SourceBranch,
+			Revision: module.SourceRev,
+		}, modulefs, si); err != nil {
 			destfs.RemoveAll(module.SourceDir)
 			return err
 		}
