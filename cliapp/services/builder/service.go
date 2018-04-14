@@ -19,6 +19,7 @@ type Service struct {
 	deps struct {
 		CWD             string                   `argument:"?cwd"`
 		TemplateService services.TemplateService `dependency:"TemplateService"`
+		Modules         services.ModulesService  `dependency:"ModulesService"`
 	}
 }
 
@@ -35,13 +36,22 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 	return services.BuilderService(instance), nil
 }
 
-// Build project files and directories from data
 func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) (err error) {
+	return s.build("", fs, buildConfigs, data, properties, secrets)
+}
+
+// Build project files and directories from data
+func (s *Service) build(subPath string, fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) (err error) {
 	var (
 		templateExecutor services.TemplateExecutor
 		writer           *FSWriter
 		hash             string
 	)
+	// build modules
+	if err = s.BuildModules(subPath, fs, data, properties, secrets); err != nil {
+		return err
+	}
+	// build main code
 	hash = varutil.RandString(30, varutil.AlphaNumericBytes)
 	if templateExecutor, err = s.deps.TemplateService.Build(fs); err != nil {
 		return err
@@ -71,9 +81,10 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 			)
 			command = strings.Replace(c.AfterBuild, "\\\"", "\"", -1)
 			args = strings.Split(command, " ")
+			cwd := s.deps.CWD + subPath
 			for i := range args {
 				// replace it here because argument.cwd can contains space (for example in home directory name)
-				args[i] = strings.Replace(args[i], "{{argument.cwd}}", s.deps.CWD, -1)
+				args[i] = strings.Replace(args[i], "{{argument.cwd}}", cwd, -1)
 			}
 			cmd := exec.Command(args[0], args[1:]...)
 			cmd.Stdout = &out
@@ -81,6 +92,39 @@ func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, d
 			if err = cmd.Run(); err != nil {
 				return fmt.Errorf("external app fail %v: %v %v", args, err, string(out.Bytes()))
 			}
+		}
+	}
+	return nil
+}
+
+// BuildModules build project modules
+func (s *Service) BuildModules(subPath string, fs filesystem.Filespace, data, properties, secrets map[string]string) (err error) {
+	var (
+		modules []*config.Module
+	)
+	if modules, err = s.deps.Modules.ReadDefFromFS(fs); err != nil {
+		return err
+	}
+	for _, module := range modules {
+		var (
+			modulefs     filesystem.Filespace
+			buildConfigs []*config.Build
+		)
+		if !fs.IsExist(module.SourceDir) {
+			return fmt.Errorf("builder.BuildModules: Module '%s' is not exist", module.SourceDir)
+		}
+		if err = fs.MkdirAll(module.SourceDir, 0766); err != nil {
+			return err
+		}
+		if modulefs, err = fs.Filespace(module.SourceDir); err != nil {
+			return err
+		}
+		if buildConfigs, err = s.ReadDefFromFS(modulefs); err != nil {
+			return err
+		}
+		moduleSubPath := subPath + module.SourceDir
+		if err = s.build(moduleSubPath, modulefs, buildConfigs, data, properties, secrets); err != nil {
+			return err
 		}
 	}
 	return nil

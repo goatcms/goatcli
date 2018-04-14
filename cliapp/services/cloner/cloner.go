@@ -58,9 +58,9 @@ func (cloner *Cloner) Clone(repoURL string, verion repositories.Version, destfs 
 		DirFilter: func(fs filesystem.Filespace, subPath string) bool {
 			return subPath != "./.git"
 		},
-		OnDir: func(fs filesystem.Filespace, subPath string) error {
+		/*OnDir: func(fs filesystem.Filespace, subPath string) error {
 			return destfs.MkdirAll(subPath, 0777)
-		},
+		},*/
 		OnFile: func(fs filesystem.Filespace, subPath string) (err error) {
 			if err = destfs.MkdirAll(path.Dir(subPath), 0777); err != nil {
 				return err

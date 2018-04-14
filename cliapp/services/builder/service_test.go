@@ -7,6 +7,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcli/cliapp/services/template"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
@@ -47,6 +48,10 @@ func TestBuilder(t *testing.T) {
 		return
 	}
 	if err = RegisterDependencies(mapp.DependencyProvider()); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = modules.RegisterDependencies(mapp.DependencyProvider()); err != nil {
 		t.Error(err)
 		return
 	}
