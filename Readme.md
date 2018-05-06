@@ -18,3 +18,6 @@ go install github.com/goatcms/goatcli
 
 ## Arguments
 * cwd - set Current Working Directory 
+
+## Presentations 
+* (PL) GoatCLI on Kariera IT Poznan 21-04-2018: https://youtu.be/YX6Ne1Z83l8 and [Slides](https://docs.google.com/presentation/d/1qaqgWtXEjiPy0CljDwsvlryFVut3fm0bQ5WJpbRIXGI/edit#slide=id.p)
