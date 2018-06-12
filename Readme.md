@@ -21,3 +21,4 @@ go install github.com/goatcms/goatcli
 
 ## Presentations 
 * (PL) GoatCLI on Kariera IT Poznan 21-04-2018: https://youtu.be/YX6Ne1Z83l8 and [Slides](https://docs.google.com/presentation/d/1qaqgWtXEjiPy0CljDwsvlryFVut3fm0bQ5WJpbRIXGI/edit#slide=id.p)
+* (PL) P.I.W.O (Poznańska Impreza Wolnego Oprogramowania): https://www.twitch.tv/videos/264532807 and [Slides](https://docs.google.com/presentation/d/1i4_a_G-ZvvPaZXuyajok4jlfg_lA4b8S_g3dTZv52mw/edit?usp=sharing)
