@@ -1,23 +1,25 @@
 package tfunc
 
-import "html/template"
-
 // Noescape return noescaped content
-func Noescape(value string) template.HTML {
-	return template.HTML(value)
+// Deprecated: It is now required.
+func Noescape(value string) string {
+	return value
 }
 
 // SafeHTMLAttr return noescaped content
-func SafeHTMLAttr(s string) template.HTMLAttr {
-	return template.HTMLAttr(s)
+// Deprecated: It is now required.
+func SafeHTMLAttr(s string) string {
+	return s
 }
 
 // SafeHTML return noescaped content
-func SafeHTML(s string) template.HTML {
-	return template.HTML(s)
+// Deprecated: It is now required.
+func SafeHTML(s string) string {
+	return s
 }
 
 // SafeURL return noescaped content
-func SafeURL(s string) template.URL {
-	return template.URL(s)
+// Deprecated: It is now required.
+func SafeURL(s string) string {
+	return s
 }

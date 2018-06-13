@@ -1,15 +1,15 @@
 package template
 
 import (
-	"html/template"
 	"io"
+	"text/template"
 
-	"github.com/goatcms/goatcore/goathtml/ghprovider"
+	"github.com/goatcms/goatcore/goattext/gtprovider"
 )
 
 // Executor is global template provider
 type Executor struct {
-	provider *ghprovider.Provider
+	provider *gtprovider.Provider
 }
 
 // Execute run template by name

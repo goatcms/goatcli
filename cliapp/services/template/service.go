@@ -2,13 +2,13 @@ package template
 
 import (
 	"fmt"
-	"html/template"
 	"sync"
+	"text/template"
 
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
-	"github.com/goatcms/goatcore/goathtml/ghprovider"
+	"github.com/goatcms/goatcore/goattext/gtprovider"
 )
 
 // Service is global template provider
@@ -49,7 +49,7 @@ func (s *Service) AddFunc(name string, f interface{}) error {
 func (s *Service) Build(fs filesystem.Filespace) (services.TemplateExecutor, error) {
 	s.isUsed = true
 	// prepare executor
-	provider := ghprovider.NewProvider(fs, HelpersPath, LayoutPath, ViewPath, FileExtension, s.funcs)
+	provider := gtprovider.NewProvider(fs, HelpersPath, LayoutPath, ViewPath, FileExtension, s.funcs)
 	return &Executor{
 		provider: provider,
 	}, nil
