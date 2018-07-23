@@ -7,7 +7,7 @@ GoatCLI is set of console tools.
 
 ## Install
 ```
-go install github.com/goatcms/goatcli
+go get -u github.com/goatcms/goatcli
 ```
 
 ## Commands
