@@ -12,4 +12,6 @@ debug
 .idea/
 *.log
 
+/vendor
+
 configuration.json
