@@ -13,6 +13,8 @@ import (
 func Run(a app.App) (err error) {
 	var (
 		deps struct {
+			Interactive string `argument:"?interactive"`
+
 			CurrentFS filesystem.Filespace `filespace:"current"`
 
 			PropertiesService services.PropertiesService `dependency:"PropertiesService"`
@@ -30,10 +32,12 @@ func Run(a app.App) (err error) {
 		isChanged      bool
 		builderDef     []*config.Build
 		data           map[string]string
+		interactive    bool
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
 		return err
 	}
+	interactive = !(deps.Interactive == "false")
 	if err = prevents.RequireGoatProject(deps.CurrentFS); err != nil {
 		return err
 	}
@@ -44,7 +48,7 @@ func Run(a app.App) (err error) {
 	if propertiesData, err = deps.PropertiesService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
-	if isChanged, err = deps.PropertiesService.FillData(propertiesDef, propertiesData, map[string]string{}); err != nil {
+	if isChanged, err = deps.PropertiesService.FillData(propertiesDef, propertiesData, map[string]string{}, interactive); err != nil {
 		return err
 	}
 	if isChanged {
@@ -59,7 +63,7 @@ func Run(a app.App) (err error) {
 	if secretsData, err = deps.SecretsService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
-	if isChanged, err = deps.SecretsService.FillData(secretsDef, secretsData, map[string]string{}); err != nil {
+	if isChanged, err = deps.SecretsService.FillData(secretsDef, secretsData, map[string]string{}, interactive); err != nil {
 		return err
 	}
 	if isChanged {

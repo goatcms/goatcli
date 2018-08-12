@@ -12,7 +12,7 @@ import (
 )
 
 // ReadProperties read properties from app.Input
-func ReadProperties(baseKey string, in app.Input, out app.Output, def []*config.Property, data, defaultData map[string]string) (isChanged bool, err error) {
+func ReadProperties(baseKey string, in app.Input, out app.Output, def []*config.Property, data, defaultData map[string]string, interactive bool) (isChanged bool, err error) {
 	var (
 		ok           bool
 		defaultValue string
@@ -21,6 +21,9 @@ func ReadProperties(baseKey string, in app.Input, out app.Output, def []*config.
 	for _, property := range def {
 		if _, ok = data[baseKey+property.Key]; ok {
 			continue
+		}
+		if !interactive {
+			return false, fmt.Errorf("Data for %s key is not defined", baseKey+property.Key)
 		}
 		if defaultValue, ok = defaultData[property.Key]; !ok {
 			switch strings.ToLower(property.Type) {
@@ -104,7 +107,7 @@ loop:
 		switch strings.ToLower(line) {
 		case "y":
 			subKey := baseKey + strconv.Itoa(i) + "."
-			if isCollChanged, err = ReadProperties(subKey, in, out, properties, data, map[string]string{}); err != nil {
+			if isCollChanged, err = ReadProperties(subKey, in, out, properties, data, map[string]string{}, true); err != nil {
 				return isChanged, err
 			}
 			isChanged = isCollChanged || isChanged
@@ -137,7 +140,7 @@ func ReadPropertiesMap(baseKey string, in app.Input, out app.Output, properties 
 			return isChanged, nil
 		}
 		subKey := baseKey + mapkey + "."
-		if isCollChanged, err = ReadProperties(subKey, in, out, properties, data, map[string]string{}); err != nil {
+		if isCollChanged, err = ReadProperties(subKey, in, out, properties, data, map[string]string{}, true); err != nil {
 			return isChanged, err
 		}
 		isChanged = isCollChanged || isChanged

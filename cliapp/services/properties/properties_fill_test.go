@@ -32,7 +32,7 @@ func TestPropertieFillDataFile(t *testing.T) {
 			Min:  1,
 			Max:  22,
 		}}
-	if isChanged, err = service.FillData(propertiesDef, data, map[string]string{}); err != nil {
+	if isChanged, err = service.FillData(propertiesDef, data, map[string]string{}, true); err != nil {
 		t.Error(err)
 		return
 	}
@@ -77,7 +77,7 @@ func TestPropertieFillDataFileOmnit(t *testing.T) {
 			Type: "alnum",
 			Min:  1,
 			Max:  22,
-		}}, data, map[string]string{}); err != nil {
+		}}, data, map[string]string{}, true); err != nil {
 		t.Error(err)
 		return
 	}

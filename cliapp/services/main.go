@@ -29,7 +29,7 @@ type ClonerService interface {
 type PropertiesService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Property, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
-	FillData(def []*config.Property, data map[string]string, defaultData map[string]string) (bool, error)
+	FillData(def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (bool, error)
 	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
 }
 
@@ -37,7 +37,7 @@ type PropertiesService interface {
 type SecretsService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Property, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
-	FillData(def []*config.Property, data map[string]string, defaultData map[string]string) (bool, error)
+	FillData(def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (bool, error)
 	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
 }
 

@@ -60,8 +60,8 @@ func (p *Properties) ReadDataFromFS(fs filesystem.Filespace) (data map[string]st
 }
 
 // FillData read lost properties data to curent data map
-func (p *Properties) FillData(def []*config.Property, data map[string]string, defaultData map[string]string) (isChanged bool, err error) {
-	return cio.ReadProperties("", p.deps.Input, p.deps.Output, def, data, defaultData)
+func (p *Properties) FillData(def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (isChanged bool, err error) {
+	return cio.ReadProperties("", p.deps.Input, p.deps.Output, def, data, defaultData, interactive)
 }
 
 // WriteDataToFS write properties data to fs file

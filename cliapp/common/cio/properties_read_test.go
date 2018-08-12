@@ -20,7 +20,7 @@ func TestPropertiesRead(t *testing.T) {
 	in = gio.NewInput(strings.NewReader(" value1\n value2"))
 	out = gio.NewOutput(new(bytes.Buffer))
 	data := map[string]string{}
-	if isChanged, err = ReadProperties("basekey.", in, out, testProperties, data, map[string]string{}); err != nil {
+	if isChanged, err = ReadProperties("basekey.", in, out, testProperties, data, map[string]string{}, true); err != nil {
 		t.Error(err)
 		return
 	}
@@ -53,7 +53,7 @@ func TestPropertiesReadEOF(t *testing.T) {
 	in = gio.NewInput(strings.NewReader(""))
 	out = gio.NewOutput(new(bytes.Buffer))
 	data := map[string]string{}
-	if isChanged, err = ReadProperties("", in, out, testProperties, data, map[string]string{}); err != nil {
+	if isChanged, err = ReadProperties("", in, out, testProperties, data, map[string]string{}, true); err != nil {
 		t.Error(err)
 		return
 	}

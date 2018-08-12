@@ -8,7 +8,7 @@ import (
 // ReadDataSet read properties from app.Input
 func ReadDataSet(baseKey string, in app.Input, out app.Output, def *config.DataSet, data map[string]string) (isChanged bool, err error) {
 	var isChangedTmp bool
-	if isChangedTmp, err = ReadProperties(baseKey, in, out, def.Properties, data, map[string]string{}); err != nil {
+	if isChangedTmp, err = ReadProperties(baseKey, in, out, def.Properties, data, map[string]string{}, true); err != nil {
 		return false, err
 	}
 	isChanged = isChangedTmp || isChanged
