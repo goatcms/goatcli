@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -47,15 +48,40 @@ func (d *Data) HasDataFromFS(fs filesystem.Filespace, prefix string) bool {
 
 // ReadDefFromFS return data definition
 func (d *Data) ReadDefFromFS(fs filesystem.Filespace) (dataSets []*config.DataSet, err error) {
-	var json []byte
-	if !fs.IsFile(DataDefPath) {
-		return make([]*config.DataSet, 0), nil
+	var (
+		json  []byte
+		nodes []os.FileInfo
+		sets  []*config.DataSet
+	)
+	if fs.IsFile(DataDefPath) {
+		if json, err = fs.ReadFile(DataDefPath); err != nil {
+			return nil, err
+		}
+		if dataSets, err = config.NewDataSets(json); err != nil {
+			return nil, err
+		}
+	} else {
+		dataSets = make([]*config.DataSet, 0)
 	}
-	if json, err = fs.ReadFile(DataDefPath); err != nil {
+	// Read separated data.def files
+	if !fs.IsDir(BaseDataDefPath) {
+		return dataSets, nil
+	}
+	if nodes, err = fs.ReadDir(BaseDataDefPath); err != nil {
 		return nil, err
 	}
-	if dataSets, err = config.NewDataSets(json); err != nil {
-		return nil, err
+	for _, node := range nodes {
+		var path = BaseDataDefPath + node.Name()
+		if !fs.IsFile(path) || !strings.HasSuffix(path, DataDefSuffix) {
+			continue
+		}
+		if json, err = fs.ReadFile(path); err != nil {
+			return nil, err
+		}
+		if sets, err = config.NewDataSets(json); err != nil {
+			return nil, err
+		}
+		dataSets = append(dataSets, sets...)
 	}
 	return dataSets, nil
 }
