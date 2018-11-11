@@ -3,6 +3,7 @@ package data
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/plainmap"
@@ -44,7 +45,12 @@ func readDataFromFS(data map[string]string, fs filesystem.Filespace, path string
 				return err
 			}
 		} else {
-			if json, err = fs.ReadFile(path + node.Name()); err != nil {
+			nodeName := node.Name()
+			if !strings.HasSuffix(nodeName, ".json") {
+				// skip no *.json file
+				continue
+			}
+			if json, err = fs.ReadFile(path + nodeName); err != nil {
 				return err
 			}
 			if filedata, err = plainmap.JSONToPlainStringMap(json); err != nil {
