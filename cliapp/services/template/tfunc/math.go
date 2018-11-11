@@ -1,9 +1,28 @@
 package tfunc
 
+import (
+	"fmt"
+	"strconv"
+)
+
 // Sum add all values
-func Sum(rows ...int) (value int) {
+func Sum(rows ...interface{}) (value int) {
+	var (
+		i   int
+		err error
+	)
 	for _, row := range rows {
-		value += row
+		switch v := row.(type) {
+		case int:
+			value += v
+		case string:
+			if i, err = strconv.Atoi(v); err != nil {
+				panic(err)
+			}
+			value += i
+		default:
+			panic(fmt.Sprint("incorrect template sum type for ", row))
+		}
 	}
 	return value
 }
