@@ -64,7 +64,7 @@ func NewDataSet(json []byte) (dataSet *DataSet, err error) {
 			if dataSet.Collections, err = NewCollections(value); err != nil {
 				return err
 			}
-		case "comment":
+		case commentProperty:
 			// ignore all comments
 		default:
 			return fmt.Errorf("config.NewReplace: Unknow key %s (value: %s)", key, value)

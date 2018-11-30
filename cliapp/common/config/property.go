@@ -88,7 +88,7 @@ func NewProperty(json []byte) (*Property, error) {
 				return fmt.Errorf("property.prompt expected string and take %s", value)
 			}
 			p.Prompt = string(value)
-		case "comment":
+		case commentProperty:
 			// ignore all comments
 		default:
 			return fmt.Errorf("config.NewProperty: Unknow key %s (value: %s)", key, value)

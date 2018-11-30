@@ -78,7 +78,7 @@ func NewCollection(json []byte) (coll *Collection, err error) {
 				return fmt.Errorf("property.prompt expected string and take %s", value)
 			}
 			coll.Prompt = string(value)
-		case "comment":
+		case commentProperty:
 			// ignore all comments
 		default:
 			return fmt.Errorf("Collection.NewCollection: Unknow key %s (value: %s)", key, value)

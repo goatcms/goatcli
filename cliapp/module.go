@@ -5,13 +5,15 @@ import (
 	"github.com/goatcms/goatcli/cliapp/commands/buildc"
 	"github.com/goatcms/goatcli/cliapp/commands/clonec"
 	"github.com/goatcms/goatcli/cliapp/commands/datac"
+	"github.com/goatcms/goatcli/cliapp/commands/depsc"
 	"github.com/goatcms/goatcli/cliapp/commands/initc"
 	"github.com/goatcms/goatcli/cliapp/services/builder"
 	"github.com/goatcms/goatcli/cliapp/services/cloner"
 	"github.com/goatcms/goatcli/cliapp/services/data"
+	"github.com/goatcms/goatcli/cliapp/services/dependencies"
 	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcli/cliapp/services/properties"
-	"github.com/goatcms/goatcli/cliapp/services/repositiories"
+	"github.com/goatcms/goatcli/cliapp/services/repositories"
 	"github.com/goatcms/goatcli/cliapp/services/secrets"
 	"github.com/goatcms/goatcli/cliapp/services/template"
 	"github.com/goatcms/goatcore/app"
@@ -29,7 +31,7 @@ func NewModule() app.Module {
 //RegisterDependencies is init callback to register module dependencies
 func (m *Module) RegisterDependencies(a app.App) (err error) {
 	// commands
-	if err := m.registerCommands(a); err != nil {
+	if err = m.registerCommands(a); err != nil {
 		return err
 	}
 	// services
@@ -46,6 +48,9 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 	if err = modules.RegisterDependencies(dp); err != nil {
 		return err
 	}
+	if err = dependencies.RegisterDependencies(dp); err != nil {
+		return err
+	}
 	if err = properties.RegisterDependencies(dp); err != nil {
 		return err
 	}
@@ -60,15 +65,23 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 
 func (m *Module) registerCommands(a app.App) error {
 	commandScope := a.CommandScope()
-	// commands
+	// core commands
 	commandScope.Set("help.command.clone", commands.Clone)
 	commandScope.Set("command.clone", clonec.Run)
-	commandScope.Set("help.command.data:add", commands.DataAdd)
-	commandScope.Set("command.data:add", datac.RunAdd)
-	commandScope.Set("help.command.build", commands.Build)
-	commandScope.Set("command.build", buildc.Run)
 	commandScope.Set("help.command.init", commands.Init)
 	commandScope.Set("command.init", initc.Run)
+	commandScope.Set("help.command.build", commands.Build)
+	commandScope.Set("command.build", buildc.Run)
+	// data commands
+	commandScope.Set("help.command.data:add", commands.DataAdd)
+	commandScope.Set("command.data:add", datac.RunAdd)
+	// dependencies commands
+	commandScope.Set("help.command.deps:add", commands.AddDep)
+	commandScope.Set("command.deps:add", depsc.RunAddDep)
+	commandScope.Set("help.command.deps:add:go", commands.AddGODep)
+	commandScope.Set("command.deps:add:go", depsc.RunAddGODep)
+	commandScope.Set("help.command.deps:add:go:import", commands.AddGOImportsDep)
+	commandScope.Set("command.deps:add:go:import", depsc.RunAddGOImportsDep)
 	// arguments
 	commandScope.Set("help.argument.cwd", commands.CWDArg)
 	return nil

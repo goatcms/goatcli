@@ -1,10 +1,9 @@
 package cloner
 
 import (
-	"io"
-
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/filesystem/fshelper"
 )
 
 const (
@@ -24,7 +23,7 @@ func copy(sourcefs, destfs filesystem.Filespace, subPath string, replaces []*con
 			return destfs.WriteFile(subPath, content, 0766)
 		}
 	}
-	return streamCopy(sourcefs, destfs, subPath)
+	return fshelper.StreamCopy(sourcefs, destfs, subPath)
 }
 
 func replaceLoop(subPath string, content []byte, replaces []*config.Replace) []byte {
@@ -34,21 +33,4 @@ func replaceLoop(subPath string, content []byte, replaces []*config.Replace) []b
 		}
 	}
 	return content
-}
-
-func streamCopy(sourcefs, destfs filesystem.Filespace, subPath string) (err error) {
-	var (
-		reader filesystem.Reader
-		writer filesystem.Writer
-	)
-	if reader, err = sourcefs.Reader(subPath); err != nil {
-		return err
-	}
-	if writer, err = destfs.Writer(subPath); err != nil {
-		return err
-	}
-	if _, err = io.Copy(writer, reader); err != nil {
-		return err
-	}
-	return writer.Close()
 }

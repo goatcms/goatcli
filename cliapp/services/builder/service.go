@@ -17,9 +17,11 @@ import (
 // Service build structure
 type Service struct {
 	deps struct {
-		CWD             string                   `argument:"?cwd"`
-		TemplateService services.TemplateService `dependency:"TemplateService"`
-		Modules         services.ModulesService  `dependency:"ModulesService"`
+		CWD             string                       `argument:"?cwd"`
+		TemplateService services.TemplateService     `dependency:"TemplateService"`
+		Modules         services.ModulesService      `dependency:"ModulesService"`
+		Dependencies    services.DependenciesService `dependency:"DependenciesService"`
+		Repositories    services.RepositoriesService `dependency:"RepositoriesService"`
 	}
 }
 
@@ -47,6 +49,10 @@ func (s *Service) build(subPath string, fs filesystem.Filespace, buildConfigs []
 		writer           *FSWriter
 		hash             string
 	)
+	// clone dependencies
+	if err = s.CloneDependencies(fs); err != nil {
+		return err
+	}
 	// build modules
 	if err = s.BuildModules(subPath, fs, data, properties, secrets); err != nil {
 		return err
@@ -95,6 +101,17 @@ func (s *Service) build(subPath string, fs filesystem.Filespace, buildConfigs []
 		}
 	}
 	return nil
+}
+
+// CloneDependencies download project dependencies
+func (s *Service) CloneDependencies(fs filesystem.Filespace) (err error) {
+	var (
+		deps []*config.Dependency
+	)
+	if deps, err = s.deps.Dependencies.ReadDefFromFS(fs); err != nil {
+		return err
+	}
+	return s.deps.Dependencies.CloneDependencies(fs, deps)
 }
 
 // BuildModules build project modules

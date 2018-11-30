@@ -46,6 +46,13 @@ type ModulesService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Module, error)
 }
 
+// DependenciesService process and return modules
+type DependenciesService interface {
+	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Dependency, error)
+	WriteDefToFS(fs filesystem.Filespace, dependencies []*config.Dependency) error
+	CloneDependencies(fs filesystem.Filespace, deps []*config.Dependency) error
+}
+
 // DataService provide data api
 type DataService interface {
 	HasDataFromFS(fs filesystem.Filespace, prefix string) bool

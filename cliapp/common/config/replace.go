@@ -70,7 +70,7 @@ func NewReplace(json []byte, si common.StringInjector) (*Replace, error) {
 			if r.Pattern, err = regexp.Compile(string(value)); err != nil {
 				return err
 			}
-		case "comment":
+		case commentProperty:
 			// ignore all comments
 		default:
 			return fmt.Errorf("config.NewReplace: Unknow key %s (value: %s)", key, value)

@@ -93,7 +93,7 @@ func NewModule(json []byte) (*Module, error) {
 				return fmt.Errorf("expected string and take %s", value)
 			}
 			c.TestDir = string(value)
-		case "comment":
+		case commentProperty:
 			// ignore all comments
 		default:
 			return fmt.Errorf("config.NewModules: Unknow key %s (value: %s)", key, value)

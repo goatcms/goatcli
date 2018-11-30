@@ -7,7 +7,9 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/services/dependencies"
 	"github.com/goatcms/goatcli/cliapp/services/modules"
+	"github.com/goatcms/goatcli/cliapp/services/repositories"
 	"github.com/goatcms/goatcli/cliapp/services/template"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
@@ -54,6 +56,14 @@ func TestCTXBuilder(t *testing.T) {
 		return
 	}
 	if err = modules.RegisterDependencies(mapp.DependencyProvider()); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = dependencies.RegisterDependencies(mapp.DependencyProvider()); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = repositories.RegisterDependencies(mapp.DependencyProvider()); err != nil {
 		t.Error(err)
 		return
 	}

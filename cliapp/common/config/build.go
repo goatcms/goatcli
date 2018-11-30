@@ -81,7 +81,7 @@ func NewBuild(json []byte) (build *Build, err error) {
 			if build.Properties, err = plainmap.JSONToPlainStringMap(value); err != nil {
 				return err
 			}
-		case "comment":
+		case commentProperty:
 			// ignore all comments
 		default:
 			return fmt.Errorf("config.NewReplace: Unknow key %s (value: %s)", key, value)
