@@ -78,3 +78,13 @@ func IsIgnoredPath(coll []*regexp.Regexp, path string) bool {
 	}
 	return false
 }
+
+// MapPath replace path
+func MapPath(mapping []PathMappingRow, path string) string {
+	for _, row := range mapping {
+		if strings.HasPrefix(path, row.From) {
+			return row.To + path[len(row.From):]
+		}
+	}
+	return path
+}

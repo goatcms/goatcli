@@ -61,7 +61,7 @@ func (set *Set) AddSource(urlOrGOPath string) (row *SetRow, err error) {
 	}
 	row = &SetRow{
 		Dependency: &config.Dependency{
-			Repo:   "https://" + relativePath + ".git",
+			Repo:   "https://" + MapPath(GOPathMapping, relativePath) + ".git",
 			Branch: "master",
 			Rev:    "",
 			Dest:   "vendor/" + relativePath,
