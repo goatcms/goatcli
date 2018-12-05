@@ -113,7 +113,7 @@ func TestMapPath(t *testing.T) {
 	}
 	// https://godoc.org/cloud.google.com/go/compute
 	result = MapPath(GOPathMapping, "cloud.google.com/go/compute")
-	if result != "cloud.google.com/go/compute" {
+	if result != "github.com/GoogleCloudPlatform/google-cloud-go/compute" {
 		t.Errorf("cloud.google.com/go/compute should be mapped to github.com/GoogleCloudPlatform/google-cloud-go/compute")
 	}
 }
