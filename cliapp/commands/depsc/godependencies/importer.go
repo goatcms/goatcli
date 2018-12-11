@@ -149,7 +149,7 @@ func (importer *Importer) processesImports(imports []string, dep int) (err error
 			return err
 		}
 		row.Imported = true
-		if err = importer.importDirectory(row.Dependency.Dest, dep+1); err != nil {
+		if err = importer.importDirectory("vendor/"+importPath, dep+1); err != nil {
 			return err
 		}
 	}
