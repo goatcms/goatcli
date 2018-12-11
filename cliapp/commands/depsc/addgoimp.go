@@ -11,6 +11,7 @@ func RunAddGOImportsDep(a app.App) (err error) {
 	var (
 		deps struct {
 			CWD          string                       `argument:"?cwd"`
+			LogLvl       string                       `argument:"?loglvl"`
 			Dependencies services.DependenciesService `dependency:"DependenciesService"`
 
 			Input  app.Input  `dependency:"InputService"`
@@ -32,7 +33,8 @@ func RunAddGOImportsDep(a app.App) (err error) {
 			deps.Output.Printf("New source: %s\n", path)
 		},
 	}, godependencies.ImporterOptions{
-		MaxDep: godependencies.MaxImportDepth,
+		MaxDep:  godependencies.MaxImportDepth,
+		DevLogs: deps.LogLvl == "dev",
 	}, deps.Dependencies); err != nil {
 		return err
 	}

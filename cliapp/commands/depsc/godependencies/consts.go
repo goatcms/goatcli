@@ -7,29 +7,22 @@ const (
 	MaxImportDepth = 404
 )
 
-// PathMappingRow is single row to mapping
-type PathMappingRow struct {
-	From string
-	To   string
-}
-
 var (
 	// AlwaysIgnored is set of ignored strings
-	AlwaysIgnored = []*regexp.Regexp{}
-
-	// GOPathMapping is list of default path to replace to non-standard repositories
-	GOPathMapping = []PathMappingRow{
-		PathMappingRow{
-			From: "golang.org/x/",
-			To:   "github.com/golang/",
-		},
-		PathMappingRow{
-			From: "google.golang.org/",
-			To:   "github.com/golang/",
-		},
-		PathMappingRow{
-			From: "cloud.google.com/go/",
-			To:   "github.com/GoogleCloudPlatform/google-cloud-go/",
-		},
+	AlwaysIgnored = []*regexp.Regexp{
+		// Top lvl domains
+		regexp.MustCompile("^[^/]+/?$"),
+		// Top lvl directories
+		regexp.MustCompile("^[^/]+/[^/]+/?$"),
 	}
+)
+
+var (
+	openInlineImportReg     = regexp.MustCompile("(\\n|\\A)[\\t\\s]*import[\\t\\s]?\\\"")
+	closeInlineImportReg    = regexp.MustCompile("\\\"[\\t\\s]*(\\n|\\z)")
+	openMultilineImportReg  = regexp.MustCompile("(\\n|\\A)[\\t\\s]*import[\\t\\s\\n]?\\(")
+	closeMultilineImportReg = regexp.MustCompile("[\\t\\s\\n]*\\)")
+	inlineCommentReg        = regexp.MustCompile("//[^\\n]*(\\n|\\z)")
+	multilineCommentReg     = regexp.MustCompile("\\/\\*([^\\*].*)*\\*/")
+	multilineStrings        = regexp.MustCompile("\\`[^\\`]*(\\`|\\z)")
 )

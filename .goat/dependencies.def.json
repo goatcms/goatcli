@@ -1,0 +1,27 @@
+[
+  {
+    "repo": "git+https://github.com/goatcms/goatcli",
+    "branch": "master",
+    "dest": "vendor/github.com/goatcms/goatcli"
+  },
+  {
+    "repo": "git+https://go.googlesource.com/tools",
+    "branch": "master",
+    "dest": "vendor/golang.org/x/tools"
+  },
+  {
+    "repo": "git+https://github.com/buger/jsonparser",
+    "branch": "master",
+    "dest": "vendor/github.com/buger/jsonparser"
+  },
+  {
+    "repo": "git+https://github.com/mitchellh/go-homedir",
+    "branch": "master",
+    "dest": "vendor/github.com/mitchellh/go-homedir"
+  },
+  {
+    "repo": "git+https://github.com/goatcms/goatcore",
+    "branch": "master",
+    "dest": "vendor/github.com/goatcms/goatcore"
+  }
+]

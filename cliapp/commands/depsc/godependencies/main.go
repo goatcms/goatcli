@@ -1,53 +1,47 @@
 package godependencies
 
 import (
-	"bytes"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/goatcms/goatcore/varutil"
 )
 
-// GetImportList return all project imports by path
+// GetExternalImportList return all external project imports by path
 // go list -f '{{ join .Imports "\n" }}' ./...
-func GetImportList(cwd string, path, prefix string) (result []string, err error) {
+/*func GetExternalImportList(path string) (result []string, err error) {
 	var (
-		outBuf bytes.Buffer
-		errBuf bytes.Buffer
-		coll   []string
-		index  int
-		gp     string
+		fs      filesystem.Filespace
+		imports []string
+		index   int
 	)
-	cmd := exec.Command("go", "list", "-f", "{{ join .Imports \"\\n\" }}", path)
-	cmd.Dir = cwd
-	cmd.Stdout = &outBuf
-	cmd.Stderr = &errBuf
-	if err = cmd.Run(); err != nil {
+	if fs, err = diskfs.NewFilespace(path); err != nil {
 		return nil, err
 	}
-	coll = strings.Split(outBuf.String(), "\n")
+	if imports, err = FSImports(fs); err != nil {
+		return nil, err
+	}
 	result = []string{}
-	for _, row := range coll {
-		if strings.HasPrefix(row, prefix) {
-			row = row[len(prefix):]
-		}
-		if gp = varutil.GOPath(row); gp == "" {
+	for _, row := range imports {
+		if row = varutil.FullGOPath(row); row == "" {
 			continue
 		}
-		if varutil.IsArrContainStr(result, gp) {
+		if IsIgnoredPath(AlwaysIgnored, row) {
 			continue
 		}
-		index = strings.Index(row, "/")
+		if varutil.IsArrContainStr(result, row) {
+			continue
+		}
+		if index = strings.Index(row, "/"); index == -1 {
+			continue
+		}
 		if strings.Index(row[:index], ".") == -1 {
 			continue
 		}
 		result = append(result, row)
 	}
 	return result, nil
-}
+}*/
 
 // MatchGoSrcRelativePath match path relative to GOPATH
 func MatchGoSrcRelativePath(GOPath, cwd string) (result string, err error) {
@@ -77,14 +71,4 @@ func IsIgnoredPath(coll []*regexp.Regexp, path string) bool {
 		}
 	}
 	return false
-}
-
-// MapPath replace path
-func MapPath(mapping []PathMappingRow, path string) string {
-	for _, row := range mapping {
-		if strings.HasPrefix(path, row.From) {
-			return row.To + path[len(row.From):]
-		}
-	}
-	return path
 }

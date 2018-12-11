@@ -40,7 +40,7 @@ func (repos *Repositories) Filespace(repoURL string, version repositories.Versio
 	}
 	if version.Branch != "" && version.Revision != "" {
 		destPath = basepath + reduceRepoURL(repoURL) + "." + version.Branch + "." + version.Revision
-	} else if version.Branch != "" {
+	} else if version.Revision != "" {
 		destPath = basepath + reduceRepoURL(repoURL) + ".master." + version.Revision
 	} else if version.Branch != "" {
 		destPath = basepath + reduceRepoURL(repoURL) + "." + version.Branch

@@ -43,47 +43,63 @@ func TestSetAddDuplicatedDependencies(t *testing.T) {
 	t.Parallel()
 	var (
 		set = NewSet()
+		err error
 	)
-	set.Add([]*config.Dependency{
+	if set.Add([]*config.Dependency{
 		&config.Dependency{
 			Repo:   "http://github.com/goatcms/goatcli",
 			Branch: "master",
 			Rev:    "",
 			Dest:   "vendor/github.com/goatcms/goatcli",
 		},
-	})
-	set.Add([]*config.Dependency{
+	}); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = set.Add([]*config.Dependency{
 		&config.Dependency{
 			Repo:   "http://github.com/goatcms/goatcli",
 			Branch: "master",
 			Rev:    "",
 			Dest:   "vendor/github.com/goatcms/goatcli",
 		},
-	})
+	}); err == nil {
+		t.Errorf("Expected error when duplicate destination path")
+		return
+	}
 	deps := set.Dependencies()
 	if len(deps) != 1 {
 		t.Errorf("Set should remove duplicated dependency. Expected 1 dependency and take %v", len(deps))
 	}
 }
 
+/*
 func TestSetAddGOPath(t *testing.T) {
 	t.Parallel()
 	var (
 		err error
 		set = NewSet()
 	)
-	if _, err = set.AddSource("http://github.com/goatcms/goatcli"); err != nil {
-		t.Error(err)
-		return
-	}
-	if _, err = set.AddSource("http://github.com/goatcms/goatcore"); err != nil {
-		t.Error(err)
-		return
-	}
-	if _, err = set.AddSource("http://github.com/goatcms/goatcms"); err != nil {
-		t.Error(err)
-		return
-	}
+	set.Add([]*config.Dependency{
+		&config.Dependency{
+			Repo:   "http://github.com/goatcms/goatcli",
+			Branch: "master",
+			Rev:    "",
+			Dest:   "vendor/github.com/goatcms/goatcli",
+		},
+		&config.Dependency{
+			Repo:   "http://github.com/goatcms/goatcore",
+			Branch: "master",
+			Rev:    "",
+			Dest:   "vendor/github.com/goatcms/goatcore",
+		},
+		&config.Dependency{
+			Repo:   "http://github.com/goatcms/goatcms",
+			Branch: "master",
+			Rev:    "",
+			Dest:   "vendor/github.com/goatcms/goatcms",
+		},
+	})
 	deps := set.Dependencies()
 	if len(deps) != 3 {
 		t.Errorf("Result should contains all added dependencies. Expected 3 and take %v", len(deps))
@@ -124,7 +140,7 @@ func TestAddSourceReturnRow(t *testing.T) {
 	if row == nil {
 		t.Errorf("Set.AddSource should return new row")
 	}
-}
+}*/
 
 func TestSetImported(t *testing.T) {
 	t.Parallel()
@@ -134,7 +150,14 @@ func TestSetImported(t *testing.T) {
 		row    *SetRow
 		result bool
 	)
-	if _, err = set.AddSource("http://github.com/goatcms/goatcms"); err != nil {
+	if err = set.Add([]*config.Dependency{
+		&config.Dependency{
+			Repo:   "http://github.com/goatcms/goatcms",
+			Branch: "master",
+			Rev:    "",
+			Dest:   "vendor/github.com/goatcms/goatcms",
+		},
+	}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -156,5 +179,25 @@ func TestSetImportedWrongPath(t *testing.T) {
 	)
 	if row = set.Row("github.com/goatcms/goatcms"); row != nil {
 		t.Errorf("Expected undefined row equals to nil")
+	}
+}
+
+func TestImportedResolveStory(t *testing.T) {
+	t.Parallel()
+	var (
+		set = NewSet()
+	)
+	if set.Resolve("github.com/goatcms/goatcms") == true {
+		t.Errorf("should return false for undefined path")
+	}
+	set.SetResolve("github.com/goatcms/goatcms", true)
+	if set.Resolve("github.com/goatcms/goatcms") == false {
+		t.Errorf("should return true for resolved path")
+	}
+	// Last case is unused now
+	// We don't support unresolved path
+	set.SetResolve("github.com/goatcms/goatcms", false)
+	if set.Resolve("github.com/goatcms/goatcms") == true {
+		t.Errorf("should return true for unresolved path")
 	}
 }

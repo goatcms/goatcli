@@ -5,19 +5,20 @@ import (
 	"sync"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
-	"github.com/goatcms/goatcore/varutil"
 )
 
 // Set is a class accumulate golang imports
 type Set struct {
-	m  map[string]*SetRow
-	mu sync.RWMutex
+	resolved map[string]bool
+	m        map[string]*SetRow
+	mu       sync.RWMutex
 }
 
 // NewSet create new Set instance
 func NewSet() *Set {
 	return &Set{
-		m: map[string]*SetRow{},
+		resolved: map[string]bool{},
+		m:        map[string]*SetRow{},
 	}
 }
 
@@ -51,8 +52,18 @@ func (set *Set) Add(dependencies []*config.Dependency) (err error) {
 	return nil
 }
 
+// Resolve return status for path. True for resolved path or false for unresolved
+func (set *Set) Resolve(gopath string) bool {
+	return set.resolved[gopath]
+}
+
+// SetResolve set status for path
+func (set *Set) SetResolve(gopath string, status bool) {
+	set.resolved[gopath] = status
+}
+
 // AddSource add repositories master branches by URL or golang source path
-func (set *Set) AddSource(urlOrGOPath string) (row *SetRow, err error) {
+/*func (set *Set) AddSource(urlOrGOPath string) (row *SetRow, err error) {
 	var (
 		relativePath string
 	)
@@ -61,7 +72,7 @@ func (set *Set) AddSource(urlOrGOPath string) (row *SetRow, err error) {
 	}
 	row = &SetRow{
 		Dependency: &config.Dependency{
-			Repo:   "https://" + MapPath(GOPathMapping, relativePath) + ".git",
+			Repo:   "https://" + varutil.GOPath(MapPath(GOPathMapping, relativePath)) + ".git",
 			Branch: "master",
 			Rev:    "",
 			Dest:   "vendor/" + relativePath,
@@ -74,3 +85,4 @@ func (set *Set) AddSource(urlOrGOPath string) (row *SetRow, err error) {
 	set.m[row.Dependency.Dest] = row
 	return row, nil
 }
+*/
