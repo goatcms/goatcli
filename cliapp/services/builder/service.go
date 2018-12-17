@@ -38,7 +38,12 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 	return services.BuilderService(instance), nil
 }
 
+// Build scaffolding a new app and clone dependencies
 func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) (err error) {
+	// clone dependencies
+	if err = s.CloneDependencies(fs); err != nil {
+		return err
+	}
 	return s.build("", fs, buildConfigs, data, properties, secrets)
 }
 
@@ -49,10 +54,6 @@ func (s *Service) build(subPath string, fs filesystem.Filespace, buildConfigs []
 		writer           *FSWriter
 		hash             string
 	)
-	// clone dependencies
-	if err = s.CloneDependencies(fs); err != nil {
-		return err
-	}
 	// build modules
 	if err = s.BuildModules(subPath, fs, data, properties, secrets); err != nil {
 		return err

@@ -92,16 +92,16 @@ func (importer *Importer) Import() (err error) {
 	if imports, err = FSDepImports(importer.fs); err != nil {
 		return err
 	}
-	return importer.processesImports(imports, 0)
+	return importer.processesImports(imports, []string{})
 }
 
-func (importer *Importer) importDirectory(path string, dep int) (err error) {
+func (importer *Importer) importDirectory(path string, stacktrace []string) (err error) {
 	var (
 		imports []string
 		fs      filesystem.Filespace
 	)
-	if dep == importer.options.MaxDep {
-		return fmt.Errorf("godependencies.Importer.importDirectory: To much import recursive depths. You have %v recursive import lvls", dep)
+	if len(stacktrace) >= importer.options.MaxDep {
+		return fmt.Errorf("godependencies.Importer.importDirectory: To much import recursive depths. You have %v recursive import lvls: %v", len(stacktrace), stacktrace)
 	}
 	if fs, err = importer.fs.Filespace(path); err != nil {
 		return err
@@ -109,10 +109,10 @@ func (importer *Importer) importDirectory(path string, dep int) (err error) {
 	if imports, err = FSDirImports(fs); err != nil {
 		return err
 	}
-	return importer.processesImports(imports, dep)
+	return importer.processesImports(imports, stacktrace)
 }
 
-func (importer *Importer) processesImports(imports []string, dep int) (err error) {
+func (importer *Importer) processesImports(imports, stacktrace []string) (err error) {
 	imports = importer.reduceImports(imports)
 	for _, importPath := range imports {
 		var (
@@ -126,7 +126,7 @@ func (importer *Importer) processesImports(imports []string, dep int) (err error
 		}
 		importer.set.SetResolve(importPath, true)
 		if repoRoot, err = vcs.RepoRootForImportPath(importPath, importer.options.DevLogs); err != nil {
-			return err
+			return fmt.Errorf("%v %s", err.Error(), strings.Join(stacktrace, "\n at "))
 		}
 		dependency = importer.toDependency(repoRoot)
 		if row = importer.set.Row(dependency.Dest); row == nil {
@@ -137,7 +137,7 @@ func (importer *Importer) processesImports(imports []string, dep int) (err error
 				importer.logs.OnNewSource(dependency.Dest)
 			}
 			if row = importer.set.Row(dependency.Dest); row == nil {
-				return fmt.Errorf("godependencies.Importer.importPath: add dependency fail")
+				return fmt.Errorf("godependencies.Importer.importPath: add dependency fail. %s", strings.Join(stacktrace, "\n at "))
 			}
 		}
 		if row.Imported {
@@ -146,10 +146,14 @@ func (importer *Importer) processesImports(imports []string, dep int) (err error
 		if err = importer.dependencies.CloneDependencies(importer.fs, []*config.Dependency{
 			row.Dependency,
 		}); err != nil {
-			return err
+			if importer.options.DevLogs {
+				return fmt.Errorf("Stacktrace: %v \nImports: %v\nError: %v", stacktrace, imports, err.Error())
+			}
+			return fmt.Errorf("Stacktrace: %v \nError: %v", stacktrace, err.Error())
 		}
 		row.Imported = true
-		if err = importer.importDirectory("vendor/"+importPath, dep+1); err != nil {
+		newStacktrace := append(stacktrace, importPath)
+		if err = importer.importDirectory("vendor/"+importPath, newStacktrace); err != nil {
 			return err
 		}
 	}

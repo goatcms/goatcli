@@ -18,7 +18,7 @@ func FSDepImports(sourcefs filesystem.Filespace) (imports []string, err error) {
 	loop := fsloop.NewLoop(&fsloop.LoopData{
 		Filespace: sourcefs,
 		DirFilter: func(fs filesystem.Filespace, subPath string) bool {
-			return subPath != "./.git"
+			return subPath != "./.git" && subPath != "./vendor" && !strings.Contains(subPath, "/vendor/")
 		},
 		OnFile: func(fs filesystem.Filespace, subPath string) (err error) {
 			var (
@@ -66,7 +66,12 @@ func FSDirImports(sourcefs filesystem.Filespace) (imports []string, err error) {
 		return nil, err
 	}
 	for _, node := range nodes {
-		if node.IsDir() || !strings.HasSuffix(node.Name(), ".go") {
+		name := node.Name()
+		if node.IsDir() || !strings.HasSuffix(name, ".go") {
+			continue
+		}
+		// skip test files (for sub projects)
+		if strings.HasSuffix(name, "_test.go") {
 			continue
 		}
 		if code, err = sourcefs.ReadFile(node.Name()); err != nil {
