@@ -34,8 +34,12 @@
   name = "github.com/goatcms/goatcore"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/mitchellh/go-homedir"
+  version = "1.0.0"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/tools"
 
 [prune]
   go-tests = true
