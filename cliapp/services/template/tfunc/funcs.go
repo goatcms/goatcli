@@ -50,6 +50,7 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("findRow", FindRow)
 	deps.TemplateService.AddFunc("findRows", FindRows)
 	deps.TemplateService.AddFunc("noescape", Noescape)
+	deps.TemplateService.AddFunc("wrap", Wrap)
 	deps.TemplateService.AddFunc("safeHTMLAttr", SafeHTMLAttr)
 	deps.TemplateService.AddFunc("safeHTML", SafeHTML)
 	deps.TemplateService.AddFunc("safeURL", SafeURL)

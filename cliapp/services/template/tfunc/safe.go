@@ -1,5 +1,11 @@
 package tfunc
 
+// Wrap return text wraped with '{{' and end with '}}'
+// Deprecated: It is now required.
+func Wrap(value string) string {
+	return "{{" + value + "}}"
+}
+
 // Noescape return noescaped content
 // Deprecated: It is now required.
 func Noescape(value string) string {
