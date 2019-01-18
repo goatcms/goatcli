@@ -69,7 +69,7 @@ func (m *Module) registerCommands(a app.App) error {
 	commandScope.Set("help.command.clone", commands.Clone)
 	commandScope.Set("command.clone", clonec.Run)
 	commandScope.Set("help.command.init", commands.Init)
-	commandScope.Set("command.init", initc.Run)
+	commandScope.Set("command.init", initc.RunInit)
 	commandScope.Set("help.command.build", commands.Build)
 	commandScope.Set("command.build", buildc.Run)
 	// data commands
