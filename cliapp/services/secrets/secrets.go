@@ -1,6 +1,10 @@
 package secrets
 
 import (
+	"os"
+	"sort"
+	"strings"
+
 	"github.com/goatcms/goatcli/cliapp/common/cio"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
@@ -31,7 +35,7 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 
 // ReadDefFromFS read secrets definitions from filespace
 func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace) (secrets []*config.Property, err error) {
-	var json []byte
+	/*var json []byte
 	if !fs.IsFile(SecretsDefPath) {
 		return make([]*config.Property, 0), nil
 	}
@@ -40,6 +44,46 @@ func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace) (secrets []*config.Prop
 	}
 	if secrets, err = config.NewProperties(json); err != nil {
 		return nil, err
+	}
+	return secrets, nil*/
+
+	var (
+		json  []byte
+		nodes []os.FileInfo
+		props []*config.Property
+	)
+	if fs.IsFile(SecretsDefPath) {
+		if json, err = fs.ReadFile(SecretsDefPath); err != nil {
+			return nil, err
+		}
+		if secrets, err = config.NewProperties(json); err != nil {
+			return nil, err
+		}
+	} else {
+		secrets = make([]*config.Property, 0)
+	}
+	// Read separated data.def files
+	if !fs.IsDir(BaseSecretsDefPath) {
+		return secrets, nil
+	}
+	if nodes, err = fs.ReadDir(BaseSecretsDefPath); err != nil {
+		return nil, err
+	}
+	sort.SliceStable(nodes, func(i, j int) bool {
+		return nodes[i].Name() < nodes[j].Name()
+	})
+	for _, node := range nodes {
+		var path = BaseSecretsDefPath + node.Name()
+		if !fs.IsFile(path) || !strings.HasSuffix(path, SecretsDefSuffix) {
+			continue
+		}
+		if json, err = fs.ReadFile(path); err != nil {
+			return nil, err
+		}
+		if props, err = config.NewProperties(json); err != nil {
+			return nil, err
+		}
+		secrets = append(secrets, props...)
 	}
 	return secrets, nil
 }
