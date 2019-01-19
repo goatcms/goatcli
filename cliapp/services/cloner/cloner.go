@@ -52,7 +52,6 @@ func (cloner *Cloner) Clone(repoURL string, verion repositories.Version, destfs 
 			return err
 		}
 	}
-	cleanRequired := false
 	loop := fsloop.NewLoop(&fsloop.LoopData{
 		Filespace: sourcefs,
 		DirFilter: func(fs filesystem.Filespace, subPath string) bool {
@@ -66,7 +65,6 @@ func (cloner *Cloner) Clone(repoURL string, verion repositories.Version, destfs 
 				return err
 			}
 			if err = copy(sourcefs, destfs, subPath, replaces); err != nil {
-				cleanRequired = true
 				return err
 			}
 			return nil
