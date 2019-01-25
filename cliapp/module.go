@@ -7,6 +7,8 @@ import (
 	"github.com/goatcms/goatcli/cliapp/commands/datac"
 	"github.com/goatcms/goatcli/cliapp/commands/depsc"
 	"github.com/goatcms/goatcli/cliapp/commands/initc"
+	"github.com/goatcms/goatcli/cliapp/commands/propertiesc"
+	"github.com/goatcms/goatcli/cliapp/commands/secretsc"
 	"github.com/goatcms/goatcli/cliapp/services/builder"
 	"github.com/goatcms/goatcli/cliapp/services/cloner"
 	"github.com/goatcms/goatcli/cliapp/services/data"
@@ -82,6 +84,16 @@ func (m *Module) registerCommands(a app.App) error {
 	commandScope.Set("command.deps:add:go", depsc.RunAddGODep)
 	commandScope.Set("help.command.deps:add:go:import", commands.AddGOImportsDep)
 	commandScope.Set("command.deps:add:go:import", depsc.RunAddGOImportsDep)
+	// properties command
+	commandScope.Set("help.command.properties:set", commands.SetPropertyValueDep)
+	commandScope.Set("command.properties:set", propertiesc.RunSetPropertyValue)
+	commandScope.Set("help.command.properties:get", commands.GetPropertyValueDep)
+	commandScope.Set("command.properties:get", propertiesc.RunGetPropertyValue)
+	// secrets command
+	commandScope.Set("help.command.secrets:set", commands.SetSecretValueDep)
+	commandScope.Set("command.secrets:set", secretsc.RunSetSecretValue)
+	commandScope.Set("help.command.secrets:get", commands.GetSecretValueDep)
+	commandScope.Set("command.secrets:get", secretsc.RunGetSecretValue)
 	// arguments
 	commandScope.Set("help.argument.cwd", commands.CWDArg)
 	return nil
