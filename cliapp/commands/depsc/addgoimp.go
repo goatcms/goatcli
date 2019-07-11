@@ -7,19 +7,22 @@ import (
 )
 
 // RunAddGOImportsDep run deps:add:go:imports command
-func RunAddGOImportsDep(a app.App) (err error) {
+func RunAddGOImportsDep(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
-			CWD          string                       `argument:"?cwd"`
-			LogLvl       string                       `argument:"?loglvl"`
-			Dependencies services.DependenciesService `dependency:"DependenciesService"`
+			CWD    string `argument:"?cwd",command:"?cwd"`
+			LogLvl string `argument:"?loglvl",command:"?loglvl"`
 
-			Input  app.Input  `dependency:"InputService"`
-			Output app.Output `dependency:"OutputService"`
+			Dependencies services.DependenciesService `dependency:"DependenciesService"`
+			Input        app.Input                    `dependency:"InputService"`
+			Output       app.Output                   `dependency:"OutputService"`
 		}
 		importer *godependencies.Importer
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
+		return err
+	}
+	if err = ctxScope.InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.CWD == "" {

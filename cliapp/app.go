@@ -79,6 +79,7 @@ func NewCLIApp(name, version string) (app.App, error) {
 		capp.engineScope,
 	})
 
+	capp.dp.SetDefault(app.AppService, app.App(capp))
 	return capp, nil
 }
 

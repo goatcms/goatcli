@@ -6,7 +6,7 @@ import (
 )
 
 // RunInit run init command
-func RunInit(a app.App) (err error) {
+func RunInit(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
 			CurrentFS filesystem.Filespace `filespace:"current"`

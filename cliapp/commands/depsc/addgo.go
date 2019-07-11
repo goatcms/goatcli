@@ -11,13 +11,13 @@ import (
 )
 
 // RunAddGODep run deps:add:go command
-func RunAddGODep(a app.App) (err error) {
+func RunAddGODep(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
-			GORepo string `argument:"?$2"`
-			Branch string `argument:"?$3"`
-			Rev    string `argument:"?$3"`
-			CWD    string `argument:"?cwd"`
+			GORepo string `command:"?$1"`
+			Branch string `command:"?$2"`
+			Rev    string `command:"?$3"`
+			CWD    string `argument:"?cwd",command:"?cwd"`
 
 			Dependencies services.DependenciesService `dependency:"DependenciesService"`
 		}
@@ -26,6 +26,9 @@ func RunAddGODep(a app.App) (err error) {
 		dest string
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
+		return err
+	}
+	if err = ctxScope.InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.GORepo == "" {

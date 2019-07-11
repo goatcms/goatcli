@@ -11,11 +11,11 @@ import (
 )
 
 // RunAdd run data:add command
-func RunAdd(a app.App) (err error) {
+func RunAdd(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
-			TypeName    string               `argument:"?$2"`
-			DataName    string               `argument:"?$3"`
+			TypeName    string               `command:"?$1"`
+			DataName    string               `command:"?$2"`
 			CurrentFS   filesystem.Filespace `filespace:"current"`
 			DataService services.DataService `dependency:"DataService"`
 			Input       app.Input            `dependency:"InputService"`
@@ -26,6 +26,9 @@ func RunAdd(a app.App) (err error) {
 		datamap map[string]string
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
+		return err
+	}
+	if err = ctxScope.InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.TypeName == "" {

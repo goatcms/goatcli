@@ -10,10 +10,10 @@ import (
 )
 
 // Run run command in app.App context
-func Run(a app.App) (err error) {
+func Run(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
-			Interactive string `argument:"?interactive"`
+			Interactive string `argument:"?interactive",command:"?interactive"`
 
 			CurrentFS filesystem.Filespace `filespace:"current"`
 
@@ -35,6 +35,9 @@ func Run(a app.App) (err error) {
 		interactive    bool
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
+		return err
+	}
+	if err = ctxScope.InjectTo(&deps); err != nil {
 		return err
 	}
 	interactive = !(deps.Interactive == "false")

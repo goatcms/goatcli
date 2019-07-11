@@ -9,11 +9,11 @@ import (
 )
 
 // RunSetSecretValue run command to set new secret value
-func RunSetSecretValue(a app.App) (err error) {
+func RunSetSecretValue(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
-			Key            string                  `argument:"?$2"`
-			Value          string                  `argument:"?$3"`
+			Key            string                  `command:"?$1"`
+			Value          string                  `command:"?$2"`
 			CurrentFS      filesystem.Filespace    `filespace:"current"`
 			SecretsService services.SecretsService `dependency:"SecretsService"`
 			Input          app.Input               `dependency:"InputService"`
@@ -22,6 +22,9 @@ func RunSetSecretValue(a app.App) (err error) {
 		secretsData map[string]string
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
+		return err
+	}
+	if err = ctxScope.InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.Key == "" {

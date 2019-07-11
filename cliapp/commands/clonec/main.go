@@ -12,16 +12,15 @@ import (
 )
 
 // Run run command in app.App context
-func Run(a app.App) (err error) {
+func Run(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
-			Interactive string `argument:"?interactive"`
+			Interactive string `argument:"?interactive",command:"?interactive"`
 
-			Command            string `argument:"$1"`
-			RepositoryURL      string `argument:"?$2"`
-			RepositoryBranch   string `argument:"?branch"`
-			RepositoryRevision string `argument:"?rev"`
-			DestPath           string `argument:"?$3"`
+			RepositoryURL      string `command:"?$1"`
+			DestPath           string `command:"?$2"`
+			RepositoryBranch   string `command:"?branch"`
+			RepositoryRevision string `command:"?rev"`
 
 			RootFilespace filesystem.Filespace `filespace:"root"`
 
@@ -39,6 +38,9 @@ func Run(a app.App) (err error) {
 		interactive    bool
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
+		return err
+	}
+	if err = ctxScope.InjectTo(&deps); err != nil {
 		return err
 	}
 	interactive = !(deps.Interactive == "false")

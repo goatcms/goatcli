@@ -9,10 +9,10 @@ import (
 )
 
 // RunGetPropertyValue run command to set property value
-func RunGetPropertyValue(a app.App) (err error) {
+func RunGetPropertyValue(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
-			Key               string                     `argument:"?$2"`
+			Key               string                     `command:"?$1"`
 			CurrentFS         filesystem.Filespace       `filespace:"current"`
 			PropertiesService services.PropertiesService `dependency:"PropertiesService"`
 			Input             app.Input                  `dependency:"InputService"`
@@ -23,6 +23,9 @@ func RunGetPropertyValue(a app.App) (err error) {
 		value          string
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
+		return err
+	}
+	if err = ctxScope.InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.Key == "" {
