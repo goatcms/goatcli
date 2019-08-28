@@ -7,6 +7,8 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/filesystem/fscache"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 // Run run command in app.App context
@@ -33,6 +35,7 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 		builderDef     []*config.Build
 		data           map[string]string
 		interactive    bool
+		fs             fscache.Cache
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
 		return err
@@ -41,55 +44,75 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 		return err
 	}
 	interactive = !(deps.Interactive == "false")
-	if err = prevents.RequireGoatProject(deps.CurrentFS); err != nil {
+	if fs, err = fscache.NewMemCache(fs); err != nil {
+		return err
+	}
+	if err = prevents.RequireGoatProject(fs); err != nil {
 		return err
 	}
 	// load properties
-	if propertiesDef, err = deps.PropertiesService.ReadDefFromFS(deps.CurrentFS); err != nil {
+	if propertiesDef, err = deps.PropertiesService.ReadDefFromFS(fs); err != nil {
 		return err
 	}
-	if propertiesData, err = deps.PropertiesService.ReadDataFromFS(deps.CurrentFS); err != nil {
+	if propertiesData, err = deps.PropertiesService.ReadDataFromFS(fs); err != nil {
 		return err
 	}
 	if isChanged, err = deps.PropertiesService.FillData(propertiesDef, propertiesData, map[string]string{}, interactive); err != nil {
 		return err
 	}
 	if isChanged {
-		if err = deps.PropertiesService.WriteDataToFS(deps.CurrentFS, propertiesData); err != nil {
+		if err = deps.PropertiesService.WriteDataToFS(fs, propertiesData); err != nil {
 			return err
 		}
 	}
 	// load secrets
-	if secretsDef, err = deps.SecretsService.ReadDefFromFS(deps.CurrentFS); err != nil {
+	if secretsDef, err = deps.SecretsService.ReadDefFromFS(fs); err != nil {
 		return err
 	}
-	if secretsData, err = deps.SecretsService.ReadDataFromFS(deps.CurrentFS); err != nil {
+	if secretsData, err = deps.SecretsService.ReadDataFromFS(fs); err != nil {
 		return err
 	}
 	if isChanged, err = deps.SecretsService.FillData(secretsDef, secretsData, map[string]string{}, interactive); err != nil {
 		return err
 	}
 	if isChanged {
-		if err = deps.SecretsService.WriteDataToFS(deps.CurrentFS, secretsData); err != nil {
+		if err = deps.SecretsService.WriteDataToFS(fs, secretsData); err != nil {
 			return err
 		}
 	}
 	// load data
-	if data, err = deps.DataService.ReadDataFromFS(deps.CurrentFS); err != nil {
+	if data, err = deps.DataService.ReadDataFromFS(fs); err != nil {
 		return err
 	}
 	// Clone modules (if required)
 	propertiesResult := result.NewPropertiesResult(propertiesData)
-	if err = deps.ClonerService.CloneModules(deps.CurrentFS, deps.CurrentFS, propertiesResult); err != nil {
+	if err = deps.ClonerService.CloneModules(fs, fs, propertiesResult); err != nil {
 		return err
 	}
 	// build
-	if builderDef, err = deps.BuilderService.ReadDefFromFS(deps.CurrentFS); err != nil {
+	if builderDef, err = deps.BuilderService.ReadDefFromFS(fs); err != nil {
 		return err
 	}
-	if err = deps.BuilderService.Build(deps.CurrentFS, builderDef, data, propertiesData, secretsData); err != nil {
+	if err = deps.BuilderService.Build(ctxScope, fs, builderDef, data, propertiesData, secretsData); err != nil {
 		return err
 	}
-	deps.Output.Printf("builded")
+	if err = ctxScope.Wait(); err != nil {
+		return goaterr.ToErrors(goaterr.AppendError(nil,
+			err,
+			ctxScope.Trigger(app.RollbackEvent, nil)))
+	}
+	deps.Output.Printf("builded\n")
+	if err = fs.Commit(); err != nil {
+		return err
+	}
+	deps.Output.Printf("commit to filesystem...\n")
+	if err = ctxScope.Trigger(app.CommitEvent, nil); err != nil {
+		return err
+	}
+	deps.Output.Printf("start after commit tasks...\n")
+	if err = ctxScope.Trigger(app.AfterCommitEvent, nil); err != nil {
+		return err
+	}
+	deps.Output.Printf("after commit tasks done ")
 	return nil
 }

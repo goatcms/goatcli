@@ -1,4 +1,4 @@
-package tfunc
+package naming
 
 import "testing"
 
@@ -26,6 +26,10 @@ func TestToCamelCase(t *testing.T) {
 	}
 	if ToCamelCase("firstAndLast") != "firstAndLast" {
 		t.Errorf("ToCamelCase('firstAndLast') = %s expected 'firstAndLast' result", ToCamelCase("firstAndLast"))
+		return
+	}
+	if ToCamelCase("first.and.last") != "firstAndLast" {
+		t.Errorf("ToCamelCase('first.and.last') = %s expected 'firstAndLast' result", ToCamelCase("first.and.last"))
 		return
 	}
 }

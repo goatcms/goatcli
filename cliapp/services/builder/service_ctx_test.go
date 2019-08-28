@@ -13,18 +13,20 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services/template"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/scope"
 )
 
 const (
-	testCTXBuilderLayout   = `{{define "list"}} {{range .}}{{println "," .}}{{end}} {{end}}`
+	testCTXBuilderLayout = `{{- define "out/file.txt"}}
+		{{- $ctx := .}}
+		{{- index $ctx.PlainData "datakey" }}
+		{{- index $ctx.Properties.Project "propkey" }}
+		{{- index $ctx.Properties.Secrets "secretkey" }}
+	{{- end}}`
 	testCTXBuilderTemplate = `
-	{{if not (.Filesystem.IsFile "out/file.txt")}}
-		{{.Out.File "out/file.txt"}}
-			{{- index .Data "datakey" -}}
-			{{- index .Properties.Project "propkey" -}}
-			{{- index .Properties.Secrets "secretkey" -}}
-		{{.Out.EOF}}
-	{{end}}`
+	{{$ctx := .}}
+	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}
+	`
 )
 
 func TestCTXBuilder(t *testing.T) {
@@ -92,13 +94,18 @@ func TestCTXBuilder(t *testing.T) {
 		},
 	}
 	fs := mapp.RootFilespace()
-	if err = deps.BuilderService.Build(fs, buildConfig, map[string]string{
+	ctxScope := scope.NewScope("test")
+	if err = deps.BuilderService.Build(ctxScope, fs, buildConfig, map[string]string{
 		"datakey": "Ala",
 	}, map[string]string{
 		"propkey": " ma",
 	}, map[string]string{
 		"secretkey": " kota",
 	}); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = ctxScope.Wait(); err != nil {
 		t.Error(err)
 		return
 	}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/repositories"
 )
@@ -70,11 +71,12 @@ type TemplateService interface {
 
 // TemplateExecutor render data
 type TemplateExecutor interface {
-	Execute(layoutName, TemplatePath string, wr io.Writer, data interface{}) error
+	Execute(layoutName, TemplatePath string, wr io.Writer, data interface{}) (err error)
+	ExecuteTemplate(layoutName, viewName, templateName string, wr io.Writer, data interface{}) (err error)
 }
 
 // BuilderService build project structure
 type BuilderService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Build, error)
-	Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) error
+	Build(ctxScope app.Scope, fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) error
 }

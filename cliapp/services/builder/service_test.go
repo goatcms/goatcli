@@ -13,16 +13,16 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services/template"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/scope"
 )
 
 const (
-	testBuilderLayout   = `{{define "list"}} {{range .}}{{println "," .}}{{end}} {{end}}`
-	testBuilderTemplate = `
-	{{if not (.Filesystem.IsFile "out/file.txt")}}
-		{{.Out.File "out/file.txt"}}
+	testBuilderLayout = `{{- define "out/file.txt" -}}
 		File Content
-		{{.Out.EOF}}
-	{{end}}`
+	{{- end -}}`
+	testBuilderTemplate = `
+	{{$ctx := .}}
+	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}`
 )
 
 func TestBuilder(t *testing.T) {
@@ -90,7 +90,12 @@ func TestBuilder(t *testing.T) {
 		},
 	}
 	fs := mapp.RootFilespace()
-	if err = deps.BuilderService.Build(fs, buildConfig, map[string]string{}, map[string]string{}, map[string]string{}); err != nil {
+	ctxScope := scope.NewScope("test")
+	if err = deps.BuilderService.Build(ctxScope, fs, buildConfig, map[string]string{}, map[string]string{}, map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = ctxScope.Wait(); err != nil {
 		t.Error(err)
 		return
 	}

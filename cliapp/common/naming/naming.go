@@ -1,4 +1,4 @@
-package tfunc
+package naming
 
 import (
 	"regexp"

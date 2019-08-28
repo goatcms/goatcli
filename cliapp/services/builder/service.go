@@ -4,25 +4,28 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
-	"github.com/goatcms/goatcli/cliapp/services/builder/bcontext"
+	"github.com/goatcms/goatcli/cliapp/services/builder/executor"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
-	"github.com/goatcms/goatcore/varutil"
 )
 
 // Service build structure
 type Service struct {
 	deps struct {
 		CWD             string                       `argument:"?cwd"`
+		ExecutorLimit   string                       `argument:"?executor.limit"`
 		TemplateService services.TemplateService     `dependency:"TemplateService"`
 		Modules         services.ModulesService      `dependency:"ModulesService"`
 		Dependencies    services.DependenciesService `dependency:"DependenciesService"`
 		Repositories    services.RepositoriesService `dependency:"RepositoriesService"`
 	}
+	limit int64
 }
 
 // ServiceFactory create new repositories instance
@@ -35,71 +38,87 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 	if instance.deps.CWD == "" {
 		instance.deps.CWD = "./"
 	}
+	if instance.deps.ExecutorLimit == "" {
+		instance.limit = DefaultExecutorLimit
+	} else {
+		if instance.limit, err = strconv.ParseInt(instance.deps.ExecutorLimit, 10, 64); err != nil {
+			return nil, err
+		}
+	}
 	return services.BuilderService(instance), nil
 }
 
 // Build scaffolding a new app and clone dependencies
-func (s *Service) Build(fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) (err error) {
+func (s *Service) Build(ctxScope app.Scope, fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) (err error) {
 	// clone dependencies
 	if err = s.CloneDependencies(fs); err != nil {
 		return err
 	}
-	return s.build("", fs, buildConfigs, data, properties, secrets)
+	return s.build(ctxScope, "", fs, buildConfigs, data, properties, secrets)
 }
 
 // Build project files and directories from data
-func (s *Service) build(subPath string, fs filesystem.Filespace, buildConfigs []*config.Build, data, properties, secrets map[string]string) (err error) {
+func (s *Service) build(ctxScope app.Scope, subPath string, fs filesystem.Filespace, buildConfigs []*config.Build, data, projectProperties, secrets map[string]string) (err error) {
 	var (
-		templateExecutor services.TemplateExecutor
-		writer           *FSWriter
-		hash             string
+		templateExecutor  services.TemplateExecutor
+		generatorExecutor *executor.GeneratorExecutor
 	)
 	// build modules
-	if err = s.BuildModules(subPath, fs, data, properties, secrets); err != nil {
+	if err = s.BuildModules(ctxScope, subPath, fs, data, projectProperties, secrets); err != nil {
 		return err
 	}
-	// build main code
-	hash = varutil.RandString(30, varutil.AlphaNumericBytes)
 	if templateExecutor, err = s.deps.TemplateService.Build(fs); err != nil {
 		return err
 	}
-	writer = NewFSWriter(fs, hash)
+	if generatorExecutor, err = executor.NewGeneratorExecutor(ctxScope, executor.SharedData{
+		PlainData: data,
+		Properties: executor.GlobalProperties{
+			Project: projectProperties,
+			Secrets: secrets,
+		},
+		FS: fs,
+	}, s.limit, templateExecutor); err != nil {
+		return err
+	}
 	for _, c := range buildConfigs {
-		context := bcontext.NewBuildContext(&bcontext.Options{
-			From: c.From,
-			To:   c.To,
-			FS:   fs,
-			Data: data,
-			Hash: hash,
-			Properties: bcontext.PropertieOptions{
-				Project: properties,
-				Secrets: secrets,
-				Build:   c.Properties,
+		generatorExecutor.ExecuteTask(executor.Task{
+			Template: executor.TemplateHandler{
+				Layout: c.Layout,
+				Path:   c.Template,
 			},
+			DotData: TaskData{
+				From: c.From,
+				To:   c.To,
+			},
+			BuildProperties: c.Properties,
+			FSPath:          "",
 		})
-		if err = templateExecutor.Execute(c.Layout, c.Template, writer, context); err != nil {
-			return err
-		}
 		if c.AfterBuild != "" {
-			var (
-				command string
-				out     bytes.Buffer
-				args    []string
-			)
-			command = strings.Replace(c.AfterBuild, "\\\"", "\"", -1)
-			args = strings.Split(command, " ")
-			cwd := s.deps.CWD + subPath
-			for i := range args {
-				// replace it here because argument.cwd can contains space (for example in home directory name)
-				args[i] = strings.Replace(args[i], "{{argument.cwd}}", cwd, -1)
-			}
-			cmd := exec.Command(args[0], args[1:]...)
-			cmd.Stdout = &out
-			cmd.Stderr = &out
-			if err = cmd.Run(); err != nil {
-				return fmt.Errorf("external app fail %v: %v %v", args, err, string(out.Bytes()))
-			}
+			ctxScope.On(app.CommitEvent, func(d interface{}) error {
+				return s.afterBuild(subPath, c.AfterBuild)
+			})
 		}
+	}
+	return nil
+}
+
+func (s *Service) afterBuild(subPath string, command string) (err error) {
+	var (
+		out  bytes.Buffer
+		args []string
+	)
+	command = strings.Replace(command, "\\\"", "\"", -1)
+	args = strings.Split(command, " ")
+	cwd := s.deps.CWD + subPath
+	for i := range args {
+		// replace it here because argument.cwd can contains space (for example in home directory name)
+		args[i] = strings.Replace(args[i], "{{argument.cwd}}", cwd, -1)
+	}
+	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	if err = cmd.Run(); err != nil {
+		return fmt.Errorf("external app fail %v: %v %v", args, err, string(out.Bytes()))
 	}
 	return nil
 }
@@ -116,7 +135,7 @@ func (s *Service) CloneDependencies(fs filesystem.Filespace) (err error) {
 }
 
 // BuildModules build project modules
-func (s *Service) BuildModules(subPath string, fs filesystem.Filespace, data, properties, secrets map[string]string) (err error) {
+func (s *Service) BuildModules(ctxScope app.Scope, subPath string, fs filesystem.Filespace, data, properties, secrets map[string]string) (err error) {
 	var (
 		modules []*config.Module
 	)
@@ -141,11 +160,32 @@ func (s *Service) BuildModules(subPath string, fs filesystem.Filespace, data, pr
 			return err
 		}
 		moduleSubPath := subPath + module.SourceDir
-		if err = s.build(moduleSubPath, modulefs, buildConfigs, data, properties, secrets); err != nil {
+		if err = s.build(ctxScope, moduleSubPath, modulefs, buildConfigs, data, properties, secrets); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (s *Service) buildModule(ctxScope app.Scope, subPath string, module *config.Module, fs filesystem.Filespace, data, properties, secrets map[string]string) (err error) {
+	var (
+		modulefs     filesystem.Filespace
+		buildConfigs []*config.Build
+	)
+	if !fs.IsExist(module.SourceDir) {
+		return fmt.Errorf("builder.BuildModules: Module '%s' is not exist", module.SourceDir)
+	}
+	if err = fs.MkdirAll(module.SourceDir, 0766); err != nil {
+		return err
+	}
+	if modulefs, err = fs.Filespace(module.SourceDir); err != nil {
+		return err
+	}
+	if buildConfigs, err = s.ReadDefFromFS(modulefs); err != nil {
+		return err
+	}
+	moduleSubPath := subPath + module.SourceDir
+	return s.build(ctxScope, moduleSubPath, modulefs, buildConfigs, data, properties, secrets)
 }
 
 // ReadDefFromFS return data definition

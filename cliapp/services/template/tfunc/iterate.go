@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Keys return sub keys for key
+// Keys return sub keys for prefix
 func Keys(plainmap map[string]string, prefix string) (keys []string) {
 	m := map[string]bool{}
 	for k := range plainmap {
