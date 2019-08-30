@@ -5,28 +5,37 @@ import (
 	"strings"
 )
 
-var camel = regexp.MustCompile("(^[^A-Z]*|[A-Z]*)([A-Z][^A-Z]+|$)")
-var under = regexp.MustCompile("[\\s\\t!@#$%^&*()_\\+-=.]+[a-zA-Z0-9]{1}")
+var under = regexp.MustCompile("(^[^A-Z]*|[A-Z]*)([A-Z][^A-Z]+|$)")
+var cc = regexp.MustCompile("[\\s\\t!@#$%^&*()_\\+-=\\.]+[a-zA-Z0-9]{1}")
 
 // ToUnderscore convert string to underscore
-func ToUnderscore(s string) string {
-	var a []string
-	for _, sub := range camel.FindAllStringSubmatch(s, -1) {
-		if sub[1] != "" {
-			a = append(a, sub[1])
+func ToUnderscore(name string) (result string) {
+	var wasBig = false
+	for i := 0; i < len(name); i++ {
+		c := name[i]
+		if c >= 'a' && c <= 'z' {
+			result += string(c)
+			wasBig = false
+			continue
 		}
-		if sub[2] != "" {
-			a = append(a, sub[2])
+		if !wasBig && len(result) > 0 && !strings.HasSuffix(result, "_") {
+			result += "_"
+		}
+		if c >= 'A' && c <= 'Z' {
+			result += strings.ToLower(string(c))
+			wasBig = true
+		} else {
+			wasBig = false
 		}
 	}
-	return strings.ToLower(strings.Join(a, "_"))
+	return result
 }
 
 // ToCamelCase convert string to CamelCase
 func ToCamelCase(s string) string {
 	var a []string
 	lastIndex := 0
-	for _, sub := range under.FindAllStringIndex(s, -1) {
+	for _, sub := range cc.FindAllStringIndex(s, -1) {
 		a = append(a, s[lastIndex:sub[0]])
 		a = append(a, strings.ToUpper(s[sub[1]-1:sub[1]]))
 		lastIndex = sub[1]

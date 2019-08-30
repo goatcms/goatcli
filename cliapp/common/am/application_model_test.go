@@ -3,6 +3,7 @@ package am
 import (
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common/am/entitymodel"
 	"github.com/goatcms/goatcore/varutil/plainmap"
 )
 
@@ -17,7 +18,7 @@ const (
 	      "admin_insert_roles": "admin",
 	      "admin_edit_roles":   "admin",
 	      "admin_delete_roles": "admin",
-	      "label":"email",
+	      "label":"firstname",
 	      "fields": {
 	        "0": {
 	          "name": "firstname",
@@ -26,41 +27,6 @@ const (
 	          "unique": "n",
 	          "required": "y"
 	        },
-	        "1": {
-	          "name": "lastname",
-	          "system": "n",
-	          "type": "string",
-	          "unique": "n",
-	          "required": "y"
-	        },
-	        "2": {
-	          "name": "email",
-	          "system": "n",
-	          "type": "email",
-	          "unique": "y",
-	          "required": "y"
-	        },
-	        "3": {
-	          "name": "password",
-	          "system": "y",
-	          "type": "password",
-	          "unique": "n",
-	          "required": "n"
-	        },
-	        "4": {
-	          "name": "roles",
-	          "system": "y",
-	          "type": "string",
-	          "unique": "n",
-	          "required": "n"
-	        },
-	        "5": {
-	          "name": "username",
-	          "system": "n",
-	          "type": "string",
-	          "unique": "y",
-	          "required": "y"
-	        }
 	      }
 	    },
 	    "session": {
@@ -72,23 +38,46 @@ const (
 	          "system": "n",
 	          "type": "string",
 	          "unique": "y"
-	        },
-	        "1": {
-	          "name": "expires",
-	          "required": "y",
-	          "system": "n",
-	          "type": "int",
-	          "unique": "n"
 	        }
 	      },
 	      "relations": {
 	        "0": {
-	          "model": "user",
-	          "name": "user",
+	          "to": "user",
+	          "name": "owner",
 	          "required": "y",
 	          "system": "y",
 	          "unique": "n"
 	        }
+	      }
+	    }
+	  },
+	  "dto": {
+	    "user": {
+	      "name": "user",
+	      "plural": "users",
+	      "fields": {
+	        "0": {
+	          "name": "firstname",
+	          "system": "n",
+	          "type": "string",
+	          "unique": "n",
+	          "required": "y"
+	        },
+	      }
+	    }
+	  },
+	  "options": {
+	    "user": {
+	      "name": "user",
+	      "plural": "users",
+	      "fields": {
+	        "0": {
+	          "name": "firstname",
+	          "system": "n",
+	          "type": "string",
+	          "unique": "n",
+	          "required": "y"
+	        },
 	      }
 	    }
 	  }
@@ -100,7 +89,9 @@ func TestNewApplicationModel(t *testing.T) {
 	var (
 		data             map[string]string
 		applicationModel *ApplicationModel
-		entities         EntitiesModel
+		entities         entitymodel.Entities
+		dtos             entitymodel.Entities
+		options          entitymodel.Entities
 		err              error
 	)
 	t.Parallel()
@@ -115,6 +106,22 @@ func TestNewApplicationModel(t *testing.T) {
 	}
 	if len(entities) != 2 {
 		t.Errorf("expected two entities in entitiesModel and take %v", entities)
+		return
+	}
+	if options, err = applicationModel.Options(); err != nil {
+		t.Error(err)
+		return
+	}
+	if len(options) != 1 {
+		t.Errorf("expected one options in options and take %v", options)
+		return
+	}
+	if dtos, err = applicationModel.DTO(); err != nil {
+		t.Error(err)
+		return
+	}
+	if len(dtos) != 1 {
+		t.Errorf("expected one dtos in dtos and take %v", dtos)
 		return
 	}
 }

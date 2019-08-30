@@ -1,4 +1,4 @@
-package am
+package entitymodel
 
 import (
 	"fmt"
@@ -7,24 +7,29 @@ import (
 	"github.com/goatcms/goatcli/cliapp/common/naming"
 )
 
+const (
+	duplicateStructureElementError = "Duplicated structure elemenet %s"
+)
+
 // Structure contains fields and relations structure
 type Structure struct {
+	Fields     *Fields
+	Relations  Relations
 	Path       []string
-	Fields     *FieldSet
-	Relations  RelationSet
 	Structures map[string]*Structure
 }
 
 // NewStructure create new Structure instance
 func NewStructure() (instance *Structure) {
 	return &Structure{
+		Fields:     NewFields(),
+		Relations:  NewRelations(),
 		Path:       []string{},
-		Fields:     &FieldSet{},
-		Relations:  RelationSet{},
 		Structures: map[string]*Structure{},
 	}
 }
 
+// ByPath return child structrure by path
 func (structure *Structure) ByPath(path string) (current *Structure, err error) {
 	current = structure
 	for _, key := range strings.Split(path, ".") {
@@ -40,12 +45,10 @@ func (structure *Structure) ByPath(path string) (current *Structure, err error) 
 	return current, nil
 }
 
+// AddField add new field to structure
 func (structure *Structure) AddField(field *Field) (err error) {
-	if _, ok := structure.Relations[field.Name.CamelCaseUF]; ok {
-		return fmt.Errorf("%s contains field and relation with the same name", field.FullName.CamelCaseUF)
-	}
-	if _, ok := structure.Structures[field.Name.CamelCaseUF]; ok {
-		return fmt.Errorf("%s contains field and structure with the same name", field.FullName.CamelCaseUF)
+	if err = structure.preventDuplicateNames(field.Name.CamelCaseUF); err != nil {
+		return err
 	}
 	structure.Fields.ByName[field.Name.CamelCaseUF] = field
 	typeset := structure.Fields.ByType[field.Name.CamelCaseUF]
@@ -53,31 +56,36 @@ func (structure *Structure) AddField(field *Field) (err error) {
 	return nil
 }
 
+// AddRelation add new relation to structure
 func (structure *Structure) AddRelation(relation *Relation) (err error) {
-	if _, ok := structure.Fields.ByName[relation.Name.CamelCaseUF]; ok {
-		return fmt.Errorf("%s contains field and relation with the same name", relation.FullName.CamelCaseUF)
-	}
-	if _, ok := structure.Structures[relation.Name.CamelCaseUF]; ok {
-		return fmt.Errorf("%s contains relation and structure with the same name", relation.FullName.CamelCaseUF)
+	if err = structure.preventDuplicateNames(relation.Name.CamelCaseUF); err != nil {
+		return err
 	}
 	structure.Relations[relation.Name.CamelCaseUF] = relation
 	return nil
 }
 
+// NewStructure create new child structure
 func (structure *Structure) NewStructure(name string) (node *Structure, err error) {
 	name = naming.ToCamelCaseUF(name)
-	if _, ok := structure.Fields.ByName[name]; ok {
-		return nil, fmt.Errorf("%s contains field and structure with the same name", name)
+	if err = structure.preventDuplicateNames(name); err != nil {
+		return nil, err
 	}
-	if _, ok := structure.Relations[name]; ok {
-		return nil, fmt.Errorf("%s contains structure and relation with the same name", name)
-	}
-	node = &Structure{
-		Path:       append(structure.Path, name),
-		Fields:     &FieldSet{},
-		Relations:  RelationSet{},
-		Structures: map[string]*Structure{},
-	}
+	node = NewStructure()
+	node.Path = append(structure.Path, name)
 	structure.Structures[name] = node
 	return node, nil
+}
+
+func (structure *Structure) preventDuplicateNames(name string) (err error) {
+	if _, ok := structure.Fields.ByName[name]; ok {
+		return fmt.Errorf(duplicateStructureElementError, name)
+	}
+	if _, ok := structure.Relations[name]; ok {
+		return fmt.Errorf(duplicateStructureElementError, name)
+	}
+	if _, ok := structure.Structures[name]; ok {
+		return fmt.Errorf(duplicateStructureElementError, name)
+	}
+	return nil
 }

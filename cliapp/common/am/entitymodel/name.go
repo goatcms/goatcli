@@ -1,4 +1,4 @@
-package am
+package entitymodel
 
 import (
 	"fmt"

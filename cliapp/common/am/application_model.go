@@ -1,15 +1,19 @@
 package am
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/goatcms/goatcli/cliapp/common/am/entitymodel"
+)
 
 // ApplicationModel contains application data
 type ApplicationModel struct {
 	data       map[string]string
-	entities   EntitiesModel
+	entities   entitymodel.Entities
 	entitiesMU sync.Mutex
-	options    EntitiesModel
+	options    entitymodel.Entities
 	optionsMU  sync.Mutex
-	dto        EntitiesModel
+	dto        entitymodel.Entities
 	dtoMU      sync.Mutex
 }
 
@@ -21,7 +25,7 @@ func NewApplicationModel(data map[string]string) *ApplicationModel {
 }
 
 // Entities return application entities model
-func (am *ApplicationModel) Entities() (model EntitiesModel, err error) {
+func (am *ApplicationModel) Entities() (model entitymodel.Entities, err error) {
 	if am.entities != nil {
 		return am.entities, nil
 	}
@@ -30,14 +34,14 @@ func (am *ApplicationModel) Entities() (model EntitiesModel, err error) {
 	if am.entities != nil {
 		return am.entities, nil
 	}
-	if am.entities, err = NewEntitiesModel("model", am.data); err != nil {
+	if am.entities, err = entitymodel.NewEntitiesFromPlainmap("model", am.data); err != nil {
 		return nil, err
 	}
 	return am.entities, nil
 }
 
 // Options return application options model
-func (am *ApplicationModel) Options() (model EntitiesModel, err error) {
+func (am *ApplicationModel) Options() (model entitymodel.Entities, err error) {
 	if am.options != nil {
 		return am.options, nil
 	}
@@ -46,14 +50,14 @@ func (am *ApplicationModel) Options() (model EntitiesModel, err error) {
 	if am.options != nil {
 		return am.options, nil
 	}
-	if am.options, err = NewEntitiesModel("options.", am.data); err != nil {
+	if am.options, err = entitymodel.NewEntitiesFromPlainmap("options", am.data); err != nil {
 		return nil, err
 	}
 	return am.options, nil
 }
 
 // DTO return application dto model
-func (am *ApplicationModel) DTO() (model EntitiesModel, err error) {
+func (am *ApplicationModel) DTO() (model entitymodel.Entities, err error) {
 	if am.dto != nil {
 		return am.dto, nil
 	}
@@ -62,7 +66,7 @@ func (am *ApplicationModel) DTO() (model EntitiesModel, err error) {
 	if am.dto != nil {
 		return am.dto, nil
 	}
-	if am.dto, err = NewEntitiesModel("dto.", am.data); err != nil {
+	if am.dto, err = entitymodel.NewEntitiesFromPlainmap("dto", am.data); err != nil {
 		return nil, err
 	}
 	return am.dto, nil

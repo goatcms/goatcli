@@ -1,4 +1,4 @@
-package am
+package entitymodel
 
 import (
 	"fmt"
@@ -22,27 +22,27 @@ type FieldFlags struct {
 }
 
 // NewField create new Field instance
-func NewField(prefix string, plainmap map[string]string) (instance *Field, err error) {
-	var (
-		index   int
-		nameStr = plainmap[prefix+".name"]
-	)
+func NewField(name string) (instance *Field, err error) {
+	var index int
 	instance = &Field{}
-	if instance.FullName, err = NewName(nameStr); err != nil {
+	if instance.FullName, err = NewName(name); err != nil {
 		return nil, err
 	}
-	index = strings.LastIndex(nameStr, ".")
+	index = strings.LastIndex(name, ".")
 	if index == -1 {
 		instance.Name = instance.FullName
-		// instance.Path = make([]string, 0)
 	} else {
 		if instance.Name, err = NewName(instance.FullName.Plain[index:]); err != nil {
 			return nil, err
 		}
-		// instance.Path = strings.Split(nameStr[:index], ".")
-		// for i := 0; i < len(instance.Path); i++ {
-		// 	instance.Path[i] = naming.ToCamelCaseUF(instance.Path[i])
-		// }
+	}
+	return instance, nil
+}
+
+// NewFieldFromPlainmap create new Field instance and load data from plainmap
+func NewFieldFromPlainmap(prefix string, plainmap map[string]string) (instance *Field, err error) {
+	if instance, err = NewField(plainmap[prefix+".name"]); err != nil {
+		return nil, err
 	}
 	instance.Type = strings.ToLower(plainmap[prefix+".type"])
 	if instance.Type == "" {

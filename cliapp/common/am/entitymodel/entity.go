@@ -1,4 +1,4 @@
-package am
+package entitymodel
 
 import (
 	"fmt"
@@ -13,16 +13,16 @@ var (
 	DefaultACLRoles = []string{"admin"}
 )
 
-// EntityModel contains single entity model data
-type EntityModel struct {
-	Name       Name
-	Singular   Name
-	Plural     Name
-	LabelField *Field
-	ACL        EntityACL
-	Fields     *FieldSet
-	Relations  RelationSet
-	Structure  *Structure
+// Entity contains single entity model data
+type Entity struct {
+	Name         Name
+	Singular     Name
+	Plural       Name
+	LabelField   *Field
+	ACL          EntityACL
+	AllFields    *Fields
+	AllRelations Relations
+	Structure    *Structure
 }
 
 // EntityACL contains criteria to access entity
@@ -38,50 +38,59 @@ type AdminEntityACL struct {
 	DeleteRoles []string
 }
 
-// NewEntityModel create new EntityModel instance
-func NewEntityModel(prefix string, data map[string]string) (instance *EntityModel, err error) {
+// NewEntity create new Entity instance
+func NewEntity(name, singular, plural string) (instance *Entity, err error) {
+	instance = &Entity{
+		AllFields:    NewFields(),
+		AllRelations: NewRelations(),
+		Structure:    NewStructure(),
+	}
+	if name == "" {
+		return nil, fmt.Errorf("Entity name is required")
+	}
+	if instance.Name, err = NewName(name); err != nil {
+		return nil, err
+	}
+	if singular == "" {
+		instance.Singular = instance.Name
+	} else {
+		if instance.Singular, err = NewName(singular); err != nil {
+			return nil, err
+		}
+	}
+	if plural == "" {
+		instance.Plural = instance.Name
+	} else {
+		if instance.Plural, err = NewName(plural); err != nil {
+			return nil, err
+		}
+	}
+	return instance, nil
+}
+
+// NewEntityFromPlainmap create new Entity instance and load data from plainmap
+func NewEntityFromPlainmap(prefix string, data map[string]string) (instance *Entity, err error) {
 	var (
 		labelField string
 		ok         bool
-		value      string
 	)
-	instance = &EntityModel{}
-	if value = data[prefix+".name"]; value == "" {
-		return nil, fmt.Errorf("%s is required", prefix+".name")
-	}
-	if instance.Name, err = NewName(value); err != nil {
+	if instance, err = NewEntity(
+		data[prefix+".name"],
+		data[prefix+".singular"],
+		data[prefix+".plural"]); err != nil {
 		return nil, err
-	}
-	if value = data[prefix+".singular"]; value == "" {
-		instance.Singular = instance.Name
-	} else {
-		if instance.Singular, err = NewName(value); err != nil {
-			return nil, err
-		}
-	}
-	if value = data[prefix+".plural"]; value == "" {
-		instance.Plural = instance.Name
-	} else {
-		if instance.Plural, err = NewName(value); err != nil {
-			return nil, err
-		}
-	}
-	instance.Structure = &Structure{
-		Fields:     &FieldSet{},
-		Relations:  RelationSet{},
-		Structures: map[string]*Structure{},
 	}
 	if err = loadStructure(prefix, data, instance); err != nil {
 		return nil, err
 	}
 	if labelField = data[prefix+".label"]; labelField == "" {
-		for _, field := range instance.Fields.ByName {
+		for _, field := range instance.AllFields.ByName {
 			instance.LabelField = field
 			break
 		}
 	} else {
 		labelFieldUF := naming.ToCamelCaseUF(labelField)
-		if instance.LabelField, ok = instance.Fields.ByName[labelFieldUF]; !ok {
+		if instance.LabelField, ok = instance.AllFields.ByName[labelFieldUF]; !ok {
 			return nil, fmt.Errorf("%s label field is not exist for %s entity", labelFieldUF, instance.Name)
 		}
 	}
@@ -89,30 +98,28 @@ func NewEntityModel(prefix string, data map[string]string) (instance *EntityMode
 	return instance, nil
 }
 
-func loadACL(prefix string, data map[string]string, e *EntityModel) {
+func loadACL(prefix string, data map[string]string, e *Entity) {
 	e.ACL.Admin.EditRoles = arrayValue(data, prefix+".admin_edit_roles", DefaultACLRoles)
 	e.ACL.Admin.ReadRoles = arrayValue(data, prefix+".admin_read_roles", DefaultACLRoles)
 	e.ACL.Admin.InsertRoles = arrayValue(data, prefix+".admin_insert_roles", DefaultACLRoles)
 	e.ACL.Admin.DeleteRoles = arrayValue(data, prefix+".admin_read_roles", DefaultACLRoles)
 }
 
-func loadStructure(prefix string, data map[string]string, e *EntityModel) (err error) {
+func loadStructure(prefix string, data map[string]string, e *Entity) (err error) {
 	var (
 		structure *Structure
 		path      string
 	)
 	// load
-	e.Structure = &Structure{
-		Structures: map[string]*Structure{},
-	}
-	if e.Fields, err = NewFieldSet(prefix+".fields", data); err != nil {
+	e.Structure = NewStructure()
+	if e.AllFields, err = NewFieldsFromPlainmap(prefix+".fields", data); err != nil {
 		return err
 	}
-	if e.Relations, err = NewRelationSet(prefix+".relations", data); err != nil {
+	if e.AllRelations, err = NewRelationsFromPlainmap(prefix+".relations", data); err != nil {
 		return err
 	}
 	// build structure - fields
-	for _, field := range e.Structure.Fields.ByName {
+	for _, field := range e.AllFields.ByName {
 		structure = e.Structure
 		if path = pathFromPlainName(field.FullName.Plain); path != "" {
 			if structure, err = e.Structure.ByPath(path); err != nil {
@@ -124,7 +131,7 @@ func loadStructure(prefix string, data map[string]string, e *EntityModel) (err e
 		}
 	}
 	// build structure - relations
-	for _, relation := range e.Structure.Relations {
+	for _, relation := range e.AllRelations {
 		structure = e.Structure
 		if path = pathFromPlainName(relation.FullName.Plain); path != "" {
 			if structure, err = e.Structure.ByPath(path); err != nil {

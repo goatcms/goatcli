@@ -4,12 +4,28 @@ import "testing"
 
 func TestToUnderscore(t *testing.T) {
 	t.Parallel()
+	result := ToUnderscore("FirstAndLast")
 	if ToUnderscore("FirstAndLast") != "first_and_last" {
-		t.Errorf("ToUnderscore('FirstAndLast') expected 'first_and_last' result")
+		t.Errorf("ToUnderscore('FirstAndLast') expected 'first_and_last' result and take %s", result)
 		return
 	}
-	if ToUnderscore("FirstANDLast") != "first_and_last" {
-		t.Errorf("ToUnderscore('FirstANDLast') expected 'first_and_last' result")
+	result = ToUnderscore("FirstJSON")
+	if result != "first_json" {
+		t.Errorf("ToUnderscore('FirstANDLast') expected 'first_json' result and take %s", result)
+		return
+	}
+}
+
+func TestToUnderscoreFromDot(t *testing.T) {
+	t.Parallel()
+	result := ToUnderscore("First.And.Last")
+	if result != "first_and_last" {
+		t.Errorf("ToUnderscore('First.And.Last') expected 'first_and_last' result and take %s", result)
+		return
+	}
+	result = ToUnderscore("First.AND.Last")
+	if result != "first_and_last" {
+		t.Errorf("ToUnderscore('First.AND.Last') expected 'first_and_last' result and take %s", result)
 		return
 	}
 }
@@ -52,32 +68,37 @@ func TestToCamelCaseLF(t *testing.T) {
 
 func TestToCamelCaseUF(t *testing.T) {
 	t.Parallel()
-	if ToCamelCaseUF("First_and_Last") != "FirstAndLast" {
-		t.Errorf("ToCamelCaseUF('First_and_Last') = %s expected 'FirstAndLast' result", ToCamelCaseUF("First_and_Last"))
+	result := ToCamelCaseUF("First_and_Last")
+	if result != "FirstAndLast" {
+		t.Errorf("ToCamelCaseUF('First_and_Last') = %s expected 'FirstAndLast' result", result)
 		return
 	}
-	if ToCamelCaseUF("FirstAndLast") != "FirstAndLast" {
-		t.Errorf("ToCamelCaseUF('FirstAndLast') = %s expected 'FirstAndLast' result", ToCamelCaseUF("FirstAndLast"))
+	result = ToCamelCaseUF("FirstAndLast")
+	if result != "FirstAndLast" {
+		t.Errorf("ToCamelCaseUF('FirstAndLast') = %s expected 'FirstAndLast' result", result)
 		return
 	}
-	if ToCamelCaseUF("firstAndLast") != "FirstAndLast" {
-		t.Errorf("ToCamelCaseUF('firstAndLast') = %s expected 'FirstAndLast' result", ToCamelCaseUF("firstAndLast"))
+	result = ToCamelCaseUF("firstAndLast")
+	if result != "FirstAndLast" {
+		t.Errorf("ToCamelCaseUF('firstAndLast') = %s expected 'FirstAndLast' result", result)
 		return
 	}
 }
 
 func TestToUpperFirst(t *testing.T) {
 	t.Parallel()
-	if ToUpperFirst("upperFirst") != "UpperFirst" {
-		t.Errorf("ToUpperFirst('upperFirst') = %s expected 'UpperFirst' result", ToUpperFirst("upperFirst"))
+	result := ToUpperFirst("upperFirst")
+	if result != "UpperFirst" {
+		t.Errorf("ToUpperFirst('upperFirst') = %s expected 'UpperFirst' result", result)
 		return
 	}
 }
 
 func TestToLowerFirst(t *testing.T) {
 	t.Parallel()
-	if ToLowerFirst("LOWER") != "lOWER" {
-		t.Errorf("ToLowerFirst('LOWER') = %s expected 'lOWER' result", ToCamelCaseUF("LOWER"))
+	result := ToLowerFirst("LOWER")
+	if result != "lOWER" {
+		t.Errorf("ToLowerFirst('LOWER') = %s expected 'lOWER' result", result)
 		return
 	}
 }

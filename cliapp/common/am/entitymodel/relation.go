@@ -1,21 +1,9 @@
-package am
+package entitymodel
 
 import (
 	"fmt"
 	"strings"
 )
-
-/*
-"relations": {
-	"0": {
-		"model": "user",
-		"name": "user",
-		"required": "y",
-		"system": "y",
-		"unique": "n"
-	}
-}
-*/
 
 // Relation struct represent single relation to other entity
 type Relation struct {
@@ -33,13 +21,18 @@ type RelationFlags struct {
 }
 
 // NewRelation create new Relation instance
-func NewRelation(prefix string, plainmap map[string]string) (instance *Relation, err error) {
+func NewRelation(name, to string) (instance *Relation, err error) {
 	var (
-		index   int
-		nameStr = plainmap[prefix+".name"]
+		index int
 	)
+	if name == "" {
+		return nil, fmt.Errorf("Relation: Name is required")
+	}
+	if to == "" {
+		return nil, fmt.Errorf("Relation: To field is required")
+	}
 	instance = &Relation{}
-	if instance.FullName, err = NewName(nameStr); err != nil {
+	if instance.FullName, err = NewName(name); err != nil {
 		return nil, err
 	}
 	index = strings.LastIndex(instance.FullName.Plain, ".")
@@ -50,9 +43,14 @@ func NewRelation(prefix string, plainmap map[string]string) (instance *Relation,
 			return nil, err
 		}
 	}
-	instance.To = strings.ToLower(plainmap[prefix+".to"])
-	if instance.To == "" {
-		return nil, fmt.Errorf("Name is required")
+	instance.To = strings.ToLower(to)
+	return instance, nil
+}
+
+// NewRelationFromPlainmap create new Relation instance and load data from plainmap
+func NewRelationFromPlainmap(prefix string, plainmap map[string]string) (instance *Relation, err error) {
+	if instance, err = NewRelation(plainmap[prefix+".name"], plainmap[prefix+".to"]); err != nil {
+		return nil, err
 	}
 	instance.Flags.System = plainmap[prefix+".system"] == "y"
 	instance.Flags.Unique = plainmap[prefix+".unique"] == "y"

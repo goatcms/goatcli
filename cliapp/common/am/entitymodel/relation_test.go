@@ -1,4 +1,4 @@
-package am
+package entitymodel
 
 import (
 	"testing"
@@ -18,7 +18,7 @@ func TestNewRelation(t *testing.T) {
 		"prefix.unique":   "y",
 		"prefix.required": "y",
 	}
-	if relation, err = NewRelation("prefix", data); err != nil {
+	if relation, err = NewRelationFromPlainmap("prefix", data); err != nil {
 		t.Error(err)
 		return
 	}

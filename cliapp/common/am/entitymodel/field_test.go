@@ -1,4 +1,4 @@
-package am
+package entitymodel
 
 import (
 	"testing"
@@ -12,18 +12,22 @@ func TestNewField(t *testing.T) {
 	)
 	t.Parallel()
 	data = map[string]string{
-		"prefix.name":     "title",
+		"prefix.name":     "struct.title",
 		"prefix.type":     "Text",
 		"prefix.system":   "y",
 		"prefix.unique":   "y",
 		"prefix.required": "y",
 	}
-	if field, err = NewField("prefix", data); err != nil {
+	if field, err = NewFieldFromPlainmap("prefix", data); err != nil {
 		t.Error(err)
 		return
 	}
 	if field.Name.CamelCaseUF != "Title" {
 		t.Errorf("field.Name.CamelCaseUF should be equals to 'Title' and take %s", field.Name.CamelCaseUF)
+		return
+	}
+	if field.FullName.CamelCaseUF != "StructTitle" {
+		t.Errorf("field.FullName.CamelCaseUF should be equals to 'StructTitle' and take %s", field.FullName.CamelCaseUF)
 		return
 	}
 	if field.Type != "text" {
