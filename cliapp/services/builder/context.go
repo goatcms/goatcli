@@ -24,6 +24,7 @@ type Command struct {
 // Context contains build process data
 type Context struct {
 	scope      app.Scope
+	appModel   interface{}
 	data       map[string]string
 	properties map[string]string
 	secrets    map[string]string
@@ -94,6 +95,7 @@ func (c *Context) build(fs filesystem.Filespace, subPath string, buildConfigs []
 		return err
 	}
 	if generatorExecutor, err = executor.NewGeneratorExecutor(c.scope, executor.SharedData{
+		AM:        c.appModel,
 		PlainData: c.data,
 		Properties: executor.GlobalProperties{
 			Project: c.properties,

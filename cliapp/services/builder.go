@@ -14,5 +14,5 @@ type BuildContext interface {
 // BuilderService build project structure
 type BuilderService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Build, error)
-	NewContext(scope app.Scope, data, properties, secrets map[string]string) BuildContext
+	NewContext(scope app.Scope, appModel interface{}, data, properties, secrets map[string]string) BuildContext
 }

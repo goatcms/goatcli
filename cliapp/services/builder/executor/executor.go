@@ -109,6 +109,7 @@ func (e *GeneratorExecutor) executeToWriter(writer io.Writer, task Task) (err er
 	}
 	sharedData := e.sharedData
 	ctx := &Context{
+		AM:        sharedData.AM,
 		Template:  task.Template,
 		DotData:   task.DotData,
 		PlainData: sharedData.PlainData,

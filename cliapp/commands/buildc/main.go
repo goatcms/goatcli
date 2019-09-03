@@ -1,16 +1,13 @@
 package buildc
 
 import (
-	"os"
-
+	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/prevents"
 	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
-	"github.com/goatcms/goatcore/filesystem/fscache"
-	"github.com/goatcms/goatcore/filesystem/fsloop"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -18,7 +15,7 @@ import (
 func Run(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
-			Interactive string `argument:"?interactive",command:"?interactive"`
+			Interactive string `argument:"?interactive" ,command:"?interactive"`
 
 			CurrentFS filesystem.Filespace `filespace:"current"`
 
@@ -36,22 +33,18 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 		secretsDef     []*config.Property
 		secretsData    map[string]string
 		isChanged      bool
-		builderDef     []*config.Build
 		data           map[string]string
 		interactive    bool
-		fs             fscache.Cache
-		vcsData        services.VCSData
+		fs             filesystem.Filespace
+		appModel       *am.ApplicationModel
 	)
-	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
-		return err
-	}
-	if err = ctxScope.InjectTo(&deps); err != nil {
+	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		a.DependencyProvider().InjectTo(&deps),
+		ctxScope.InjectTo(&deps))); err != nil {
 		return err
 	}
 	interactive = !(deps.Interactive == "false")
-	if fs, err = fscache.NewMemCache(fs); err != nil {
-		return err
-	}
+	fs = deps.CurrentFS
 	if err = prevents.RequireGoatProject(fs); err != nil {
 		return err
 	}
@@ -96,11 +89,11 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 		return err
 	}
 	deps.Output.Printf("cloned\n")
+	// Build
 	deps.Output.Printf("start build... ")
-	if builderDef, err = deps.BuilderService.ReadDefFromFS(fs); err != nil {
-		return err
-	}
-	if err = deps.BuilderService.Build(ctxScope, fs, builderDef, data, propertiesData, secretsData); err != nil {
+	appModel = am.NewApplicationModel(data)
+	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, data, propertiesData, secretsData)
+	if err = buildContext.Build(fs); err != nil {
 		return err
 	}
 	if err = ctxScope.Wait(); err != nil {
@@ -109,37 +102,10 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 			ctxScope.Trigger(app.RollbackEvent, nil)))
 	}
 	deps.Output.Printf("builded\n")
-	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
-		return err
-	}
-	generatedFiles := vcsData.VCSGeneratedFiles()
-	if err = fsloop.WalkFS(fs, ".", func(path string, info os.FileInfo) (err error) {
-		generatedFiles.Add(&services.GeneratedFile{
-			Path: path,
-		})
-		return nil
-	}, nil); err != nil {
-		return err
-	}
-	deps.Output.Printf("run vcs hook... ")
-	deps.Output.Printf("finished\n")
 	deps.Output.Printf("start commit... ")
-	if err = fs.Commit(); err != nil {
-		return err
-	}
 	if err = ctxScope.Trigger(app.CommitEvent, nil); err != nil {
 		return err
 	}
 	deps.Output.Printf("commited\n")
-	deps.Output.Printf("start after commit tasks...\n")
-	if err = ctxScope.Trigger(app.AfterCommitEvent, nil); err != nil {
-		return err
-	}
-	deps.Output.Printf("after commit tasks done\n")
-	fs.Buffer()
-	if err = ctxScope.Trigger(app.AfterCommitEvent, nil); err != nil {
-		return err
-	}
-	deps.Output.Printf("updated vcs")
 	return nil
 }

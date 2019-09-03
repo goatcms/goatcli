@@ -14,10 +14,10 @@ type Context struct {
 	DotData    interface{}
 	PlainData  map[string]string
 	Properties TaskProperties
+	AM         interface{}
 
 	// internal variables
-	fs filesystem.Filespace
-	//lifecycle *jobsync.Lifecycle
+	fs       filesystem.Filespace
 	executor *GeneratorExecutor
 }
 

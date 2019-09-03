@@ -46,13 +46,14 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 }
 
 // NewContext create new Context instance
-func (s *Service) NewContext(scope app.Scope, data, properties, secrets map[string]string) services.BuildContext {
+func (s *Service) NewContext(scope app.Scope, appModel interface{}, data, properties, secrets map[string]string) services.BuildContext {
 	return &Context{
 		scope:      scope,
 		data:       data,
 		properties: properties,
 		secrets:    secrets,
 		service:    s,
+		appModel:   appModel,
 	}
 }
 

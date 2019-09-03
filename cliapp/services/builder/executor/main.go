@@ -30,6 +30,7 @@ type SharedData struct {
 	PlainData  map[string]string
 	Properties GlobalProperties
 	FS         filesystem.Filespace
+	AM         interface{}
 }
 
 // GlobalProperties contains task properties

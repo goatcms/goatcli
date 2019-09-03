@@ -7,6 +7,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/services/data"
 	"github.com/goatcms/goatcli/cliapp/services/dependencies"
 	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcli/cliapp/services/repositories"
@@ -20,29 +21,70 @@ import (
 )
 
 const (
-	testCTXBuilderLayout = `{{- define "out/file.txt"}}
+	testCTXAMLayout = `{{- define "out/file.txt"}}
 		{{- $ctx := .}}
+		{{- $entities := $ctx.AM.Entities }}
 		{{- index $ctx.PlainData "datakey" }}
 		{{- index $ctx.Properties.Project "propkey" }}
 		{{- index $ctx.Properties.Secrets "secretkey" }}
+
+		Entities:
+		{{- range $index, $entity := $entities }}
+			{{$entity.Name.CamelCaseUF}}
+		{{- end -}}
 	{{- end}}`
-	testCTXBuilderTemplate = `
+	testCTXAMTemplate = `
 	{{$ctx := .}}
 	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}
 	`
-	testCTXBuilderConfig = `[{
+	testCTXAMConfig = `[{
 	  "from":"ignore",
 	  "to":"ignore",
 	  "template":"names",
 	  "layout":"default"
 	}]`
+	testCTXAMData = `
+	{
+	  "model": {
+	    "user": {
+	      "name": "user",
+	      "plural": "users",
+	      "label":"firstname",
+	      "fields": {
+	        "0": {
+	          "name": "firstname",
+	          "system": "n",
+	          "type": "string",
+	          "unique": "n",
+	          "required": "y"
+	        },
+	      }
+	    },
+			"session": {
+				"name": "session",
+				"plural": "sessions",
+				"label":"data",
+				"fields": {
+					"0": {
+						"name": "data",
+						"system": "n",
+						"type": "string",
+						"unique": "n",
+						"required": "y"
+					},
+				}
+			}
+	  }
+	}
+`
 )
 
-func TestCTXBuilderAM(t *testing.T) {
+func TestCTXBuilderAfterBuild(t *testing.T) {
 	var (
-		mapp    app.App
-		err     error
-		context []byte
+		mapp      app.App
+		err       error
+		fileBytes []byte
+		ctxData   map[string]string
 	)
 	t.Parallel()
 	// prepare mockup application & data
@@ -55,9 +97,10 @@ func TestCTXBuilderAM(t *testing.T) {
 	}
 	fs := mapp.RootFilespace()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
-		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXBuilderLayout), 0766),
-		fs.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXBuilderTemplate), 0766),
-		fs.WriteFile(".goat/build.def.json", []byte(testCTXBuilderConfig), 0766))); err != nil {
+		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXAMLayout), 0766),
+		fs.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXAMTemplate), 0766),
+		fs.WriteFile(".goat/data/model/user.json", []byte(testCTXAMData), 0766),
+		fs.WriteFile(".goat/build.def.json", []byte(testCTXAMConfig), 0766))); err != nil {
 		t.Error(err)
 		return
 	}
@@ -68,6 +111,7 @@ func TestCTXBuilderAM(t *testing.T) {
 		repositories.RegisterDependencies(mapp.DependencyProvider()),
 		template.RegisterDependencies(mapp.DependencyProvider()),
 		vcs.RegisterDependencies(mapp.DependencyProvider()),
+		data.RegisterDependencies(mapp.DependencyProvider()),
 		template.InitDependencies(mapp))); err != nil {
 		t.Error(err)
 		return
@@ -75,20 +119,19 @@ func TestCTXBuilderAM(t *testing.T) {
 	// test
 	var deps struct {
 		BuilderService services.BuilderService `dependency:"BuilderService"`
+		DataService    services.DataService    `dependency:"DataService"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)
 		return
 	}
 	ctxScope := scope.NewScope("test")
-	appModel := am.NewApplicationModel(map[string]string{})
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, map[string]string{
-		"datakey": "Ala",
-	}, map[string]string{
-		"propkey": " ma",
-	}, map[string]string{
-		"secretkey": " kota",
-	})
+	if ctxData, err = deps.DataService.ReadDataFromFS(fs); err != nil {
+		t.Error(err)
+		return
+	}
+	appModel := am.NewApplicationModel(ctxData)
+	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, ctxData, map[string]string{}, map[string]string{})
 	if err = buildContext.Build(fs); err != nil {
 		t.Error(err)
 		return
@@ -105,12 +148,15 @@ func TestCTXBuilderAM(t *testing.T) {
 		t.Errorf("out/file.txt is not exist")
 		return
 	}
-	if context, err = fs.ReadFile("out/file.txt"); err != nil {
+	if fileBytes, err = fs.ReadFile("out/file.txt"); err != nil {
 		t.Error(err)
 		return
 	}
-	if string(context) != "Ala ma kota" {
-		t.Errorf("File content must be equals to 'Ala ma kota' and it is '%s'", context)
-		return
+	fileString := string(fileBytes)
+	if !strings.Contains(fileString, "User") {
+		t.Errorf("Result should contains 'User' and it is '%s'", fileString)
+	}
+	if !strings.Contains(fileString, "Session") {
+		t.Errorf("Result should contains 'User' and it is '%s'", fileString)
 	}
 }

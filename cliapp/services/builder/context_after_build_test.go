@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcli/cliapp/services/dependencies"
 	"github.com/goatcms/goatcli/cliapp/services/modules"
@@ -73,7 +74,8 @@ func TestCTXBuilder(t *testing.T) {
 		return
 	}
 	ctxScope := scope.NewScope("test")
-	buildContext := deps.BuilderService.NewContext(ctxScope, map[string]string{}, map[string]string{}, map[string]string{})
+	appModel := am.NewApplicationModel(map[string]string{})
+	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, map[string]string{}, map[string]string{}, map[string]string{})
 	if err = buildContext.Build(fs); err != nil {
 		t.Error(err)
 		return
