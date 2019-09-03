@@ -5,15 +5,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcli/cliapp/services/dependencies"
 	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcli/cliapp/services/repositories"
 	"github.com/goatcms/goatcli/cliapp/services/template"
+	"github.com/goatcms/goatcli/cliapp/services/vcs"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
 	"github.com/goatcms/goatcore/app/scope"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 const (
@@ -27,53 +29,45 @@ const (
 	{{$ctx := .}}
 	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}
 	`
+	testCTXBuilderConfig = `[{
+	  "from":"ignore",
+	  "to":"ignore",
+	  "template":"names",
+	  "layout":"default"
+	}]`
 )
 
-func TestCTXBuilder(t *testing.T) {
+func TestCTXBuilderAfterBuild(t *testing.T) {
 	var (
+		mapp    app.App
 		err     error
 		context []byte
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	output := new(bytes.Buffer)
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
+	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
 		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(output),
-	})
-	if err != nil {
+		Output: gio.NewOutput(new(bytes.Buffer)),
+	}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXBuilderLayout), 0766); err != nil {
+	fs := mapp.RootFilespace()
+	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXBuilderLayout), 0766),
+		fs.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXBuilderTemplate), 0766),
+		fs.WriteFile(".goat/build.def.json", []byte(testCTXBuilderConfig), 0766))); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXBuilderTemplate), 0766); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = modules.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = dependencies.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = repositories.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = template.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = template.InitDependencies(mapp); err != nil {
+	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		RegisterDependencies(mapp.DependencyProvider()),
+		modules.RegisterDependencies(mapp.DependencyProvider()),
+		dependencies.RegisterDependencies(mapp.DependencyProvider()),
+		repositories.RegisterDependencies(mapp.DependencyProvider()),
+		template.RegisterDependencies(mapp.DependencyProvider()),
+		vcs.RegisterDependencies(mapp.DependencyProvider()),
+		template.InitDependencies(mapp))); err != nil {
 		t.Error(err)
 		return
 	}
@@ -85,27 +79,23 @@ func TestCTXBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	buildConfig := []*config.Build{
-		&config.Build{
-			From:     "ignore",
-			To:       "ignore",
-			Template: "names",
-			Layout:   "default",
-		},
-	}
-	fs := mapp.RootFilespace()
 	ctxScope := scope.NewScope("test")
-	if err = deps.BuilderService.Build(ctxScope, fs, buildConfig, map[string]string{
+	buildContext := deps.BuilderService.NewContext(ctxScope, map[string]string{
 		"datakey": "Ala",
 	}, map[string]string{
 		"propkey": " ma",
 	}, map[string]string{
 		"secretkey": " kota",
-	}); err != nil {
+	})
+	if err = buildContext.Build(fs); err != nil {
 		t.Error(err)
 		return
 	}
 	if err = ctxScope.Wait(); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = ctxScope.Trigger(app.CommitEvent, nil); err != nil {
 		t.Error(err)
 		return
 	}

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/buger/jsonparser"
+	"github.com/goatcms/goatcore/varutil"
 	"github.com/goatcms/goatcore/varutil/plainmap"
 )
 
@@ -73,7 +74,7 @@ func NewBuild(json []byte) (build *Build, err error) {
 			if dataType != jsonparser.String {
 				return fmt.Errorf("Builder.AfterBuild expected string and take %s", value)
 			}
-			build.AfterBuild = string(value)
+			build.AfterBuild = varutil.UnescapeString(string(value))
 		case "properties":
 			if dataType != jsonparser.Object {
 				return fmt.Errorf("DataSet.Properties expected map and take %s", value)

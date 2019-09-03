@@ -3,6 +3,8 @@ package executor
 import (
 	"fmt"
 	"io"
+	"os"
+	"time"
 
 	"github.com/goatcms/goatcli/cliapp/common/cutil"
 	"github.com/goatcms/goatcli/cliapp/services"
@@ -50,8 +52,35 @@ func (e *GeneratorExecutor) ExecuteTask(task Task) (err error) {
 	return nil
 }
 
+// ExecuteHook run single hook templates
+func (e *GeneratorExecutor) ExecuteHook(name string, data interface{}) (err error) {
+	var nodes []os.FileInfo
+	fs := e.sharedData.FS
+	path := ".goat/build/templates/hook/" + name
+	if !fs.IsDir(path) {
+		return nil
+	}
+	if nodes, err = fs.ReadDir(path); err != nil {
+		return err
+	}
+	for _, node := range nodes {
+		if err = e.ExecuteTask(Task{
+			Template: TemplateHandler{
+				Path: "hook/" + name + "/" + node.Name(),
+			},
+			DotData:         data,
+			BuildProperties: map[string]string{},
+			FSPath:          "",
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ExecuteTask run single executor template
 func (e *GeneratorExecutor) consumer() (err error) {
+	generatedFileds := e.sharedData.VCSData.VCSGeneratedFiles()
 	for {
 		select {
 		case task, more := <-e.ch:
@@ -66,8 +95,10 @@ func (e *GeneratorExecutor) consumer() (err error) {
 				e.scope.AppendError(err)
 			}
 			e.scope.DoneTask()
-			// default:
-			// 	runtime.Gosched()
+			generatedFileds.Add(&services.GeneratedFile{
+				Path:    task.FSPath,
+				ModTime: time.Now(),
+			})
 		}
 	}
 }

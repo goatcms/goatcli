@@ -18,19 +18,19 @@ import (
 )
 
 const (
-	master = `
+	masterHook = `
 		{{ $ctx := . }}
-		{{$ctx.RenderOnce "dir/result.txt" "" "testTemplate" "testf" $ctx.DotData}}
+		{{$ctx.RenderOnce "dir/result.txt" "" "" "testf" $ctx.DotData}}
 	`
-	testf = `
+	testfHook = `
 	{{define "testf"}}
 		{{ $ctx := .}}
 		Names:{{block "list" $ctx.DotData}}{{"\n"}}{{range .}}{{println "-" .}}{{end}}{{end}}
 	{{end}}`
-	overlay = `{{define "list"}} {{join . ", "}}{{end}} `
+	overlayHook = `{{define "list"}} {{join . ", "}}{{end}} `
 )
 
-func TestContextExecuteHook(t *testing.T) {
+func TestContextExecute(t *testing.T) {
 	t.Parallel()
 	var (
 		guardians         = []string{"Gamora", "Groot", "Nebula", "Rocket", "Star-Lord"}
@@ -54,9 +54,9 @@ func TestContextExecuteHook(t *testing.T) {
 		}
 		fs = mapp.RootFilespace()
 		if err = goaterr.ToErrors(goaterr.AppendError(nil,
-			fs.WriteFile(".goat/build/templates/testTemplate/master.tmpl", []byte(master), filesystem.DefaultUnixFileMode),
-			fs.WriteFile(".goat/build/templates/testTemplate/testf.tmpl", []byte(testf), filesystem.DefaultUnixFileMode),
-			fs.WriteFile(".goat/build/templates/testTemplate/overlay.tmpl", []byte(overlay), filesystem.DefaultUnixFileMode),
+			fs.WriteFile(".goat/build/templates/hook/testHook/git/master.tmpl", []byte(masterHook), filesystem.DefaultUnixFileMode),
+			fs.WriteFile(".goat/build/templates/hook/testHook/git/testf.tmpl", []byte(testfHook), filesystem.DefaultUnixFileMode),
+			fs.WriteFile(".goat/build/templates/hook/testHook/git/overlay.tmpl", []byte(overlayHook), filesystem.DefaultUnixFileMode),
 			templates.RegisterDependencies(mapp.DependencyProvider()),
 			templates.InitDependencies(mapp),
 		)); err != nil {
@@ -75,7 +75,6 @@ func TestContextExecuteHook(t *testing.T) {
 			t.Error(err)
 			return
 		}
-
 		if generatorExecutor, err = NewGeneratorExecutor(generatorScope, SharedData{
 			PlainData: map[string]string{},
 			Properties: GlobalProperties{
@@ -88,14 +87,7 @@ func TestContextExecuteHook(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		if err = generatorExecutor.ExecuteTask(Task{
-			Template: TemplateHandler{
-				Path: "testTemplate",
-			},
-			DotData:         guardians,
-			BuildProperties: map[string]string{},
-			FSPath:          "",
-		}); err != nil {
+		if err = generatorExecutor.ExecuteHook("testHook", guardians); err != nil {
 			t.Error(err)
 			return
 		}

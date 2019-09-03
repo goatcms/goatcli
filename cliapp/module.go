@@ -18,6 +18,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services/repositories"
 	"github.com/goatcms/goatcli/cliapp/services/secrets"
 	"github.com/goatcms/goatcli/cliapp/services/template"
+	"github.com/goatcms/goatcli/cliapp/services/vcs"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
@@ -39,31 +40,17 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 	}
 	// services
 	dp := a.DependencyProvider()
-	if err = builder.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	if err = cloner.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	if err = data.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	if err = modules.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	if err = dependencies.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	if err = properties.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	if err = secrets.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	if err = repositories.RegisterDependencies(dp); err != nil {
-		return err
-	}
-	return template.RegisterDependencies(dp)
+	return goaterr.ToErrors(goaterr.AppendError(nil,
+		builder.RegisterDependencies(dp),
+		cloner.RegisterDependencies(dp),
+		data.RegisterDependencies(dp),
+		modules.RegisterDependencies(dp),
+		dependencies.RegisterDependencies(dp),
+		properties.RegisterDependencies(dp),
+		secrets.RegisterDependencies(dp),
+		repositories.RegisterDependencies(dp),
+		template.RegisterDependencies(dp),
+		vcs.RegisterDependencies(dp)))
 }
 
 func (m *Module) registerCommands(a app.App) error {

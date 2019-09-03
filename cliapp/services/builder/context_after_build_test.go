@@ -19,40 +19,37 @@ import (
 )
 
 const (
-	testBuilderLayout = `{{- define "out/file.txt" -}}
-		File Content
-	{{- end -}}`
-	testBuilderTemplate = `
+	testCTXBuilderAfterBuildTemplate = `
 	{{$ctx := .}}
-	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}`
-	testBuilderConfig = `[{
+	`
+	testCTXBuilderAfterBuildConfig = `[{
 	  "from":"ignore",
 	  "to":"ignore",
 	  "template":"names",
-	  "layout":"default"
+	  "layout":"default",
+	  "afterBuild": "echo \"TestOK\""
 	}]`
 )
 
-func TestBuilder(t *testing.T) {
+func TestCTXBuilder(t *testing.T) {
 	var (
-		mapp    app.App
-		err     error
-		context []byte
+		mapp app.App
+		err  error
 	)
 	t.Parallel()
 	// prepare mockup application & data
+	output := new(bytes.Buffer)
 	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
 		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(new(bytes.Buffer)),
+		Output: gio.NewOutput(output),
 	}); err != nil {
 		t.Error(err)
 		return
 	}
-	rootFS := mapp.RootFilespace()
+	fs := mapp.RootFilespace()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
-		rootFS.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testBuilderLayout), 0766),
-		rootFS.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testBuilderTemplate), 0766),
-		rootFS.WriteFile(".goat/build.def.json", []byte(testBuilderConfig), 0766))); err != nil {
+		fs.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXBuilderAfterBuildTemplate), 0766),
+		fs.WriteFile(".goat/build.def.json", []byte(testCTXBuilderAfterBuildConfig), 0766))); err != nil {
 		t.Error(err)
 		return
 	}
@@ -75,7 +72,6 @@ func TestBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	fs := mapp.RootFilespace()
 	ctxScope := scope.NewScope("test")
 	buildContext := deps.BuilderService.NewContext(ctxScope, map[string]string{}, map[string]string{}, map[string]string{})
 	if err = buildContext.Build(fs); err != nil {
@@ -90,16 +86,8 @@ func TestBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if !fs.IsFile("out/file.txt") {
-		t.Errorf("out/file.txt is not exist")
-		return
-	}
-	if context, err = fs.ReadFile("out/file.txt"); err != nil {
-		t.Error(err)
-		return
-	}
-	if strings.Index(string(context), "File Content") == -1 {
-		t.Errorf("File must contains 'File Content' and it is '%s'", context)
+	if !strings.Contains(output.String(), "TestOK") {
+		t.Errorf("expected TestOK in afterBuild command output and take '%s'", output.String())
 		return
 	}
 }

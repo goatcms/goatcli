@@ -19,40 +19,39 @@ import (
 )
 
 const (
-	testBuilderLayout = `{{- define "out/file.txt" -}}
-		File Content
-	{{- end -}}`
-	testBuilderTemplate = `
+	testCTXHookLayout = `{{- define ".gitignore"}}
+		{{- $ctx := .}}
+		#ignore these file
+		/main.go
+	{{- end}}`
+	testCTXHookTemplate = `
 	{{$ctx := .}}
-	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}`
-	testBuilderConfig = `[{
-	  "from":"ignore",
-	  "to":"ignore",
-	  "template":"names",
-	  "layout":"default"
-	}]`
+	{{$ctx.RenderOnce ".gitignore" "" "" ".gitignore" $ctx.DotData}}
+	`
+	testCTXHookConfig = `[]`
 )
 
-func TestBuilder(t *testing.T) {
+func TestCTXHook(t *testing.T) {
 	var (
-		mapp    app.App
 		err     error
 		context []byte
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
+	output := new(bytes.Buffer)
+	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
 		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(new(bytes.Buffer)),
-	}); err != nil {
+		Output: gio.NewOutput(output),
+	})
+	if err != nil {
 		t.Error(err)
 		return
 	}
-	rootFS := mapp.RootFilespace()
+	fs := mapp.RootFilespace()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
-		rootFS.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testBuilderLayout), 0766),
-		rootFS.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testBuilderTemplate), 0766),
-		rootFS.WriteFile(".goat/build.def.json", []byte(testBuilderConfig), 0766))); err != nil {
+		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXHookLayout), 0766),
+		fs.WriteFile(".goat/build/templates/hook/vcs/git/main.tmpl", []byte(testCTXHookTemplate), 0766),
+		fs.WriteFile(".goat/build.def.json", []byte(testCTXHookConfig), 0766))); err != nil {
 		t.Error(err)
 		return
 	}
@@ -75,7 +74,6 @@ func TestBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	fs := mapp.RootFilespace()
 	ctxScope := scope.NewScope("test")
 	buildContext := deps.BuilderService.NewContext(ctxScope, map[string]string{}, map[string]string{}, map[string]string{})
 	if err = buildContext.Build(fs); err != nil {
@@ -90,16 +88,16 @@ func TestBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if !fs.IsFile("out/file.txt") {
-		t.Errorf("out/file.txt is not exist")
+	if !fs.IsFile(".gitignore") {
+		t.Errorf(".gitignore is not exist")
 		return
 	}
-	if context, err = fs.ReadFile("out/file.txt"); err != nil {
+	if context, err = fs.ReadFile(".gitignore"); err != nil {
 		t.Error(err)
 		return
 	}
-	if strings.Index(string(context), "File Content") == -1 {
-		t.Errorf("File must contains 'File Content' and it is '%s'", context)
+	if !strings.Contains(string(context), "/main.go") {
+		t.Errorf("expected '/main.go' in .gitignore file and take '%s'", context)
 		return
 	}
 }

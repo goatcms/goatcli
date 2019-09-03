@@ -11,9 +11,11 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcli/cliapp/services/repositories"
 	"github.com/goatcms/goatcli/cliapp/services/template"
+	"github.com/goatcms/goatcli/cliapp/services/vcs"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 const (
@@ -22,8 +24,8 @@ const (
 
 func TestDataDefFromFile(t *testing.T) {
 	var (
-		err        error
 		mapp       app.App
+		err        error
 		builderDef []*config.Build
 	)
 	t.Parallel()
@@ -39,23 +41,14 @@ func TestDataDefFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = modules.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = dependencies.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = repositories.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = template.RegisterDependencies(mapp.DependencyProvider()); err != nil {
+	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		RegisterDependencies(mapp.DependencyProvider()),
+		modules.RegisterDependencies(mapp.DependencyProvider()),
+		dependencies.RegisterDependencies(mapp.DependencyProvider()),
+		repositories.RegisterDependencies(mapp.DependencyProvider()),
+		template.RegisterDependencies(mapp.DependencyProvider()),
+		vcs.RegisterDependencies(mapp.DependencyProvider()),
+		template.InitDependencies(mapp))); err != nil {
 		t.Error(err)
 		return
 	}
@@ -92,23 +85,14 @@ func TestDataDefDefaultEmpty(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = modules.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = dependencies.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = repositories.RegisterDependencies(mapp.DependencyProvider()); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = template.RegisterDependencies(mapp.DependencyProvider()); err != nil {
+	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		RegisterDependencies(mapp.DependencyProvider()),
+		modules.RegisterDependencies(mapp.DependencyProvider()),
+		dependencies.RegisterDependencies(mapp.DependencyProvider()),
+		repositories.RegisterDependencies(mapp.DependencyProvider()),
+		template.RegisterDependencies(mapp.DependencyProvider()),
+		vcs.RegisterDependencies(mapp.DependencyProvider()),
+		template.InitDependencies(mapp))); err != nil {
 		t.Error(err)
 		return
 	}
