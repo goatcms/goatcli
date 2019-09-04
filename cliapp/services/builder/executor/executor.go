@@ -95,10 +95,12 @@ func (e *GeneratorExecutor) consumer() (err error) {
 				e.scope.AppendError(err)
 			}
 			e.scope.DoneTask()
-			generatedFileds.Add(&services.GeneratedFile{
-				Path:    task.FSPath,
-				ModTime: time.Now(),
-			})
+			if task.FSPath != "" {
+				generatedFileds.Add(&services.GeneratedFile{
+					Path:    task.FSPath,
+					ModTime: time.Now(),
+				})
+			}
 		}
 	}
 }

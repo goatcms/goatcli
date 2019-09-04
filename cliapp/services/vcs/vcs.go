@@ -64,6 +64,9 @@ func (vcs *VCS) WriteDataToFS(fs filesystem.Filespace, data services.VCSData) (e
 		ignoredWriter   filesystem.Writer
 		generatedWriter filesystem.Writer
 	)
+	if err = vcs.deps.FS.MkdirAll(DataDirectoryPath, filesystem.DefaultUnixDirMode); err != nil {
+		return err
+	}
 	if generatedWriter, err = vcs.deps.FS.Writer(GeneratedFilesPath); err != nil {
 		return err
 	}

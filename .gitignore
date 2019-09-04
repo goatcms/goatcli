@@ -2,6 +2,7 @@ vendors
 
 main
 npm-debug.log
+__debug_bin
 *.test
 *~
 *.exe
