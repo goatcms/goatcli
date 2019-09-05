@@ -44,8 +44,16 @@ func TestVCSWriteIgnoredToFS(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	if vcsData.VCSIgnoredFiles().Modified() != false {
+		t.Errorf("Ignored files should be unmodified after read")
+		return
+	}
 	vcsData.VCSIgnoredFiles().AddPath("/first/ignored.file")
 	vcsData.VCSIgnoredFiles().AddPath("/second/ignored.file")
+	if vcsData.VCSIgnoredFiles().Modified() != true {
+		t.Errorf("after add paths to ignored files Modified flag must be true")
+		return
+	}
 	if err = deps.VCSService.WriteDataToFS(mapp.RootFilespace(), vcsData); err != nil {
 		t.Error(err)
 		return

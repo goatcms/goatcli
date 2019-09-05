@@ -46,6 +46,10 @@ func TestVCSWriteGeneratedToFS(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	if vcsData.VCSGeneratedFiles().Modified() != false {
+		t.Errorf("Generated files should be unmodified after read")
+		return
+	}
 	if expectedTime, err = time.Parse(time.RFC3339, "2009-11-10T23:00:00Z"); err != nil {
 		t.Error(err)
 		return
@@ -58,6 +62,10 @@ func TestVCSWriteGeneratedToFS(t *testing.T) {
 		Path:    "/second/generated.file",
 		ModTime: expectedTime,
 	})
+	if vcsData.VCSGeneratedFiles().Modified() != true {
+		t.Errorf("after add records to generated files Modified flag must be true")
+		return
+	}
 	if err = deps.VCSService.WriteDataToFS(mapp.RootFilespace(), vcsData); err != nil {
 		t.Error(err)
 		return

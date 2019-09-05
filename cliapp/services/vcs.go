@@ -21,6 +21,7 @@ type VCSGeneratedFiles interface {
 	ContainsPath(path string) bool
 	Add(row *GeneratedFile)
 	WriteAll(writer io.Writer) (err error)
+	Modified() bool
 }
 
 // VCSIgnoredFiles contains ignored files
@@ -29,6 +30,7 @@ type VCSIgnoredFiles interface {
 	ContainsPath(path string) bool
 	AddPath(path string)
 	WriteAll(writer io.Writer) (err error)
+	Modified() bool
 }
 
 // VCSData contains vcs data like generated files list, ignored files etc

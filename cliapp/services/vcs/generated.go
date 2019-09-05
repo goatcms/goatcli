@@ -29,18 +29,20 @@ func NewGeneratedFileFromText(text string) (instance *services.GeneratedFile, er
 
 // GeneratedFiles contains generated files
 type GeneratedFiles struct {
-	mu      sync.RWMutex
-	rows    []*services.GeneratedFile
-	indexes map[string]*services.GeneratedFile
-	news    map[string]*services.GeneratedFile
+	mu       sync.RWMutex
+	rows     []*services.GeneratedFile
+	indexes  map[string]*services.GeneratedFile
+	news     map[string]*services.GeneratedFile
+	modified bool
 }
 
 // NewGeneratedFiles create new GeneratedFiles instance
-func NewGeneratedFiles() (instance *GeneratedFiles) {
+func NewGeneratedFiles(modified bool) (instance *GeneratedFiles) {
 	return &GeneratedFiles{
-		rows:    []*services.GeneratedFile{},
-		indexes: map[string]*services.GeneratedFile{},
-		news:    map[string]*services.GeneratedFile{},
+		rows:     []*services.GeneratedFile{},
+		indexes:  map[string]*services.GeneratedFile{},
+		news:     map[string]*services.GeneratedFile{},
+		modified: modified,
 	}
 }
 
@@ -49,7 +51,7 @@ func NewGeneratedFilesFromStream(reader io.Reader) (instance *GeneratedFiles, er
 	var (
 		scanner = bufio.NewScanner(reader)
 	)
-	instance = NewGeneratedFiles()
+	instance = NewGeneratedFiles(false)
 	for scanner.Scan() {
 		instance.addRow(scanner.Text())
 	}
@@ -106,6 +108,7 @@ func (generated *GeneratedFiles) addRow(text string) (row *services.GeneratedFil
 		return nil, err
 	}
 	generated.add(row)
+	generated.modified = true
 	return row, nil
 }
 
@@ -124,6 +127,7 @@ func (generated *GeneratedFiles) add(row *services.GeneratedFile) {
 	}
 	generated.rows = append(generated.rows, row)
 	generated.indexes[row.Path] = row
+	generated.modified = true
 }
 
 // WriteAll write all rows to write stream
@@ -136,4 +140,9 @@ func (generated *GeneratedFiles) WriteAll(writer io.Writer) (err error) {
 		}
 	}
 	return nil
+}
+
+// Modified return true if object was modiefid
+func (generated *GeneratedFiles) Modified() bool {
+	return generated.modified
 }

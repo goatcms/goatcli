@@ -7,6 +7,8 @@ const (
 	DataAdd = "[type_name, data_name] add new data set to project scaffolding data"
 	// Build is a build command help
 	Build = "build goat project in current directory"
+	// Clean is a clean command help
+	Clean = "clean builded files"
 	// Init is a init command help
 	Init = "initialize new goat project"
 	// AddDep is a deps:add command help

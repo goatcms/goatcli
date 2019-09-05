@@ -11,8 +11,8 @@ import (
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-// Run run command in app.App context
-func Run(a app.App, ctxScope app.Scope) (err error) {
+// RunBuild run build command
+func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 	var (
 		deps struct {
 			Interactive string `argument:"?interactive" ,command:"?interactive"`

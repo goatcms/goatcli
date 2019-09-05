@@ -9,16 +9,18 @@ import (
 
 // IgnoredFiles contains ignored files
 type IgnoredFiles struct {
-	mu      sync.RWMutex
-	rows    []string
-	indexes map[string]string
+	mu       sync.RWMutex
+	rows     []string
+	indexes  map[string]string
+	modified bool
 }
 
 // NewIgnoredFiles create new IgnoredFiles instance
-func NewIgnoredFiles() (instance *IgnoredFiles) {
+func NewIgnoredFiles(modified bool) (instance *IgnoredFiles) {
 	return &IgnoredFiles{
-		rows:    []string{},
-		indexes: map[string]string{},
+		rows:     []string{},
+		indexes:  map[string]string{},
+		modified: modified,
 	}
 }
 
@@ -27,7 +29,7 @@ func NewIgnoredFilesFromStream(reader io.Reader) (instance *IgnoredFiles, err er
 	var (
 		scanner = bufio.NewScanner(reader)
 	)
-	instance = NewIgnoredFiles()
+	instance = NewIgnoredFiles(false)
 	for scanner.Scan() {
 		instance.AddPath(scanner.Text())
 	}
@@ -63,6 +65,7 @@ func (ignored *IgnoredFiles) AddPath(path string) {
 	}
 	ignored.rows = append(ignored.rows, path)
 	ignored.indexes[path] = path
+	ignored.modified = true
 }
 
 // WriteAll write all rows to write stream
@@ -75,4 +78,9 @@ func (ignored *IgnoredFiles) WriteAll(writer io.Writer) (err error) {
 		}
 	}
 	return nil
+}
+
+// Modified return true if object was modiefid
+func (ignored *IgnoredFiles) Modified() bool {
+	return ignored.modified
 }

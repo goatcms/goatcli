@@ -3,6 +3,7 @@ package cliapp
 import (
 	"github.com/goatcms/goatcli/cliapp/commands"
 	"github.com/goatcms/goatcli/cliapp/commands/buildc"
+	"github.com/goatcms/goatcli/cliapp/commands/cleanc"
 	"github.com/goatcms/goatcli/cliapp/commands/clonec"
 	"github.com/goatcms/goatcli/cliapp/commands/datac"
 	"github.com/goatcms/goatcli/cliapp/commands/depsc"
@@ -55,17 +56,18 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 
 func (m *Module) registerCommands(a app.App) error {
 	return goaterr.ToErrors(goaterr.AppendError(nil,
-		app.RegisterComand(a, "clone", clonec.Run, commands.Clone),
-		app.RegisterComand(a, "init", initc.RunInit, commands.Init),
-		app.RegisterComand(a, "build", buildc.Run, commands.Build),
-		app.RegisterComand(a, "data:add", datac.RunAdd, commands.DataAdd),
-		app.RegisterComand(a, "deps:add", depsc.RunAddDep, commands.AddDep),
-		app.RegisterComand(a, "deps:add:go", depsc.RunAddGODep, commands.AddGODep),
-		app.RegisterComand(a, "deps:add:go:import", depsc.RunAddGOImportsDep, commands.AddGOImportsDep),
-		app.RegisterComand(a, "properties:set", propertiesc.RunSetPropertyValue, commands.SetPropertyValueDep),
-		app.RegisterComand(a, "properties:get", propertiesc.RunGetPropertyValue, commands.GetPropertyValueDep),
-		app.RegisterComand(a, "secrets:set", secretsc.RunSetSecretValue, commands.SetSecretValueDep),
-		app.RegisterComand(a, "secrets:get", secretsc.RunGetSecretValue, commands.GetSecretValueDep),
+		app.RegisterCommand(a, "clone", clonec.Run, commands.Clone),
+		app.RegisterCommand(a, "init", initc.RunInit, commands.Init),
+		app.RegisterCommand(a, "build", buildc.RunBuild, commands.Build),
+		app.RegisterCommand(a, "clean", cleanc.RunClean, commands.Clean),
+		app.RegisterCommand(a, "data:add", datac.RunAdd, commands.DataAdd),
+		app.RegisterCommand(a, "deps:add", depsc.RunAddDep, commands.AddDep),
+		app.RegisterCommand(a, "deps:add:go", depsc.RunAddGODep, commands.AddGODep),
+		app.RegisterCommand(a, "deps:add:go:import", depsc.RunAddGOImportsDep, commands.AddGOImportsDep),
+		app.RegisterCommand(a, "properties:set", propertiesc.RunSetPropertyValue, commands.SetPropertyValueDep),
+		app.RegisterCommand(a, "properties:get", propertiesc.RunGetPropertyValue, commands.GetPropertyValueDep),
+		app.RegisterCommand(a, "secrets:set", secretsc.RunSetSecretValue, commands.SetSecretValueDep),
+		app.RegisterCommand(a, "secrets:get", secretsc.RunGetSecretValue, commands.GetSecretValueDep),
 		app.RegisterArgument(a, "cwd", commands.CWDArg),
 	))
 }
