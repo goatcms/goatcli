@@ -72,6 +72,8 @@ func (m *Module) registerCommands(a app.App) error {
 		app.RegisterCommand(a, "vcs:clean", vcsc.RunClean, commands.VCSClean),
 		app.RegisterCommand(a, "vcs:ignored:add", vcsc.RunIgnoredAdd, commands.VCSIgnoredAdd),
 		app.RegisterCommand(a, "vcs:ignored:remove", vcsc.RunIgnoredRemove, commands.VCSIgnoredRemove),
+		app.RegisterCommand(a, "vcs:ignored:list", vcsc.RunIgnoredList, commands.VCSIgnoredList),
+		app.RegisterCommand(a, "vcs:generated:list", vcsc.RunGeneratedList, commands.VCSGeneratedList),
 		app.RegisterArgument(a, "cwd", commands.CWDArg),
 	))
 }

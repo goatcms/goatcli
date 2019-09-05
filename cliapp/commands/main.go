@@ -31,6 +31,10 @@ const (
 	VCSIgnoredAdd = "Add new vcs ignored file [--path=file path to be ignored]"
 	// VCSIgnoredRemove is a vcs:ignored:remove command help
 	VCSIgnoredRemove = "Remove a vcs ignored file [--path=file path]"
+	// VCSIgnoredList is a vcs:ignored:list command help
+	VCSIgnoredList = "Show ignored files listing"
+	// VCSGeneratedList is a vcs:generated:list command help
+	VCSGeneratedList = "Show generated files listing"
 	// CWDArg is a cwd argument description
 	CWDArg = "set Current Working Dirctory"
 )
