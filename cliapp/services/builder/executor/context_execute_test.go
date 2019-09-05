@@ -83,7 +83,7 @@ func TestContextExecuteHook(t *testing.T) {
 				Secrets: map[string]string{},
 			},
 			FS:      fs,
-			VCSData: vcs.NewData(vcs.NewGeneratedFiles(), vcs.NewIgnoredFiles()),
+			VCSData: vcs.NewData(vcs.NewGeneratedFiles(true), vcs.NewIgnoredFiles(true)),
 		}, 10, templateExecutor); err != nil {
 			t.Error(err)
 			return
