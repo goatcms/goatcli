@@ -61,6 +61,8 @@ func (m *Module) registerCommands(a app.App) error {
 		app.RegisterCommand(a, "init", initc.RunInit, commands.Init),
 		app.RegisterCommand(a, "build", buildc.RunBuild, commands.Build),
 		app.RegisterCommand(a, "clean", cleanc.RunClean, commands.Clean),
+		app.RegisterCommand(a, "clean:dependencies", cleanc.RunCleanDependencies, commands.CleanDependencies),
+		app.RegisterCommand(a, "clean:build", cleanc.RunCleanBuild, commands.CleanBuild),
 		app.RegisterCommand(a, "data:add", datac.RunAdd, commands.DataAdd),
 		app.RegisterCommand(a, "deps:add", depsc.RunAddDep, commands.AddDep),
 		app.RegisterCommand(a, "deps:add:go", depsc.RunAddGODep, commands.AddGODep),

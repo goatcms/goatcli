@@ -8,7 +8,11 @@ const (
 	// Build is a build command help
 	Build = "build goat project in current directory"
 	// Clean is a clean command help
-	Clean = "clean builded files"
+	Clean = "clean builded files and dependencies"
+	// CleanDependencies is a clean command help
+	CleanDependencies = "clean dependencies files"
+	// CleanBuild is a clean command help
+	CleanBuild = "clean build files"
 	// Init is a init command help
 	Init = "initialize new goat project"
 	// AddDep is a deps:add command help
