@@ -24,6 +24,7 @@ func NewGeneratedFileFromText(text string) (instance *services.GeneratedFile, er
 		return instance, err
 	}
 	instance.Path = parts[1]
+	instance.Path = strings.Trim(instance.Path, " \t")
 	return instance, nil
 }
 

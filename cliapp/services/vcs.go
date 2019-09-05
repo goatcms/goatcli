@@ -29,6 +29,7 @@ type VCSIgnoredFiles interface {
 	All() []string
 	ContainsPath(path string) bool
 	AddPath(path string)
+	RemovePath(path string)
 	WriteAll(writer io.Writer) (err error)
 	Modified() bool
 }

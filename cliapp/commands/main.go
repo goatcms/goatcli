@@ -25,6 +25,12 @@ const (
 	SetPropertyValueDep = "[key, value] adds or updates an property with a specified key and value"
 	// GetPropertyValueDep is a properties:get command help
 	GetPropertyValueDep = "[key] display a specified element from a properties"
+	// VCSClean is a vcs:clean command help
+	VCSClean = "Clean vcs ignored files"
+	// VCSIgnoredAdd is a vcs:ignored:add command help
+	VCSIgnoredAdd = "Add new vcs ignored file [--path=file path to be ignored]"
+	// VCSIgnoredRemove is a vcs:ignored:remove command help
+	VCSIgnoredRemove = "Remove a vcs ignored file [--path=file path]"
 	// CWDArg is a cwd argument description
 	CWDArg = "set Current Working Dirctory"
 )

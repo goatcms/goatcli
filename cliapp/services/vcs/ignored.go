@@ -36,6 +36,7 @@ func NewIgnoredFilesFromStream(reader io.Reader) (instance *IgnoredFiles, err er
 	if err = scanner.Err(); err != nil {
 		return nil, err
 	}
+	instance.modified = false
 	return instance, nil
 }
 
@@ -60,11 +61,35 @@ func (ignored *IgnoredFiles) AddPath(path string) {
 		return
 	}
 	path = strings.Trim(path, " \t")
+	if path == "" {
+		return
+	}
 	if _, ok := ignored.indexes[path]; ok {
 		return
 	}
 	ignored.rows = append(ignored.rows, path)
 	ignored.indexes[path] = path
+	ignored.modified = true
+}
+
+// RemovePath add new path to ignored
+func (ignored *IgnoredFiles) RemovePath(path string) {
+	ignored.mu.Lock()
+	defer ignored.mu.Unlock()
+	if emptyRegexp.MatchString(path) {
+		return
+	}
+	path = strings.Trim(path, " \t")
+	if _, ok := ignored.indexes[path]; !ok {
+		return
+	}
+	for i, row := range ignored.rows {
+		if row == path {
+			ignored.rows = append(ignored.rows[:i], ignored.rows[i+1:]...)
+			break
+		}
+	}
+	delete(ignored.indexes, path)
 	ignored.modified = true
 }
 

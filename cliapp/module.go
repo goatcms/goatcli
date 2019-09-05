@@ -10,6 +10,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/commands/initc"
 	"github.com/goatcms/goatcli/cliapp/commands/propertiesc"
 	"github.com/goatcms/goatcli/cliapp/commands/secretsc"
+	"github.com/goatcms/goatcli/cliapp/commands/vcsc"
 	"github.com/goatcms/goatcli/cliapp/services/builder"
 	"github.com/goatcms/goatcli/cliapp/services/cloner"
 	"github.com/goatcms/goatcli/cliapp/services/data"
@@ -68,6 +69,9 @@ func (m *Module) registerCommands(a app.App) error {
 		app.RegisterCommand(a, "properties:get", propertiesc.RunGetPropertyValue, commands.GetPropertyValueDep),
 		app.RegisterCommand(a, "secrets:set", secretsc.RunSetSecretValue, commands.SetSecretValueDep),
 		app.RegisterCommand(a, "secrets:get", secretsc.RunGetSecretValue, commands.GetSecretValueDep),
+		app.RegisterCommand(a, "vcs:clean", vcsc.RunClean, commands.VCSClean),
+		app.RegisterCommand(a, "vcs:ignored:add", vcsc.RunIgnoredAdd, commands.VCSIgnoredAdd),
+		app.RegisterCommand(a, "vcs:ignored:remove", vcsc.RunIgnoredRemove, commands.VCSIgnoredRemove),
 		app.RegisterArgument(a, "cwd", commands.CWDArg),
 	))
 }
