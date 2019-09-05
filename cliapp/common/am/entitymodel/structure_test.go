@@ -11,15 +11,40 @@ func TestStructureAddField(t *testing.T) {
 	)
 	t.Parallel()
 	name, _ := NewName("name")
-	if err = instance.AddField(&Field{
+	field := &Field{
 		Name: name,
-	}); err != nil {
+	}
+	if err = instance.AddField(field); err != nil {
 		t.Error(err)
 		return
 	}
+	if field.Structure != instance {
+		t.Errorf("Field structure should be updated")
+	}
 	if _, ok := instance.Fields.ByName["Name"]; !ok {
 		t.Errorf("Name field should be defined")
+	}
+}
+
+func TestStructureAddRelation(t *testing.T) {
+	var (
+		instance = NewStructure()
+		err      error
+	)
+	t.Parallel()
+	name, _ := NewName("name")
+	relation := &Relation{
+		Name: name,
+	}
+	if err = instance.AddRelation(relation); err != nil {
+		t.Error(err)
 		return
+	}
+	if relation.Structure != instance {
+		t.Errorf("Relation structure should be updated")
+	}
+	if _, ok := instance.Relations["Name"]; !ok {
+		t.Errorf("Name relation should be defined")
 	}
 }
 

@@ -8,10 +8,11 @@ import (
 // Field struct represent single entity field
 type Field struct {
 	// Path     []string
-	FullName Name
-	Name     Name
-	Type     string
-	Flags    FieldFlags
+	FullName  Name
+	Name      Name
+	Type      string
+	Flags     FieldFlags
+	Structure *Structure
 }
 
 // FieldFlags contains flags represent a field

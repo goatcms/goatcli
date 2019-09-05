@@ -50,6 +50,7 @@ func (structure *Structure) AddField(field *Field) (err error) {
 	if err = structure.preventDuplicateNames(field.Name.CamelCaseUF); err != nil {
 		return err
 	}
+	field.Structure = structure
 	structure.Fields.ByName[field.Name.CamelCaseUF] = field
 	typeset := structure.Fields.ByType[field.Name.CamelCaseUF]
 	structure.Fields.ByType[field.Name.CamelCaseUF] = append(typeset, field)
@@ -61,6 +62,7 @@ func (structure *Structure) AddRelation(relation *Relation) (err error) {
 	if err = structure.preventDuplicateNames(relation.Name.CamelCaseUF); err != nil {
 		return err
 	}
+	relation.Structure = structure
 	structure.Relations[relation.Name.CamelCaseUF] = relation
 	return nil
 }

@@ -7,10 +7,11 @@ import (
 
 // Relation struct represent single relation to other entity
 type Relation struct {
-	FullName Name
-	Name     Name
-	To       string
-	Flags    FieldFlags
+	FullName  Name
+	Name      Name
+	To        string
+	Flags     FieldFlags
+	Structure *Structure
 }
 
 // RelationFlags contains flags represent a relation flags
