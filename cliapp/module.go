@@ -60,6 +60,7 @@ func (m *Module) registerCommands(a app.App) error {
 		app.RegisterCommand(a, "clone", clonec.Run, commands.Clone),
 		app.RegisterCommand(a, "init", initc.RunInit, commands.Init),
 		app.RegisterCommand(a, "build", buildc.RunBuild, commands.Build),
+		app.RegisterCommand(a, "rebuild", buildc.RunRebuild, commands.Rebuild),
 		app.RegisterCommand(a, "clean", cleanc.RunClean, commands.Clean),
 		app.RegisterCommand(a, "clean:dependencies", cleanc.RunCleanDependencies, commands.CleanDependencies),
 		app.RegisterCommand(a, "clean:build", cleanc.RunCleanBuild, commands.CleanBuild),
