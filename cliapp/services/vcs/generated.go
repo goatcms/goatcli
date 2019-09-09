@@ -90,6 +90,8 @@ func (generated *GeneratedFiles) ContainsPath(path string) bool {
 // AddRow add new row from text to generated
 func (generated *GeneratedFiles) AddRow(text string) (err error) {
 	var row *services.GeneratedFile
+	generated.mu.Lock()
+	defer generated.mu.Unlock()
 	if emptyRegexp.MatchString(text) {
 		return nil
 	}
@@ -115,13 +117,13 @@ func (generated *GeneratedFiles) addRow(text string) (row *services.GeneratedFil
 
 // Add create or update row in collection
 func (generated *GeneratedFiles) Add(row *services.GeneratedFile) {
+	generated.mu.Lock()
+	defer generated.mu.Unlock()
 	generated.add(row)
 	generated.news[row.Path] = row
 }
 
 func (generated *GeneratedFiles) add(row *services.GeneratedFile) {
-	generated.mu.Lock()
-	defer generated.mu.Unlock()
 	if current, ok := generated.indexes[row.Path]; ok {
 		current.ModTime = row.ModTime
 		return
