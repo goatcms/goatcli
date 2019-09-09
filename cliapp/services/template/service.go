@@ -14,11 +14,13 @@ import (
 // Service is global template provider
 type Service struct {
 	deps struct {
-		Filespace filesystem.Filespace `filespace:"root"`
+		TemplateCache string               `argument:"?template.cache"`
+		Filespace     filesystem.Filespace `filespace:"root"`
 	}
 	providerMutex sync.Mutex
 	funcs         template.FuncMap
 	isUsed        bool
+	cache         bool
 }
 
 // ProviderFactory create new template provider
@@ -30,6 +32,7 @@ func ProviderFactory(dp dependency.Provider) (interface{}, error) {
 	if err := dp.InjectTo(&s.deps); err != nil {
 		return nil, err
 	}
+	s.cache = s.deps.TemplateCache != "false"
 	return services.TemplateService(s), nil
 }
 
@@ -49,7 +52,7 @@ func (s *Service) AddFunc(name string, f interface{}) error {
 func (s *Service) Build(fs filesystem.Filespace) (services.TemplateExecutor, error) {
 	s.isUsed = true
 	// prepare executor
-	provider := gtprovider.NewProvider(fs, HelpersPath, LayoutPath, ViewPath, FileExtension, s.funcs)
+	provider := gtprovider.NewProvider(fs, HelpersPath, LayoutPath, ViewPath, FileExtension, s.funcs, s.cache)
 	return &Executor{
 		provider: provider,
 	}, nil
