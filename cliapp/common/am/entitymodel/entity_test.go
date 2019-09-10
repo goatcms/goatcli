@@ -101,12 +101,16 @@ func TestNewEntity(t *testing.T) {
 		t.Errorf("entity.Plural.CamelCaseUF should be equals to 'Users' and takes %s", entity.Plural.CamelCaseUF)
 		return
 	}
-	if entity.AllFields.ByName["PersonFirstname"].Type != "string" {
-		t.Errorf("PersonFirstname must be a string type")
-		return
-	}
 	if entity.AllFields.ByName["Password"].Type != "password" {
 		t.Errorf("Password must be a password type")
+		return
+	}
+	if entity.Structure.Fields.ByName["Password"].Type != "password" {
+		t.Errorf("Password (in root structure) must be a password type")
+		return
+	}
+	if entity.AllFields.ByName["PersonFirstname"].Type != "string" {
+		t.Errorf("PersonFirstname must be a string type")
 		return
 	}
 	if entity.Structure.Structures["Person"].Fields.ByName["Firstname"].Type != "string" {

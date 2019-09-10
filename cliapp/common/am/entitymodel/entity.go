@@ -159,5 +159,5 @@ func pathFromPlainName(name string) string {
 	if pos := strings.LastIndex(name, "."); pos != -1 {
 		return name[:pos]
 	}
-	return name
+	return ""
 }
