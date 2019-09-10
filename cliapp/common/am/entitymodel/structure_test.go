@@ -6,7 +6,7 @@ import (
 
 func TestStructureAddField(t *testing.T) {
 	var (
-		instance = NewStructure()
+		instance = NewStructure(nil)
 		err      error
 	)
 	t.Parallel()
@@ -28,7 +28,7 @@ func TestStructureAddField(t *testing.T) {
 
 func TestStructureAddRelation(t *testing.T) {
 	var (
-		instance = NewStructure()
+		instance = NewStructure(nil)
 		err      error
 	)
 	t.Parallel()
@@ -50,7 +50,7 @@ func TestStructureAddRelation(t *testing.T) {
 
 func TestStructureAddFieldAndRelationWithTheSameName(t *testing.T) {
 	var (
-		instance = NewStructure()
+		instance = NewStructure(nil)
 		err      error
 	)
 	t.Parallel()

@@ -138,3 +138,28 @@ func TestNewEntity(t *testing.T) {
 		return
 	}
 }
+
+func TestNewEntityStructure(t *testing.T) {
+	var (
+		data   map[string]string
+		entity *Entity
+		err    error
+	)
+	t.Parallel()
+	if data, err = plainmap.JSONToPlainStringMap([]byte(testNewEntityJSON)); err != nil {
+		t.Error(err)
+		return
+	}
+	if entity, err = NewEntityFromPlainmap("model.user", data); err != nil {
+		t.Error(err)
+		return
+	}
+	if entity.Structure.Entity != entity {
+		t.Errorf("main structure should have entity handler")
+		return
+	}
+	if entity.Structure.Structures["Person"].Entity != entity {
+		t.Errorf("evry child structure should have entity handler")
+		return
+	}
+}

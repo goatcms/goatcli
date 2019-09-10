@@ -13,6 +13,7 @@ const (
 
 // Structure contains fields and relations structure
 type Structure struct {
+	Entity     *Entity
 	Fields     *Fields
 	Relations  Relations
 	Path       []string
@@ -20,8 +21,9 @@ type Structure struct {
 }
 
 // NewStructure create new Structure instance
-func NewStructure() (instance *Structure) {
+func NewStructure(entity *Entity) (instance *Structure) {
 	return &Structure{
+		Entity:     entity,
 		Fields:     NewFields(),
 		Relations:  NewRelations(),
 		Path:       []string{},
@@ -73,7 +75,7 @@ func (structure *Structure) NewStructure(name string) (node *Structure, err erro
 	if err = structure.preventDuplicateNames(name); err != nil {
 		return nil, err
 	}
-	node = NewStructure()
+	node = NewStructure(structure.Entity)
 	node.Path = append(structure.Path, name)
 	structure.Structures[name] = node
 	return node, nil

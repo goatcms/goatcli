@@ -43,8 +43,8 @@ func NewEntity(name, singular, plural string) (instance *Entity, err error) {
 	instance = &Entity{
 		AllFields:    NewFields(),
 		AllRelations: NewRelations(),
-		Structure:    NewStructure(),
 	}
+	instance.Structure = NewStructure(instance)
 	if name == "" {
 		return nil, fmt.Errorf("Entity name is required")
 	}
@@ -111,7 +111,7 @@ func loadStructure(prefix string, data map[string]string, e *Entity) (err error)
 		path      string
 	)
 	// load
-	e.Structure = NewStructure()
+	e.Structure = NewStructure(e)
 	if e.AllFields, err = NewFieldsFromPlainmap(prefix+".fields", data); err != nil {
 		return err
 	}
