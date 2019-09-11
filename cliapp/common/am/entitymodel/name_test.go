@@ -35,4 +35,14 @@ func TestNewName(t *testing.T) {
 		t.Errorf("name.Underscore: value is incorrect. Take %s and expect %s", name.Underscore, expect)
 		return
 	}
+	expect = "TESTNEWNAME"
+	if name.Upper != expect {
+		t.Errorf("name.Upper: value is incorrect. Take %s and expect %s", name.Upper, expect)
+		return
+	}
+	expect = "testnewname"
+	if name.Lower != expect {
+		t.Errorf("name.Lower: value is incorrect. Take %s and expect %s", name.Lower, expect)
+		return
+	}
 }
