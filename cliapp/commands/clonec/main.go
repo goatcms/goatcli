@@ -2,6 +2,7 @@ package clonec
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/result"
@@ -43,7 +44,7 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 	if err = ctxScope.InjectTo(&deps); err != nil {
 		return err
 	}
-	interactive = !(deps.Interactive == "false")
+	interactive = strings.ToLower(deps.Interactive) != "false"
 	if deps.RepositoryURL == "" {
 		return fmt.Errorf("First argument repository url is required")
 	}

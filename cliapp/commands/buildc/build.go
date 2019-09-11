@@ -1,6 +1,8 @@
 package buildc
 
 import (
+	"strings"
+
 	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/prevents"
@@ -43,7 +45,7 @@ func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 		ctxScope.InjectTo(&deps))); err != nil {
 		return err
 	}
-	interactive = !(deps.Interactive == "false")
+	interactive = strings.ToLower(deps.Interactive) != "false"
 	fs = deps.CurrentFS
 	if err = prevents.RequireGoatProject(fs); err != nil {
 		return err

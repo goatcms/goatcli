@@ -35,7 +35,7 @@ func RunCleanBuild(a app.App, ctxScope app.Scope) (err error) {
 		ctxScope.InjectTo(&deps))); err != nil {
 		return err
 	}
-	allMode = strings.ToLower(deps.AllFlag) == "y"
+	allMode = strings.ToLower(deps.AllFlag) != "false"
 	// load data
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
