@@ -6,11 +6,13 @@ import (
 	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/common/naming"
+	"github.com/goatcms/goatcore/varutil"
 )
 
 var (
 	// DefaultACLRoles is default role for ACL
 	DefaultACLRoles = []string{"admin"}
+	pluralSuffixes  = []string{"ch", "sh", "s", "x", "z"}
 )
 
 // Entity contains single entity model data
@@ -59,7 +61,15 @@ func NewEntity(name, singular, plural string) (instance *Entity, err error) {
 		}
 	}
 	if plural == "" {
-		instance.Plural = instance.Name
+		if varutil.HasOneSuffix(name, pluralSuffixes) {
+			if instance.Plural, err = NewName(name + "es"); err != nil {
+				return nil, err
+			}
+		} else {
+			if instance.Plural, err = NewName(name + "s"); err != nil {
+				return nil, err
+			}
+		}
 	} else {
 		if instance.Plural, err = NewName(plural); err != nil {
 			return nil, err

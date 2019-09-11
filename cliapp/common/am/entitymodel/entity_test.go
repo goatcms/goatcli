@@ -12,7 +12,6 @@ const (
 	  "model": {
 	    "user": {
 	      "name": "user",
-	      "plural": "users",
 	      "admin_read_roles":   "admin",
 	      "admin_insert_roles": "admin",
 	      "admin_edit_roles":   "admin",
