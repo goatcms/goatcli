@@ -6,13 +6,18 @@ import (
 
 func TestStructureAddField(t *testing.T) {
 	var (
-		instance = NewStructure(nil)
+		instance *Structure
 		err      error
+		field    *Field
 	)
 	t.Parallel()
-	name, _ := NewName("name")
-	field := &Field{
-		Name: name,
+	if instance, err = NewStructure("ROOT", nil); err != nil {
+		t.Error(err)
+		return
+	}
+	if field, err = NewField("name"); err != nil {
+		t.Error(err)
+		return
 	}
 	if err = instance.AddField(field); err != nil {
 		t.Error(err)
@@ -28,13 +33,18 @@ func TestStructureAddField(t *testing.T) {
 
 func TestStructureAddRelation(t *testing.T) {
 	var (
-		instance = NewStructure(nil)
+		instance *Structure
 		err      error
+		relation *Relation
 	)
 	t.Parallel()
-	name, _ := NewName("name")
-	relation := &Relation{
-		Name: name,
+	if instance, err = NewStructure("ROOT", nil); err != nil {
+		t.Error(err)
+		return
+	}
+	if relation, err = NewRelation("name", "to"); err != nil {
+		t.Error(err)
+		return
 	}
 	if err = instance.AddRelation(relation); err != nil {
 		t.Error(err)
@@ -43,27 +53,36 @@ func TestStructureAddRelation(t *testing.T) {
 	if relation.Structure != instance {
 		t.Errorf("Relation structure should be updated")
 	}
-	if _, ok := instance.Relations["Name"]; !ok {
+	if _, ok := instance.Relations.ByName["Name"]; !ok {
 		t.Errorf("Name relation should be defined")
 	}
 }
 
 func TestStructureAddFieldAndRelationWithTheSameName(t *testing.T) {
 	var (
-		instance = NewStructure(nil)
+		instance *Structure
 		err      error
+		relation *Relation
+		field    *Field
 	)
 	t.Parallel()
-	name, _ := NewName("name")
-	if err = instance.AddRelation(&Relation{
-		Name: name,
-	}); err != nil {
+	if instance, err = NewStructure("ROOT", nil); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = instance.AddField(&Field{
-		Name: name,
-	}); err == nil {
+	if relation, err = NewRelation("name", "to"); err != nil {
+		t.Error(err)
+		return
+	}
+	if field, err = NewField("name"); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = instance.AddRelation(relation); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = instance.AddField(field); err == nil {
 		t.Errorf("Expected error when define relation and field with the same name")
 		return
 	}

@@ -1,8 +1,9 @@
 package entitymodel
 
 import (
-	"fmt"
 	"strings"
+
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 // Relation struct represent single relation to other entity
@@ -27,10 +28,10 @@ func NewRelation(name, to string) (instance *Relation, err error) {
 		index int
 	)
 	if name == "" {
-		return nil, fmt.Errorf("Relation: Name is required")
+		return nil, goaterr.Errorf("Relation: Name is required")
 	}
 	if to == "" {
-		return nil, fmt.Errorf("Relation: To field is required")
+		return nil, goaterr.Errorf("Relation: To field is required")
 	}
 	instance = &Relation{}
 	if instance.FullName, err = NewName(name); err != nil {

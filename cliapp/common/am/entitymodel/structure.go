@@ -1,50 +1,105 @@
 package entitymodel
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/common/naming"
-)
-
-const (
-	duplicateStructureElementError = "Duplicated structure elemenet %s"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 // Structure contains fields and relations structure
 type Structure struct {
-	Entity     *Entity
-	Fields     *Fields
-	Relations  Relations
 	Path       []string
-	Structures map[string]*Structure
+	FullName   Name
+	Name       Name
+	Entity     *Entity
+	Fields     StructureFields
+	Relations  StructureRelations
+	Structures StructureChilds
+}
+
+// StructureFields struct represent fields set
+type StructureFields struct {
+	ByName  map[string]*Field
+	ByType  map[string][]*Field
+	Ordered []*Field
+}
+
+func newStructureFields() StructureFields {
+	return StructureFields{
+		ByName:  map[string]*Field{},
+		ByType:  map[string][]*Field{},
+		Ordered: []*Field{},
+	}
+}
+
+// StructureRelations struct represent relations set
+type StructureRelations struct {
+	ByName  map[string]*Relation
+	Ordered []*Relation
+}
+
+func newStructureRelations() StructureRelations {
+	return StructureRelations{
+		ByName:  map[string]*Relation{},
+		Ordered: []*Relation{},
+	}
+}
+
+// StructureChilds struct represent relations set
+type StructureChilds struct {
+	ByName  map[string]*Structure
+	Ordered []*Structure
+}
+
+func newStructureChilds() StructureChilds {
+	return StructureChilds{
+		ByName:  map[string]*Structure{},
+		Ordered: []*Structure{},
+	}
+}
+
+// NewRootStructure create new Structure instance
+func NewRootStructure(entity *Entity) (instance *Structure, err error) {
+	return &Structure{
+		Path:       nil,
+		FullName:   Name{},
+		Name:       Name{},
+		Entity:     entity,
+		Fields:     newStructureFields(),
+		Relations:  newStructureRelations(),
+		Structures: newStructureChilds(),
+	}, nil
 }
 
 // NewStructure create new Structure instance
-func NewStructure(entity *Entity) (instance *Structure) {
-	return &Structure{
+func NewStructure(plainName string, entity *Entity) (instance *Structure, err error) {
+	var (
+		name string
+	)
+	plainName = strings.TrimSpace(plainName)
+	if plainName == "" {
+		return nil, goaterr.Errorf("Structure name is required")
+	}
+	instance = &Structure{
 		Entity:     entity,
-		Fields:     NewFields(),
-		Relations:  NewRelations(),
-		Path:       []string{},
-		Structures: map[string]*Structure{},
+		Fields:     newStructureFields(),
+		Relations:  newStructureRelations(),
+		Structures: newStructureChilds(),
 	}
-}
-
-// ByPath return child structrure by path
-func (structure *Structure) ByPath(path string) (current *Structure, err error) {
-	current = structure
-	for _, key := range strings.Split(path, ".") {
-		key = naming.ToCamelCaseUF(key)
-		if newSet, ok := current.Structures[key]; ok {
-			current = newSet
-		} else {
-			if current, err = current.NewStructure(key); ok {
-				return nil, err
-			}
-		}
+	instance.Path = strings.Split(plainName, ".")
+	name = instance.Path[len(instance.Path)-1]
+	instance.Path = instance.Path[:len(instance.Path)-1]
+	for i := 0; i < len(instance.Path); i++ {
+		instance.Path[i] = naming.ToCamelCaseUF(instance.Path[i])
 	}
-	return current, nil
+	if instance.Name, err = NewName(name); err != nil {
+		return nil, err
+	}
+	if instance.FullName, err = NewName(plainName); err != nil {
+		return nil, err
+	}
+	return instance, nil
 }
 
 // AddField add new field to structure
@@ -54,8 +109,8 @@ func (structure *Structure) AddField(field *Field) (err error) {
 	}
 	field.Structure = structure
 	structure.Fields.ByName[field.Name.CamelCaseUF] = field
-	typeset := structure.Fields.ByType[field.Name.CamelCaseUF]
-	structure.Fields.ByType[field.Name.CamelCaseUF] = append(typeset, field)
+	structure.Fields.ByType[field.Type] = append(structure.Fields.ByType[field.Type], field)
+	structure.Fields.Ordered = append(structure.Fields.Ordered, field)
 	return nil
 }
 
@@ -65,31 +120,54 @@ func (structure *Structure) AddRelation(relation *Relation) (err error) {
 		return err
 	}
 	relation.Structure = structure
-	structure.Relations[relation.Name.CamelCaseUF] = relation
+	structure.Relations.ByName[relation.Name.CamelCaseUF] = relation
+	structure.Relations.Ordered = append(structure.Relations.Ordered, relation)
 	return nil
 }
 
 // NewStructure create new child structure
-func (structure *Structure) NewStructure(name string) (node *Structure, err error) {
+func (structure *Structure) instanceOfStructure(name string) (node *Structure, err error) {
+	var (
+		fullName   Name
+		structName Name
+		ok         bool
+	)
 	name = naming.ToCamelCaseUF(name)
+	if node, ok = structure.Structures.ByName[name]; ok {
+		return node, nil
+	}
 	if err = structure.preventDuplicateNames(name); err != nil {
 		return nil, err
 	}
-	node = NewStructure(structure.Entity)
-	node.Path = append(structure.Path, name)
-	structure.Structures[name] = node
+	if fullName, err = NewName(structure.FullName.CamelCaseUF + name); err != nil {
+		return nil, err
+	}
+	if structName, err = NewName(name); err != nil {
+		return nil, err
+	}
+	node = &Structure{
+		Path:       append(structure.Path, name),
+		FullName:   fullName,
+		Name:       structName,
+		Entity:     structure.Entity,
+		Fields:     newStructureFields(),
+		Relations:  newStructureRelations(),
+		Structures: newStructureChilds(),
+	}
+	structure.Structures.ByName[name] = node
+	structure.Structures.Ordered = append(structure.Structures.Ordered, node)
 	return node, nil
 }
 
 func (structure *Structure) preventDuplicateNames(name string) (err error) {
 	if _, ok := structure.Fields.ByName[name]; ok {
-		return fmt.Errorf(duplicateStructureElementError, name)
+		return goaterr.Errorf(duplicateStructureElementError, name)
 	}
-	if _, ok := structure.Relations[name]; ok {
-		return fmt.Errorf(duplicateStructureElementError, name)
+	if _, ok := structure.Relations.ByName[name]; ok {
+		return goaterr.Errorf(duplicateStructureElementError, name)
 	}
-	if _, ok := structure.Structures[name]; ok {
-		return fmt.Errorf(duplicateStructureElementError, name)
+	if _, ok := structure.Structures.ByName[name]; ok {
+		return goaterr.Errorf(duplicateStructureElementError, name)
 	}
 	return nil
 }

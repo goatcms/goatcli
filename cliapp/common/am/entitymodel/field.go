@@ -1,8 +1,9 @@
 package entitymodel
 
 import (
-	"fmt"
 	"strings"
+
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 // Field struct represent single entity field
@@ -47,7 +48,7 @@ func NewFieldFromPlainmap(prefix string, plainmap map[string]string) (instance *
 	}
 	instance.Type = strings.ToLower(plainmap[prefix+".type"])
 	if instance.Type == "" {
-		return nil, fmt.Errorf("Name is required")
+		return nil, goaterr.Errorf("Name is required")
 	}
 	instance.Flags.System = plainmap[prefix+".system"] == "y"
 	instance.Flags.Unique = plainmap[prefix+".unique"] == "y"
