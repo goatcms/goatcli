@@ -73,6 +73,10 @@ const (
 	          "name": "owner",
 	          "to": "user"
 	        }
+				},
+	      "indexes": {
+	        "username": "Username",
+		      "auth": "Username, Password"
 				}
 	    }
 	  }
@@ -336,6 +340,51 @@ func TestNewEntityStructure(t *testing.T) {
 	}
 	if entity.RootStructure.Structures.ByName["Person"].Entity != entity {
 		t.Errorf("evry child structure should have entity handler")
+		return
+	}
+}
+
+func TestNewEntityIndexes(t *testing.T) {
+	var (
+		data   map[string]string
+		entity *Entity
+		err    error
+	)
+	t.Parallel()
+	if data, err = plainmap.JSONToPlainStringMap([]byte(testNewEntityJSON)); err != nil {
+		t.Error(err)
+		return
+	}
+	if entity, err = NewEntityFromPlainmap("model.user", data); err != nil {
+		t.Error(err)
+		return
+	}
+	if len(entity.Indexes.Ordered) != 3 {
+		t.Errorf("expected three indexes: ID, Username and Auth (ID is add automatically if ID field exists)")
+		return
+	}
+	if _, ok := entity.Indexes.ByName["ID"]; !ok {
+		t.Errorf("expected ID index")
+		return
+	}
+	if _, ok := entity.Indexes.ByName["Username"]; !ok {
+		t.Errorf("expected Username index")
+		return
+	}
+	if len(entity.Indexes.ByName["Username"].Fields) != 1 {
+		t.Errorf("Username index should have one fields")
+		return
+	}
+	if entity.Indexes.ByName["Username"].Fields[0].FullName.CamelCaseUF != "Username" {
+		t.Errorf("Username index should have one fields named Username")
+		return
+	}
+	if _, ok := entity.Indexes.ByName["Auth"]; !ok {
+		t.Errorf("expected Auth index")
+		return
+	}
+	if len(entity.Indexes.ByName["Auth"].Fields) != 2 {
+		t.Errorf("Auth index should have two fields")
 		return
 	}
 }

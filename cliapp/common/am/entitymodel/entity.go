@@ -1,6 +1,7 @@
 package entitymodel
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 
@@ -14,6 +15,7 @@ var (
 	// DefaultACLRoles is default role for ACL
 	DefaultACLRoles = []string{"admin"}
 	pluralSuffixes  = []string{"ch", "sh", "s", "x", "z"}
+	whiteRegexp     = regexp.MustCompile(`\s+`)
 )
 
 // Entity contains single entity model data
@@ -26,6 +28,7 @@ type Entity struct {
 	AllFields     EntityFields
 	AllRelations  EntityRelations
 	RootStructure *Structure
+	Indexes       EntityIndexes
 }
 
 // EntityFields contains all entity fields
@@ -54,6 +57,18 @@ type AdminEntityACL struct {
 	DeleteRoles []string
 }
 
+// EntityIndexes contains all entity indexes
+type EntityIndexes struct {
+	ByName  map[string]EntityIndex
+	Ordered []EntityIndex
+}
+
+// EntityIndex contains field set to indexing by
+type EntityIndex struct {
+	Name   Name
+	Fields []*Field
+}
+
 // NewEntity create new Entity instance
 func NewEntity(name, singular, plural string) (instance *Entity, err error) {
 	instance = &Entity{
@@ -65,6 +80,10 @@ func NewEntity(name, singular, plural string) (instance *Entity, err error) {
 		AllRelations: EntityRelations{
 			ByFullName: map[string]*Relation{},
 			Ordered:    []*Relation{},
+		},
+		Indexes: EntityIndexes{
+			ByName:  map[string]EntityIndex{},
+			Ordered: []EntityIndex{},
 		},
 	}
 	if instance.RootStructure, err = NewRootStructure(instance); err != nil {
@@ -116,6 +135,9 @@ func NewEntityFromPlainmap(prefix string, data map[string]string) (instance *Ent
 		return nil, err
 	}
 	if err = instance.loadStructure(prefix, data); err != nil {
+		return nil, err
+	}
+	if err = instance.loadIndexes(prefix, data); err != nil {
 		return nil, err
 	}
 	loadACL(prefix, data, instance)
@@ -236,6 +258,58 @@ func (e *Entity) loadStructure(prefix string, data map[string]string) (err error
 			return err
 		}
 	}
+	return nil
+}
+
+func (e *Entity) loadIndexes(prefix string, data map[string]string) (err error) {
+	var (
+		key, str string
+		index    EntityIndex
+	)
+	indexesPrefix := prefix + ".indexes."
+	for _, i := range plainmap.Keys(data, indexesPrefix) {
+		key = indexesPrefix + i
+		str = whiteRegexp.ReplaceAllString(data[key], "")
+		if str == "" {
+			continue
+		}
+		index = EntityIndex{
+			Fields: []*Field{},
+		}
+		if index.Name, err = NewName(i); err != nil {
+			return err
+		}
+		for _, name := range strings.Split(str, ",") {
+			var (
+				field *Field
+				ok    bool
+			)
+			if field, ok = e.AllFields.ByFullName[name]; !ok {
+				return goaterr.Errorf("Unknow indexed field named %s (for %s entity)", name, e.Name.Plain)
+			}
+			index.Fields = append(index.Fields, field)
+		}
+		e.Indexes.ByName[index.Name.CamelCaseUF] = index
+		e.Indexes.Ordered = append(e.Indexes.Ordered, index)
+	}
+	if _, ok := e.Indexes.ByName["ID"]; !ok {
+		if idField := e.AllFields.ByFullName["ID"]; idField != nil {
+			var idName Name
+			if idName, err = NewName("ID"); err != nil {
+				return err
+			}
+			idIndex := EntityIndex{
+				Name:   idName,
+				Fields: []*Field{idField},
+			}
+			e.Indexes.ByName[idIndex.Name.CamelCaseUF] = idIndex
+			e.Indexes.Ordered = append(e.Indexes.Ordered, idIndex)
+		}
+	}
+	ordered := e.Indexes.Ordered
+	sort.Slice(ordered, func(i, j int) bool {
+		return ordered[i].Name.CamelCaseUF < ordered[j].Name.CamelCaseUF
+	})
 	return nil
 }
 
