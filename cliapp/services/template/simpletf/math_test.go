@@ -1,4 +1,4 @@
-package tfunc
+package simpletf
 
 import "testing"
 

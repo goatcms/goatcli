@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -68,4 +69,18 @@ func (c *Context) Render(destPath, layout, path, name string, dotData interface{
 		task.Template.Name = c.Template.Name
 	}
 	return c.executor.ExecuteTask(task)
+}
+
+// ExecTemplate run template by name and return result as string
+func (c *Context) ExecTemplate(name string, dotData interface{}) (result string, err error) {
+	var buf = &bytes.Buffer{}
+	if err = c.executor.templateExecutor.ExecuteTemplate(
+		c.Template.Layout,
+		c.Template.Path,
+		name,
+		buf,
+		dotData); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

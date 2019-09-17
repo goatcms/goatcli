@@ -1,4 +1,4 @@
-package tfunc
+package simpletf
 
 // Wrap return text wraped with '{{' and end with '}}'
 // Deprecated: It is now required.

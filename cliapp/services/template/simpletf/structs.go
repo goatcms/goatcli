@@ -1,4 +1,4 @@
-package tfunc
+package simpletf
 
 // Dict create a new map
 func Dict(v ...interface{}) map[string]interface{} {

@@ -20,6 +20,8 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services/repositories"
 	"github.com/goatcms/goatcli/cliapp/services/secrets"
 	"github.com/goatcms/goatcli/cliapp/services/template"
+	"github.com/goatcms/goatcli/cliapp/services/template/amtf"
+	"github.com/goatcms/goatcli/cliapp/services/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/services/vcs"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/varutil/goaterr"
@@ -82,8 +84,12 @@ func (m *Module) registerCommands(a app.App) error {
 }
 
 // InitDependencies is init callback to inject dependencies inside module
-func (m *Module) InitDependencies(a app.App) error {
-	return template.InitDependencies(a)
+func (m *Module) InitDependencies(a app.App) (err error) {
+	dp := a.DependencyProvider()
+	return goaterr.ToErrors(goaterr.AppendError(nil,
+		amtf.RegisterFunctions(dp),
+		simpletf.RegisterFunctions(dp),
+	))
 }
 
 // Run is run event callback

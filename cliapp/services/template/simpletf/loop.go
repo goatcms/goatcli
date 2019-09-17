@@ -1,4 +1,4 @@
-package tfunc
+package simpletf
 
 // reapetNTimeEmptyStruct is struct who don't require allocate memmory
 type reapetNTimeEmptyStruct struct{}
