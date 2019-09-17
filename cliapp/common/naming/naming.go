@@ -45,8 +45,16 @@ func ToCamelCase(s string) string {
 }
 
 // ToCamelCaseLF convert string to CamelCase (with first letter lower)
-func ToCamelCaseLF(s string) string {
-	return ToLowerFirst(ToCamelCase(s))
+func ToCamelCaseLF(s string) (result string) {
+	v := []byte(ToCamelCase(s))
+	for i := 0; i < len(v); i++ {
+		b := v[i]
+		if b > 'Z' || b < 'A' {
+			return string(v)
+		}
+		v[i] = b - 'A' + 'a'
+	}
+	return string(v)
 }
 
 // ToCamelCaseUF convert string to CamelCase (with first letter upper)

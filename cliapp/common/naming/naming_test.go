@@ -64,6 +64,14 @@ func TestToCamelCaseLF(t *testing.T) {
 		t.Errorf("ToCamelCaseLF('firstAndLast') = %s expected 'firstAndLast' result", ToCamelCaseLF("firstAndLast"))
 		return
 	}
+	if ToCamelCaseLF("ID") != "id" {
+		t.Errorf("ToCamelCaseLF('ID') = %s expected 'id' result", ToCamelCaseLF("firstAndLast"))
+		return
+	}
+	if ToCamelCaseLF("JSON") != "json" {
+		t.Errorf("ToCamelCaseLF('JSON') = %s expected 'json' result", ToCamelCaseLF("JSON"))
+		return
+	}
 }
 
 func TestToCamelCaseUF(t *testing.T) {
