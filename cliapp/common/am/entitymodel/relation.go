@@ -11,6 +11,7 @@ type Relation struct {
 	FullName  Name
 	Name      Name
 	To        string
+	ToEntity  *Entity
 	Flags     FieldFlags
 	Structure *Structure
 }
