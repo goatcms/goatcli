@@ -67,7 +67,16 @@ const (
 	          "unique": "y",
 	          "required": "y"
 	        }
-	      }
+	      },
+	      "relations": {
+	        "0": {
+	          "to": "user",
+	          "name": "family.parent",
+	          "required": "y",
+	          "system": "y",
+	          "unique": "n"
+	        }
+				}
 	    },
 	    "session": {
 	      "name": "session",

@@ -15,6 +15,8 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	}
 	deps.TemplateService.AddFunc("amLinkFieldUF", LinkFieldUF)
 	deps.TemplateService.AddFunc("amLinkFieldLF", LinkFieldLF)
+	deps.TemplateService.AddFunc("amLinkRelationUF", LinkRelationUF)
+	deps.TemplateService.AddFunc("amLinkRelationLF", LinkRelationLF)
 	deps.TemplateService.AddFunc("amStructClassName", StructClassName)
 	return nil
 }

@@ -64,5 +64,6 @@ func RegisterFunctions(di dependency.Injector) (err error) {
 	deps.TemplateService.AddFunc("contains", varutil.IsArrContainStr)
 	deps.TemplateService.AddFunc("repeatNTimes", RepeatNTimes)
 	deps.TemplateService.AddFunc("randIntn", rand.Intn)
+	deps.TemplateService.AddFunc("sequencer", NewSequencer)
 	return nil
 }
