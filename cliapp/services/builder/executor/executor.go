@@ -105,7 +105,6 @@ func (e *GeneratorExecutor) ExecuteView(layout, viewPath string, properties map[
 				},
 				DotData:         dotData,
 				BuildProperties: properties,
-				FSPath:          destPath,
 			})
 		}
 	}
