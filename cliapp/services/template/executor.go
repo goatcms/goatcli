@@ -4,12 +4,25 @@ import (
 	"io"
 	"text/template"
 
-	"github.com/goatcms/goatcore/goattext/gtprovider"
+	"github.com/goatcms/goatcli/cliapp/services/template/gtprovider"
 )
 
 // Executor is global template provider
 type Executor struct {
 	provider *gtprovider.Provider
+}
+
+// Templates return template list for a view
+func (executor *Executor) Templates(layoutName, viewName string) (list []string, err error) {
+	var view *template.Template
+	if view, err = executor.provider.View(layoutName, viewName); err != nil {
+		return nil, err
+	}
+	list = []string{}
+	for _, t := range view.Templates() {
+		list = append(list, t.Name())
+	}
+	return list, nil
 }
 
 // Execute run main code of a view

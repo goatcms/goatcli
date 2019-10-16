@@ -11,6 +11,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcli/cliapp/services/repositories"
 	"github.com/goatcms/goatcli/cliapp/services/template"
+	"github.com/goatcms/goatcli/cliapp/services/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/services/vcs"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
@@ -41,14 +42,15 @@ func TestDataDefFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	dp := mapp.DependencyProvider()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
-		RegisterDependencies(mapp.DependencyProvider()),
-		modules.RegisterDependencies(mapp.DependencyProvider()),
-		dependencies.RegisterDependencies(mapp.DependencyProvider()),
-		repositories.RegisterDependencies(mapp.DependencyProvider()),
-		template.RegisterDependencies(mapp.DependencyProvider()),
-		vcs.RegisterDependencies(mapp.DependencyProvider()),
-		template.InitDependencies(mapp))); err != nil {
+		RegisterDependencies(dp),
+		modules.RegisterDependencies(dp),
+		dependencies.RegisterDependencies(dp),
+		repositories.RegisterDependencies(dp),
+		template.RegisterDependencies(dp),
+		vcs.RegisterDependencies(dp),
+		simpletf.RegisterFunctions(dp))); err != nil {
 		t.Error(err)
 		return
 	}
@@ -85,14 +87,15 @@ func TestDataDefDefaultEmpty(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	dp := mapp.DependencyProvider()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
-		RegisterDependencies(mapp.DependencyProvider()),
-		modules.RegisterDependencies(mapp.DependencyProvider()),
-		dependencies.RegisterDependencies(mapp.DependencyProvider()),
-		repositories.RegisterDependencies(mapp.DependencyProvider()),
-		template.RegisterDependencies(mapp.DependencyProvider()),
-		vcs.RegisterDependencies(mapp.DependencyProvider()),
-		template.InitDependencies(mapp))); err != nil {
+		RegisterDependencies(dp),
+		modules.RegisterDependencies(dp),
+		dependencies.RegisterDependencies(dp),
+		repositories.RegisterDependencies(dp),
+		template.RegisterDependencies(dp),
+		vcs.RegisterDependencies(dp),
+		simpletf.RegisterFunctions(dp))); err != nil {
 		t.Error(err)
 		return
 	}

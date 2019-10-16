@@ -70,6 +70,7 @@ type TemplateService interface {
 
 // TemplateExecutor render data
 type TemplateExecutor interface {
+	Templates(layoutName, viewName string) (list []string, err error)
 	Execute(layoutName, TemplatePath string, wr io.Writer, data interface{}) (err error)
 	ExecuteTemplate(layoutName, viewName, templateName string, wr io.Writer, data interface{}) (err error)
 }

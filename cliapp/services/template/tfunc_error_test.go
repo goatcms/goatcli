@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/services"
-	"github.com/goatcms/goatcli/cliapp/services/template/tfunc"
+	"github.com/goatcms/goatcli/cliapp/services/template/simpletf"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
 )
@@ -35,7 +35,7 @@ func TestTFuncError(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = tfunc.RegisterFunctions(mapp.DependencyProvider()); err != nil {
+	if err = simpletf.RegisterFunctions(mapp.DependencyProvider()); err != nil {
 		t.Error(err)
 		return
 	}
