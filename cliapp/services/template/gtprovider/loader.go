@@ -49,7 +49,7 @@ func (loader *TemplateLoader) LoadSingleFileTemplate(fs filesystem.Filespace, su
 	if len(bytes) == 0 {
 		return goaterr.Errorf("empty file")
 	}
-	fullTemplateCode := `{{define "` + subPath + `"}}` + string(bytes) + `{{end}}`
+	fullTemplateCode := `{{define "` + subPath + `"}}{{ $ctx := . }}` + string(bytes) + `{{end}}`
 	if _, err := loader.template.Parse(fullTemplateCode); err != nil {
 		return goaterr.Errorf("%v: %v", subPath, err)
 	}
