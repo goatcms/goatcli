@@ -133,14 +133,7 @@ func (e *GeneratorExecutor) ExecuteHook(name string, data interface{}) (err erro
 		return err
 	}
 	for _, node := range nodes {
-		if err = e.ExecuteTask(Task{
-			Template: TemplateHandler{
-				Path: "hook/" + name + "/" + node.Name(),
-			},
-			DotData:         data,
-			BuildProperties: map[string]string{},
-			FSPath:          "",
-		}); err != nil {
+		if err = e.ExecuteView("", "hook/"+name+"/"+node.Name(), map[string]string{}, data); err != nil {
 			return err
 		}
 	}
