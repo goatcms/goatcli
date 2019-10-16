@@ -7,6 +7,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/services"
 	templates "github.com/goatcms/goatcli/cliapp/services/template"
+	"github.com/goatcms/goatcli/cliapp/services/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/services/vcs"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
@@ -29,7 +30,7 @@ const (
 	{{end}}
 	{{define "testf"}}
 		{{ $ctx := .}}
-		{{ $list := $ctx.Exec "helper" $ctx.DotData }}
+		{{ $list := $ctx.ExecTemplate "helper" $ctx.DotData }}
 		{{ $list }}
 		Names:
 	{{end}}`
@@ -62,7 +63,7 @@ func TestContextExec(t *testing.T) {
 			fs.WriteFile(".goat/build/templates/testTemplate/master.tmpl", []byte(masterExec), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/testTemplate/testf.tmpl", []byte(testfExec), filesystem.DefaultUnixFileMode),
 			templates.RegisterDependencies(mapp.DependencyProvider()),
-			templates.InitDependencies(mapp),
+			simpletf.RegisterFunctions(mapp.DependencyProvider()),
 		)); err != nil {
 			t.Error(err)
 			return

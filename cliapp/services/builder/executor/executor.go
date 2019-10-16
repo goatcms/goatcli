@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/goatcms/goatcli/cliapp/common/cutil"
@@ -40,6 +42,74 @@ func NewGeneratorExecutor(ctxScope app.Scope, sharedData SharedData, limit int64
 // Scope run executor scope
 func (e *GeneratorExecutor) Scope() app.Scope {
 	return e.scope
+}
+
+// ExecuteView run single executor template
+func (e *GeneratorExecutor) ExecuteView(layout, viewPath string, properties map[string]string, dotData interface{}) (err error) {
+	var list []string
+	// Execute main task
+	e.ExecuteTask(Task{
+		Template: TemplateHandler{
+			Layout: layout,
+			Path:   viewPath,
+		},
+		DotData:         dotData,
+		BuildProperties: properties,
+		FSPath:          "",
+	})
+	// Execute all single template
+	if list, err = e.templateExecutor.Templates(layout, viewPath); err != nil {
+		return err
+	}
+	for _, name := range list {
+		var (
+			extension, destPath string
+		)
+		if e.scope.IsKilled() {
+			return nil
+		}
+		extension = filepath.Ext(name)
+		destPath = name[0 : len(name)-len(extension)]
+		if strings.HasSuffix(name, ".once") {
+			if e.sharedData.FS.IsExist(destPath) {
+				continue
+			}
+			e.ExecuteTask(Task{
+				Template: TemplateHandler{
+					Layout: layout,
+					Path:   viewPath,
+					Name:   name,
+				},
+				DotData:         dotData,
+				BuildProperties: properties,
+				FSPath:          destPath,
+			})
+		} else if strings.HasSuffix(name, ".render") {
+			e.sharedData.FS.Remove(destPath)
+			e.ExecuteTask(Task{
+				Template: TemplateHandler{
+					Layout: layout,
+					Path:   viewPath,
+					Name:   name,
+				},
+				DotData:         dotData,
+				BuildProperties: properties,
+				FSPath:          destPath,
+			})
+		} else if strings.HasSuffix(name, ".ctrl") {
+			e.ExecuteTask(Task{
+				Template: TemplateHandler{
+					Layout: layout,
+					Path:   viewPath,
+					Name:   name,
+				},
+				DotData:         dotData,
+				BuildProperties: properties,
+				FSPath:          destPath,
+			})
+		}
+	}
+	return nil
 }
 
 // ExecuteTask run single executor template

@@ -7,6 +7,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/services"
 	templates "github.com/goatcms/goatcli/cliapp/services/template"
+	"github.com/goatcms/goatcli/cliapp/services/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/services/vcs"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
@@ -58,7 +59,7 @@ func TestContextExecute(t *testing.T) {
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/testf.tmpl", []byte(testfHook), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/overlay.tmpl", []byte(overlayHook), filesystem.DefaultUnixFileMode),
 			templates.RegisterDependencies(mapp.DependencyProvider()),
-			templates.InitDependencies(mapp),
+			simpletf.RegisterFunctions(mapp.DependencyProvider()),
 		)); err != nil {
 			t.Error(err)
 			return

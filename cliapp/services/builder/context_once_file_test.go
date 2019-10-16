@@ -5,8 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/goatcms/goatcli/cliapp/common/am"
-	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcli/cliapp/services/dependencies"
 	"github.com/goatcms/goatcli/cliapp/services/modules"
 	"github.com/goatcms/goatcli/cliapp/services/repositories"
@@ -16,30 +14,21 @@ import (
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
-	"github.com/goatcms/goatcore/app/scope"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 const (
-	testCTXBuilderLayout = `{{- define "out/file.txt"}}
-		{{- $ctx := .}}
+	tesOnceFileContent = `{{- $ctx := .}}
 		{{- index $ctx.PlainData "datakey" }}
 		{{- index $ctx.Properties.Project "propkey" }}
-		{{- index $ctx.Properties.Secrets "secretkey" }}
-	{{- end}}`
-	testCTXBuilderTemplate = `
-	{{$ctx := .}}
-	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}
-	`
-	testCTXBuilderConfig = `[{
-	  "from":"ignore",
-	  "to":"ignore",
-	  "template":"names",
-	  "layout":"default"
-	}]`
+		{{- index $ctx.Properties.Secrets "secretkey" }}`
+	tesOnceFileConfig = `[{
+		  "template":"names",
+		  "layout":"default"
+		}]`
 )
 
-func TestCTXBuilderAM(t *testing.T) {
+func TestCtrlFile(t *testing.T) {
 	var (
 		mapp    app.App
 		err     error
@@ -56,9 +45,8 @@ func TestCTXBuilderAM(t *testing.T) {
 	}
 	fs := mapp.RootFilespace()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
-		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXBuilderLayout), 0766),
-		fs.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXBuilderTemplate), 0766),
-		fs.WriteFile(".goat/build.def.json", []byte(testCTXBuilderConfig), 0766))); err != nil {
+		fs.WriteFile(".goat/build/templates/names/file.txt.once", []byte(tesOnceFileContent), 0766),
+		fs.WriteFile(".goat/build.def.json", []byte(tesOnceFileConfig), 0766))); err != nil {
 		t.Error(err)
 		return
 	}
@@ -75,44 +63,54 @@ func TestCTXBuilderAM(t *testing.T) {
 		return
 	}
 	// test
-	var deps struct {
-		BuilderService services.BuilderService `dependency:"BuilderService"`
-	}
+	var deps RenderFileDeps
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)
 		return
 	}
-	ctxScope := scope.NewScope("test")
-	appModel := am.NewApplicationModel(map[string]string{})
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, map[string]string{
+	if err = renderFile(fs, deps, map[string]string{
 		"datakey": "Ala",
 	}, map[string]string{
 		"propkey": " ma",
 	}, map[string]string{
 		"secretkey": " kota",
-	})
-	if err = buildContext.Build(fs); err != nil {
+	}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = ctxScope.Wait(); err != nil {
-		t.Error(err)
+	if !fs.IsFile("file.txt") {
+		t.Errorf("file.txt is not exist")
 		return
 	}
-	if err = ctxScope.Trigger(app.CommitEvent, nil); err != nil {
-		t.Error(err)
-		return
-	}
-	if !fs.IsFile("out/file.txt") {
-		t.Errorf("out/file.txt is not exist")
-		return
-	}
-	if context, err = fs.ReadFile("out/file.txt"); err != nil {
+	if context, err = fs.ReadFile("file.txt"); err != nil {
 		t.Error(err)
 		return
 	}
 	if string(context) != "Ala ma kota" {
 		t.Errorf("File content must be equals to 'Ala ma kota' and it is '%s'", context)
+		return
+	}
+	// It must be render once
+	if err = renderFile(fs, deps, map[string]string{
+		"datakey": "Ala",
+	}, map[string]string{
+		"propkey": " nie ma",
+	}, map[string]string{
+		"secretkey": " kota",
+	}); err != nil {
+		t.Error(err)
+		return
+	}
+	if !fs.IsFile("file.txt") {
+		t.Errorf("file.txt is not exist")
+		return
+	}
+	if context, err = fs.ReadFile("file.txt"); err != nil {
+		t.Error(err)
+		return
+	}
+	if string(context) != "Ala ma kota" {
+		t.Errorf("File content must be equals to 'Ala ma kota' and it is '%s'. The context can not cahnge after re-render/re-build", context)
 		return
 	}
 }
