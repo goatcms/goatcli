@@ -1,6 +1,10 @@
 package properties
 
 import (
+	"os"
+	"sort"
+	"strings"
+
 	"github.com/goatcms/goatcli/cliapp/common/cio"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
@@ -31,15 +35,43 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 
 // ReadDefFromFS read properties definitions from filespace
 func (p *Properties) ReadDefFromFS(fs filesystem.Filespace) (properties []*config.Property, err error) {
-	var json []byte
-	if !fs.IsFile(PropertiesDefPath) {
-		return make([]*config.Property, 0), nil
+	var (
+		json  []byte
+		nodes []os.FileInfo
+		props []*config.Property
+	)
+	if fs.IsFile(PropertiesDefPath) {
+		if json, err = fs.ReadFile(PropertiesDefPath); err != nil {
+			return nil, err
+		}
+		if properties, err = config.NewProperties(json); err != nil {
+			return nil, err
+		}
+	} else {
+		properties = make([]*config.Property, 0)
 	}
-	if json, err = fs.ReadFile(PropertiesDefPath); err != nil {
+	// Read separated data.def files
+	if !fs.IsDir(BasePropertiesDefPath) {
+		return properties, nil
+	}
+	if nodes, err = fs.ReadDir(BasePropertiesDefPath); err != nil {
 		return nil, err
 	}
-	if properties, err = config.NewProperties(json); err != nil {
-		return nil, err
+	sort.SliceStable(nodes, func(i, j int) bool {
+		return nodes[i].Name() < nodes[j].Name()
+	})
+	for _, node := range nodes {
+		var path = BasePropertiesDefPath + node.Name()
+		if !fs.IsFile(path) || !strings.HasSuffix(path, PropertiesDefSuffix) {
+			continue
+		}
+		if json, err = fs.ReadFile(path); err != nil {
+			return nil, err
+		}
+		if props, err = config.NewProperties(json); err != nil {
+			return nil, err
+		}
+		properties = append(properties, props...)
 	}
 	return properties, nil
 }
