@@ -35,18 +35,6 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 
 // ReadDefFromFS read secrets definitions from filespace
 func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace) (secrets []*config.Property, err error) {
-	/*var json []byte
-	if !fs.IsFile(SecretsDefPath) {
-		return make([]*config.Property, 0), nil
-	}
-	if json, err = fs.ReadFile(SecretsDefPath); err != nil {
-		return nil, err
-	}
-	if secrets, err = config.NewProperties(json); err != nil {
-		return nil, err
-	}
-	return secrets, nil*/
-
 	var (
 		json  []byte
 		nodes []os.FileInfo
