@@ -47,8 +47,8 @@ func TestTFuncMathSum(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	var executor services.TemplateExecutor
-	if executor, err = deps.TemplateService.Build(mapp.RootFilespace()); err != nil {
+	var executor services.TemplatesExecutor
+	if executor, err = deps.TemplateService.TemplatesExecutor(); err != nil {
 		t.Error(err)
 		return
 	}

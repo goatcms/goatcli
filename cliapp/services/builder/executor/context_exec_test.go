@@ -44,7 +44,7 @@ func TestContextExec(t *testing.T) {
 		fs                filesystem.Filespace
 		resultBytes       []byte
 		result            string
-		templateExecutor  services.TemplateExecutor
+		templatesExecutor services.TemplatesExecutor
 		generatorExecutor *GeneratorExecutor
 		generatorScope    = scope.NewScope("generator")
 		err               error
@@ -76,7 +76,7 @@ func TestContextExec(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		if templateExecutor, err = deps.TemplateService.Build(fs); err != nil {
+		if templatesExecutor, err = deps.TemplateService.TemplatesExecutor(); err != nil {
 			t.Error(err)
 			return
 		}
@@ -89,7 +89,7 @@ func TestContextExec(t *testing.T) {
 			},
 			FS:      fs,
 			VCSData: vcs.NewData(vcs.NewGeneratedFiles(true), vcs.NewIgnoredFiles(true)),
-		}, 10, templateExecutor); err != nil {
+		}, 10, templatesExecutor); err != nil {
 			t.Error(err)
 			return
 		}

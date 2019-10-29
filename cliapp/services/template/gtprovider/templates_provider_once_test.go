@@ -31,7 +31,7 @@ func TestLoadOnceFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err := fs.MkdirAll("views/", 0777); err != nil {
+	if err := fs.MkdirAll("templates/", 0777); err != nil {
 		t.Error(err)
 		return
 	}
@@ -39,14 +39,15 @@ func TestLoadOnceFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err := fs.WriteFile("views/myview/file1.txt.once", []byte(overlayOnceTemplate), 0777); err != nil {
+	if err := fs.WriteFile("templates/myview/file1.txt.once", []byte(overlayOnceTemplate), 0777); err != nil {
 		t.Error(err)
 		return
 	}
 	// test loop
 	for ti := 0; ti < workers.AsyncTestReapeat; ti++ {
-		provider := NewProvider(fs, goattext.HelpersPath, goattext.LayoutPath, goattext.ViewPath, funcs, true)
-		view, errs := provider.View(goattext.DefaultLayout, "myview")
+		assetsProvider := NewAssetsProvider(fs, "helpers/", "layouts/{name}/", funcs, true)
+		provider := NewTemplatesProvider(assetsProvider, fs, "templates/{name}/", true)
+		view, errs := provider.Template(goattext.DefaultLayout, "myview")
 		if errs != nil {
 			t.Errorf("Errors: %v", errs)
 			return

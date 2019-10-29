@@ -2,6 +2,7 @@ package services
 
 import (
 	"io"
+	"text/template"
 
 	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
@@ -64,13 +65,32 @@ type DataService interface {
 
 // TemplateService provide template api
 type TemplateService interface {
-	AddFunc(name string, f interface{}) error
-	Build(fs filesystem.Filespace) (TemplateExecutor, error)
+	TemplatesExecutor() (TemplatesExecutor, error)
+	TemplateExecutor(path string) (TemplateExecutor, error)
 }
 
-// TemplateExecutor render data
-type TemplateExecutor interface {
+// TemplatesExecutor render data for view tree
+type TemplatesExecutor interface {
 	Templates(layoutName, viewName string) (list []string, err error)
 	Execute(layoutName, TemplatePath string, wr io.Writer, data interface{}) (err error)
 	ExecuteTemplate(layoutName, viewName, templateName string, wr io.Writer, data interface{}) (err error)
+}
+
+// TemplateExecutor render data for single template
+type TemplateExecutor interface {
+	Execute(wr io.Writer, data interface{}) (err error)
+}
+
+// TemplateAssetsProvider return assets templates
+type TemplateAssetsProvider interface {
+	Layout(name string) (tmpl *template.Template, err error)
+	Base() (*template.Template, error)
+}
+
+// TemplateConfig return templates configuration
+type TemplateConfig interface {
+	AddFunc(name string, f interface{}) (err error)
+	Func() template.FuncMap
+	IsCached() bool
+	FS() filesystem.Filespace
 }

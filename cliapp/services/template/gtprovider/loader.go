@@ -1,6 +1,7 @@
 package gtprovider
 
 import (
+	"strings"
 	"sync"
 	"text/template"
 
@@ -19,6 +20,20 @@ func NewTemplateLoader(template *template.Template) *TemplateLoader {
 	return &TemplateLoader{
 		template: template,
 	}
+}
+
+// LoadByExtension file by extension (if file has unknown extension it is skipped and return nil, false)
+func (loader *TemplateLoader) LoadByExtension(fs filesystem.Filespace, subPath string) (loaded bool, err error) {
+	if strings.HasSuffix(subPath, TemplateExtension) {
+		return true, loader.LoadFullTemplate(fs, subPath)
+	} else if strings.HasSuffix(subPath, OnceTemplateExtension) {
+		return true, loader.LoadSingleFileTemplate(fs, subPath)
+	} else if strings.HasSuffix(subPath, RenderTemplateExtension) {
+		return true, loader.LoadSingleFileTemplate(fs, subPath)
+	} else if strings.HasSuffix(subPath, CtrlTemplateExtension) {
+		return true, loader.LoadSingleFileTemplate(fs, subPath)
+	}
+	return false, nil
 }
 
 // LoadFullTemplate get all templates code form files in subPath and add it to template

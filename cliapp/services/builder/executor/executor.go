@@ -17,21 +17,21 @@ import (
 
 // GeneratorExecutor is code generator task manager
 type GeneratorExecutor struct {
-	templateExecutor services.TemplateExecutor
-	sharedData       SharedData
-	limit            int64
-	ch               chan Task
-	scope            app.Scope
+	templatesExecutor services.TemplatesExecutor
+	sharedData        SharedData
+	limit             int64
+	ch                chan Task
+	scope             app.Scope
 }
 
 // NewGeneratorExecutor create new GeneratorExecutor instance
-func NewGeneratorExecutor(ctxScope app.Scope, sharedData SharedData, limit int64, templateExecutor services.TemplateExecutor) (instance *GeneratorExecutor, err error) {
+func NewGeneratorExecutor(ctxScope app.Scope, sharedData SharedData, limit int64, templatesExecutor services.TemplatesExecutor) (instance *GeneratorExecutor, err error) {
 	instance = &GeneratorExecutor{
-		templateExecutor: templateExecutor,
-		sharedData:       sharedData,
-		limit:            limit,
-		ch:               make(chan Task, limit),
-		scope:            ctxScope,
+		templatesExecutor: templatesExecutor,
+		sharedData:        sharedData,
+		limit:             limit,
+		ch:                make(chan Task, limit),
+		scope:             ctxScope,
 	}
 	for i := workers.MaxJob; i > 0; i-- {
 		go instance.consumer()
@@ -58,7 +58,7 @@ func (e *GeneratorExecutor) ExecuteView(layout, viewPath string, properties map[
 		FSPath:          "",
 	})
 	// Execute all single template
-	if list, err = e.templateExecutor.Templates(layout, viewPath); err != nil {
+	if list, err = e.templatesExecutor.Templates(layout, viewPath); err != nil {
 		return err
 	}
 	for _, name := range list {
@@ -187,9 +187,9 @@ func (e *GeneratorExecutor) executeToWriter(writer io.Writer, task Task) (err er
 	}
 	tmpl := task.Template
 	if tmpl.Name == "" {
-		return e.templateExecutor.Execute(tmpl.Layout, tmpl.Path, writer, ctx)
+		return e.templatesExecutor.Execute(tmpl.Layout, tmpl.Path, writer, ctx)
 	}
-	return e.templateExecutor.ExecuteTemplate(tmpl.Layout, tmpl.Path, tmpl.Name, writer, ctx)
+	return e.templatesExecutor.ExecuteTemplate(tmpl.Layout, tmpl.Path, tmpl.Name, writer, ctx)
 }
 
 func (e *GeneratorExecutor) run(task Task) (err error) {

@@ -9,48 +9,42 @@ import (
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/fsloop"
 	"github.com/goatcms/goatcore/goathtml"
-	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-// Provider provide templates api
-type Provider struct {
+// AssetsProvider provide templates api
+type AssetsProvider struct {
 	fs           filesystem.Filespace
 	helpersPath  string
 	layoutPath   string
-	viewPath     string
 	baseMutex    sync.Mutex
 	baseTemplate *template.Template
 	layoutMutex  sync.Mutex
 	layouts      map[string]*template.Template
-	viewMutex    sync.Mutex
-	views        map[string]*template.Template
 	funcs        template.FuncMap
 	isCached     bool
 }
 
-// NewProvider create Provider instance
-func NewProvider(fs filesystem.Filespace, helpersPath, layoutPath, viewPath string, funcs template.FuncMap, isCached bool) *Provider {
-	return &Provider{
+// NewAssetsProvider create AssetsProvider instance
+func NewAssetsProvider(fs filesystem.Filespace, helpersPath, layoutPath string, funcs template.FuncMap, isCached bool) *AssetsProvider {
+	return &AssetsProvider{
 		fs:          fs,
 		layoutPath:  layoutPath,
 		helpersPath: helpersPath,
-		viewPath:    viewPath,
 		layouts:     map[string]*template.Template{},
-		views:       map[string]*template.Template{},
 		funcs:       funcs,
 		isCached:    isCached,
 	}
 }
 
 // Base return base template (with loaded helpers)
-func (provider *Provider) Base() (*template.Template, error) {
+func (provider *AssetsProvider) Base() (*template.Template, error) {
 	if provider.baseTemplate != nil {
 		return provider.baseTemplate, nil
 	}
 	return provider.base()
 }
 
-func (provider *Provider) base() (baseTemplate *template.Template, err error) {
+func (provider *AssetsProvider) base() (baseTemplate *template.Template, err error) {
 	var subFS filesystem.Filespace
 	provider.baseMutex.Lock()
 	defer provider.baseMutex.Unlock()
@@ -81,7 +75,7 @@ func (provider *Provider) base() (baseTemplate *template.Template, err error) {
 }
 
 // Layout return template for named layout (with loaded helpers and layout definitions)
-func (provider *Provider) Layout(name string) (tmpl *template.Template, err error) {
+func (provider *AssetsProvider) Layout(name string) (tmpl *template.Template, err error) {
 	var (
 		ok bool
 	)
@@ -94,7 +88,7 @@ func (provider *Provider) Layout(name string) (tmpl *template.Template, err erro
 	return provider.layout(name)
 }
 
-func (provider *Provider) layout(name string) (layoutTemplate *template.Template, err error) {
+func (provider *AssetsProvider) layout(name string) (layoutTemplate *template.Template, err error) {
 	var (
 		ok    bool
 		subFS filesystem.Filespace
@@ -132,68 +126,7 @@ func (provider *Provider) layout(name string) (layoutTemplate *template.Template
 	return layoutTemplate, nil
 }
 
-// View return template for view by name. It contains selected layout definitions and helpers
-func (provider *Provider) View(layoutName, viewName string) (tmpl *template.Template, err error) {
-	var (
-		ok  bool
-		key string
-	)
-	if layoutName == "" {
-		layoutName = goathtml.DefaultLayout
-	}
-	if viewName == "" {
-		return nil, goaterr.Errorf("goathtml.Provider: A view name is required")
-	}
-	key = layoutName + ":" + viewName
-	if tmpl, ok = provider.views[key]; ok {
-		return tmpl, nil
-	}
-	return provider.view(layoutName, viewName, key)
-}
-
-func (provider *Provider) view(layoutName, viewName, key string) (viewTemplate *template.Template, err error) {
-	var (
-		ok    bool
-		path  string
-		subFS filesystem.Filespace
-	)
-	provider.viewMutex.Lock()
-	defer provider.viewMutex.Unlock()
-	// check after lock
-	if viewTemplate, ok = provider.views[key]; ok {
-		return viewTemplate, nil
-	}
-	// create a new view
-	if viewTemplate, err = provider.Layout(layoutName); err != nil {
-		return nil, err
-	}
-	path = strings.Replace(provider.viewPath, "{name}", viewName, 1)
-	if !provider.fs.IsDir(path) {
-		if provider.isCached {
-			provider.views[key] = viewTemplate
-		}
-		return viewTemplate, nil
-	}
-	if viewTemplate, err = viewTemplate.Clone(); err != nil {
-		return nil, err
-	}
-	viewTemplate.Funcs(provider.funcs)
-	if subFS, err = provider.fs.Filespace(path); err != nil {
-		return nil, err
-	}
-	templateLoader := NewTemplateLoader(viewTemplate)
-	if err = fsloop.WalkFS(subFS, "", func(currentPath string, info os.FileInfo) (err error) {
-		return provider.load(templateLoader, subFS, currentPath)
-	}, nil); err != nil {
-		return nil, err
-	}
-	if provider.isCached {
-		provider.views[key] = viewTemplate
-	}
-	return viewTemplate, nil
-}
-
-func (provider *Provider) load(loader *TemplateLoader, fs filesystem.Filespace, subPath string) error {
+func (provider *AssetsProvider) load(loader *TemplateLoader, fs filesystem.Filespace, subPath string) error {
 	if strings.HasSuffix(subPath, TemplateExtension) {
 		return loader.LoadFullTemplate(fs, subPath)
 	} else if strings.HasSuffix(subPath, OnceTemplateExtension) {

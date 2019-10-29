@@ -1,59 +1,42 @@
 package template
 
 import (
-	"fmt"
-	"sync"
 	"text/template"
 
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcli/cliapp/services/template/gtprovider"
 	"github.com/goatcms/goatcore/dependency"
-	"github.com/goatcms/goatcore/filesystem"
 )
 
 // Service is global template provider
 type Service struct {
 	deps struct {
-		TemplateCache string               `argument:"?template.cache"`
-		Filespace     filesystem.Filespace `filespace:"root"`
+		AssetsProvider services.TemplateAssetsProvider `dependency:"TemplateAssetsProvider"`
+		Config         services.TemplateConfig         `dependency:"TemplateConfig"`
 	}
-	providerMutex sync.Mutex
-	funcs         template.FuncMap
-	isUsed        bool
-	cache         bool
 }
 
 // ProviderFactory create new template provider
 func ProviderFactory(dp dependency.Provider) (interface{}, error) {
-	s := &Service{
-		funcs:  template.FuncMap{},
-		isUsed: false,
-	}
+	s := &Service{}
 	if err := dp.InjectTo(&s.deps); err != nil {
 		return nil, err
 	}
-	s.cache = s.deps.TemplateCache != "false"
 	return services.TemplateService(s), nil
 }
 
-// AddFunc adds the elements of the argument map to the template's function map.
-func (s *Service) AddFunc(name string, f interface{}) error {
-	if s.isUsed {
-		return fmt.Errorf("template.Service.AddFunc: Add functions to template after init template provider")
-	}
-	if _, ok := s.funcs[name]; ok {
-		return fmt.Errorf("template.Service.AddFunc: Can not add function for the same name %s twice", name)
-	}
-	s.funcs[name] = f
-	return nil
+// TemplatesExecutor return view tree executor
+func (s *Service) TemplatesExecutor() (services.TemplatesExecutor, error) {
+	provider := gtprovider.NewTemplatesProvider(s.deps.AssetsProvider, s.deps.Config.FS(), ViewPath, s.deps.Config.IsCached())
+	return NewTemplatesExecutor(provider), nil
 }
 
-// Build create new template based on layout
-func (s *Service) Build(fs filesystem.Filespace) (services.TemplateExecutor, error) {
-	s.isUsed = true
-	// prepare executor
-	provider := gtprovider.NewProvider(fs, HelpersPath, LayoutPath, ViewPath, s.funcs, s.cache)
-	return &Executor{
-		provider: provider,
-	}, nil
+// TemplateExecutor return single template executor
+func (s *Service) TemplateExecutor(path string) (exeutor services.TemplateExecutor, err error) {
+	var tmpl *template.Template
+	if tmpl, err = s.deps.AssetsProvider.Base(); err != nil {
+		return nil, err
+	}
+	provider := gtprovider.NewTemplateProvider(tmpl, s.deps.Config.FS(), path, s.deps.Config.IsCached())
+	return NewTemplateExecutor(provider), nil
 }
