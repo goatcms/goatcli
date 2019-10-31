@@ -36,7 +36,7 @@ type PropertiesService interface {
 
 // SecretsService provide project secret properties data (like passwords, credentials etc)
 type SecretsService interface {
-	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Property, error)
+	ReadDefFromFS(fs filesystem.Filespace, properties map[string]string, data ApplicationData) ([]*config.Property, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
 	FillData(def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (bool, error)
 	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
@@ -71,14 +71,17 @@ type TemplateService interface {
 
 // TemplatesExecutor render data for view tree
 type TemplatesExecutor interface {
-	Templates(layoutName, viewName string) (list []string, err error)
-	Execute(layoutName, TemplatePath string, wr io.Writer, data interface{}) (err error)
-	ExecuteTemplate(layoutName, viewName, templateName string, wr io.Writer, data interface{}) (err error)
+	Templates(layoutName, templatePath string) (list []string, err error)
+	Execute(layoutName, templatePath string, wr io.Writer, data interface{}) (err error)
+	ExecuteTemplate(layoutName, templatePath, templateName string, wr io.Writer, data interface{}) (err error)
 }
 
 // TemplateExecutor render data for single template
 type TemplateExecutor interface {
+	IsEmpty() (is bool, err error)
+	Templates() (list []string, err error)
 	Execute(wr io.Writer, data interface{}) (err error)
+	ExecuteTemplate(templateName string, wr io.Writer, data interface{}) (err error)
 }
 
 // TemplateAssetsProvider return assets templates

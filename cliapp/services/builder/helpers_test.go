@@ -14,8 +14,8 @@ type RenderFileDeps struct {
 
 func renderFile(fs filesystem.Filespace, deps RenderFileDeps, data, properties, secrets map[string]string) (err error) {
 	ctxScope := scope.NewScope("test")
-	appModel := am.NewApplicationModel(map[string]string{})
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, data, properties, secrets)
+	appData := am.NewApplicationData(data)
+	buildContext := deps.BuilderService.NewContext(ctxScope, appData, properties, secrets)
 	if err = buildContext.Build(fs); err != nil {
 		return err
 	}

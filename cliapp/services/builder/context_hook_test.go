@@ -78,8 +78,8 @@ func TestCTXHook(t *testing.T) {
 		return
 	}
 	ctxScope := scope.NewScope("test")
-	appModel := am.NewApplicationModel(map[string]string{})
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, map[string]string{}, map[string]string{}, map[string]string{})
+	appData := am.NewApplicationData(map[string]string{})
+	buildContext := deps.BuilderService.NewContext(ctxScope, appData, map[string]string{}, map[string]string{})
 	if err = buildContext.Build(fs); err != nil {
 		t.Error(err)
 		return

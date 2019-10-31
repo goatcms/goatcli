@@ -10,7 +10,7 @@ import (
 func TesSecretsFillNoInteractive(t *testing.T) {
 	var (
 		err     error
-		service services.PropertiesService
+		service services.SecretsService
 		data    = map[string]string{}
 	)
 	t.Parallel()

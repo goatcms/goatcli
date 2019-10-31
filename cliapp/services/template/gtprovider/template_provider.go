@@ -33,7 +33,7 @@ func NewTemplateProvider(baseTemplate *template.Template, fs filesystem.Filespac
 // Template load and return template
 func (provider *TemplateProvider) Template() (tmpl *template.Template, err error) {
 	if provider.tmpl != nil {
-		return tmpl, nil
+		return provider.tmpl, nil
 	}
 	return provider.load()
 }

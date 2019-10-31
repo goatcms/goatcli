@@ -132,8 +132,8 @@ func TestCTXBuilderAfterBuild(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	appModel := am.NewApplicationModel(ctxData)
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, ctxData, map[string]string{}, map[string]string{})
+	appData := am.NewApplicationData(ctxData)
+	buildContext := deps.BuilderService.NewContext(ctxScope, appData, map[string]string{}, map[string]string{})
 	if err = buildContext.Build(fs); err != nil {
 		t.Error(err)
 		return

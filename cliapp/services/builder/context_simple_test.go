@@ -83,10 +83,10 @@ func TestCTXBuilderAM(t *testing.T) {
 		return
 	}
 	ctxScope := scope.NewScope("test")
-	appModel := am.NewApplicationModel(map[string]string{})
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, map[string]string{
+	appData := am.NewApplicationData(map[string]string{
 		"datakey": "Ala",
-	}, map[string]string{
+	})
+	buildContext := deps.BuilderService.NewContext(ctxScope, appData, map[string]string{
 		"propkey": " ma",
 	}, map[string]string{
 		"secretkey": " kota",

@@ -8,7 +8,9 @@ import (
 	"github.com/goatcms/goatcli/cliapp/common/cio"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/services/secrets/executor"
 	"github.com/goatcms/goatcore/app"
+	"github.com/goatcms/goatcore/app/scope"
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/plainmap"
@@ -17,9 +19,10 @@ import (
 // Secrets provide project secrets data
 type Secrets struct {
 	deps struct {
-		FS     filesystem.Filespace `filespace:"root"`
-		Input  app.Input            `dependency:"InputService"`
-		Output app.Output           `dependency:"OutputService"`
+		FS              filesystem.Filespace     `filespace:"root"`
+		Input           app.Input                `dependency:"InputService"`
+		Output          app.Output               `dependency:"OutputService"`
+		TemplateService services.TemplateService `dependency:"TemplateService"`
 	}
 }
 
@@ -34,7 +37,7 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 }
 
 // ReadDefFromFS read secrets definitions from filespace
-func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace) (secrets []*config.Property, err error) {
+func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace, properties map[string]string, appData services.ApplicationData) (secrets []*config.Property, err error) {
 	var (
 		json  []byte
 		nodes []os.FileInfo
@@ -73,7 +76,40 @@ func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace) (secrets []*config.Prop
 		}
 		secrets = append(secrets, props...)
 	}
+	// Generate secret template
+	if props, err = p.readDefFromFTemplate(fs, properties, appData); err != nil {
+		return nil, err
+	}
+	secrets = append(secrets, props...)
 	return secrets, nil
+}
+
+// ReadDefFromFS read secrets definitions from filespace
+func (p *Secrets) readDefFromFTemplate(fs filesystem.Filespace, properties map[string]string, appData services.ApplicationData) (secrets []*config.Property, err error) {
+	var (
+		templateExecutor services.TemplateExecutor
+		secretsExecutor  *executor.SecretsExecutor
+		executorScope    = scope.NewScope("readDefFromFTemplate")
+	)
+	if templateExecutor, err = p.deps.TemplateService.TemplateExecutor(".goat/secrets.def"); err != nil {
+		return nil, err
+	}
+	if secretsExecutor, err = executor.NewSecretsExecutor(executorScope, executor.SharedData{
+		AppData: appData,
+		Properties: executor.GlobalProperties{
+			Project: properties,
+		},
+		DotData: nil,
+	}, 10, templateExecutor); err != nil {
+		return nil, err
+	}
+	if err = secretsExecutor.Execute(); err != nil {
+		return nil, err
+	}
+	if err = executorScope.Wait(); err != nil {
+		return nil, err
+	}
+	return secretsExecutor.Secrets()
 }
 
 // ReadDataFromFS read secrets data from filespace

@@ -3,6 +3,7 @@ package secrets
 import (
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
@@ -11,7 +12,7 @@ import (
 func TestSecretsReadDefFromDataFile(t *testing.T) {
 	var (
 		err     error
-		service services.PropertiesService
+		service services.SecretsService
 		mapp    app.App
 		def     []*config.Property
 	)
@@ -24,7 +25,8 @@ func TestSecretsReadDefFromDataFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if def, err = service.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	appData := am.NewApplicationData(map[string]string{})
+	if def, err = service.ReadDefFromFS(mapp.RootFilespace(), map[string]string{}, appData); err != nil {
 		t.Error(err)
 		return
 	}
@@ -45,7 +47,7 @@ func TestSecretsReadDefFromDataFile(t *testing.T) {
 func TestPropertiesReaDefFromNoFile(t *testing.T) {
 	var (
 		err     error
-		service services.PropertiesService
+		service services.SecretsService
 		mapp    app.App
 		def     []*config.Property
 	)
@@ -54,7 +56,8 @@ func TestPropertiesReaDefFromNoFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if def, err = service.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	appData := am.NewApplicationData(map[string]string{})
+	if def, err = service.ReadDefFromFS(mapp.RootFilespace(), map[string]string{}, appData); err != nil {
 		t.Error(err)
 		return
 	}
