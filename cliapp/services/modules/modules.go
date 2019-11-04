@@ -21,7 +21,7 @@ const (
 // Modules provide project modules data
 type Modules struct {
 	deps struct {
-		FS filesystem.Filespace `filespace:"root"`
+		FS filesystem.Filespace `filespace:"current"`
 	}
 	config []*config.Module
 }

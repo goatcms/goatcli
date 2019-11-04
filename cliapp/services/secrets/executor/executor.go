@@ -50,9 +50,6 @@ func (e *SecretsExecutor) Secrets() (secrets []*config.Property, err error) {
 // Execute run single executor template
 func (e *SecretsExecutor) Execute() (err error) {
 	var list []string
-	e.ExecuteTask(Task{
-		TemplateName: "",
-	})
 	// Execute all single template
 	if list, err = e.templateExecutor.Templates(); err != nil {
 		return err

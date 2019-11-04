@@ -19,6 +19,15 @@ func NewTemplatesExecutor(provider *gtprovider.TemplatesProvider) *TemplatesExec
 	}
 }
 
+// IsEmpty run true if template is not empty
+func (executor *TemplatesExecutor) IsEmpty(layoutName, viewName string) (is bool, err error) {
+	var tmpl *template.Template
+	if tmpl, err = executor.provider.Template(layoutName, viewName); err != nil {
+		return false, nil
+	}
+	return tmpl.Tree == nil || tmpl.Root == nil, nil
+}
+
 // Templates return template list for a view
 func (executor *TemplatesExecutor) Templates(layoutName, viewName string) (list []string, err error) {
 	var view *template.Template

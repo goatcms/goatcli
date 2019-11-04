@@ -27,7 +27,6 @@ const (
 		/main.go
 	{{- end}}`
 	testCTXHookTemplate = `
-	{{$ctx := .}}
 	{{$ctx.RenderOnce ".gitignore" "" "" ".gitignore" $ctx.DotData}}
 	`
 	testCTXHookConfig = `[]`
@@ -52,7 +51,7 @@ func TestCTXHook(t *testing.T) {
 	fs := mapp.RootFilespace()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXHookLayout), 0766),
-		fs.WriteFile(".goat/build/templates/hook/vcs/git/main.tmpl", []byte(testCTXHookTemplate), 0766),
+		fs.WriteFile(".goat/build/templates/hook/vcs/git/main.ctrl", []byte(testCTXHookTemplate), 0766),
 		fs.WriteFile(".goat/build.def.json", []byte(testCTXHookConfig), 0766))); err != nil {
 		t.Error(err)
 		return
