@@ -8,15 +8,15 @@ import (
 // RegisterFunctions add default helper functions for templates
 func RegisterFunctions(di dependency.Injector) (err error) {
 	var deps struct {
-		TemplateService services.TemplateService `dependency:"TemplateService"`
+		Config services.TemplateConfig `dependency:"TemplateConfig"`
 	}
 	if err = di.InjectTo(&deps); err != nil {
 		return err
 	}
-	deps.TemplateService.AddFunc("amLinkFieldUF", LinkFieldUF)
-	deps.TemplateService.AddFunc("amLinkFieldLF", LinkFieldLF)
-	deps.TemplateService.AddFunc("amLinkRelationUF", LinkRelationUF)
-	deps.TemplateService.AddFunc("amLinkRelationLF", LinkRelationLF)
-	deps.TemplateService.AddFunc("amStructClassName", StructClassName)
+	deps.Config.AddFunc("amLinkFieldUF", LinkFieldUF)
+	deps.Config.AddFunc("amLinkFieldLF", LinkFieldLF)
+	deps.Config.AddFunc("amLinkRelationUF", LinkRelationUF)
+	deps.Config.AddFunc("amLinkRelationLF", LinkRelationLF)
+	deps.Config.AddFunc("amStructClassName", StructClassName)
 	return nil
 }

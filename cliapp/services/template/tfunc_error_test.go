@@ -42,13 +42,14 @@ func TestTFuncError(t *testing.T) {
 	// test
 	var deps struct {
 		TemplateService services.TemplateService `dependency:"TemplateService"`
+		Config          services.TemplateConfig  `dependency:"TemplateConfig"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)
 		return
 	}
-	var executor services.TemplateExecutor
-	if executor, err = deps.TemplateService.Build(mapp.RootFilespace()); err != nil {
+	var executor services.TemplatesExecutor
+	if executor, err = deps.TemplateService.TemplatesExecutor(); err != nil {
 		t.Error(err)
 		return
 	}

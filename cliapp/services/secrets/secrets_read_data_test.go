@@ -11,7 +11,7 @@ import (
 func TestSecretsReadDataFromDataFile(t *testing.T) {
 	var (
 		err     error
-		service services.PropertiesService
+		service services.SecretsService
 		mapp    app.App
 		data    map[string]string
 	)
@@ -45,7 +45,7 @@ func TestSecretsReadDataFromDataFile(t *testing.T) {
 func TestPropertiesReadDataFromNoFile(t *testing.T) {
 	var (
 		err     error
-		service services.PropertiesService
+		service services.SecretsService
 		mapp    app.App
 		data    map[string]string
 		def     []*config.Property

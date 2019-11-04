@@ -13,7 +13,7 @@ import (
 // Dependencies provide project dependencies data
 type Dependencies struct {
 	deps struct {
-		FS           filesystem.Filespace         `filespace:"root"`
+		FS           filesystem.Filespace         `filespace:"current"`
 		Repositories services.RepositoriesService `dependency:"RepositoriesService"`
 	}
 	config []*config.Dependency

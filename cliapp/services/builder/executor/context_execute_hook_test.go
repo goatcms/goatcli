@@ -20,7 +20,6 @@ import (
 
 const (
 	masterHook = `
-		{{ $ctx := . }}
 		{{$ctx.RenderOnce "dir/result.txt" "" "" "testf" $ctx.DotData}}
 	`
 	testfHook = `
@@ -39,7 +38,7 @@ func TestContextExecute(t *testing.T) {
 		fs                filesystem.Filespace
 		resultBytes       []byte
 		result            string
-		templateExecutor  services.TemplateExecutor
+		templatesExecutor services.TemplatesExecutor
 		generatorExecutor *GeneratorExecutor
 		generatorScope    = scope.NewScope("generator")
 		err               error
@@ -55,7 +54,7 @@ func TestContextExecute(t *testing.T) {
 		}
 		fs = mapp.RootFilespace()
 		if err = goaterr.ToErrors(goaterr.AppendError(nil,
-			fs.WriteFile(".goat/build/templates/hook/testHook/git/master.tmpl", []byte(masterHook), filesystem.DefaultUnixFileMode),
+			fs.WriteFile(".goat/build/templates/hook/testHook/git/master.ctrl", []byte(masterHook), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/testf.tmpl", []byte(testfHook), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/overlay.tmpl", []byte(overlayHook), filesystem.DefaultUnixFileMode),
 			templates.RegisterDependencies(mapp.DependencyProvider()),
@@ -72,7 +71,7 @@ func TestContextExecute(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		if templateExecutor, err = deps.TemplateService.Build(fs); err != nil {
+		if templatesExecutor, err = deps.TemplateService.TemplatesExecutor(); err != nil {
 			t.Error(err)
 			return
 		}
@@ -84,7 +83,7 @@ func TestContextExecute(t *testing.T) {
 			},
 			FS:      fs,
 			VCSData: vcs.NewData(vcs.NewGeneratedFiles(true), vcs.NewIgnoredFiles(true)),
-		}, 10, templateExecutor); err != nil {
+		}, 10, templatesExecutor); err != nil {
 			t.Error(err)
 			return
 		}

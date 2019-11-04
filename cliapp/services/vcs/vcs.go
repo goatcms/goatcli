@@ -10,7 +10,7 @@ import (
 // VCS provide project modules data
 type VCS struct {
 	deps struct {
-		FS filesystem.Filespace `filespace:"root"`
+		FS filesystem.Filespace `filespace:"current"`
 	}
 	config []*config.Module
 }

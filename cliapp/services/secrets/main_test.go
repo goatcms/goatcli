@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/services/template"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
@@ -26,8 +27,11 @@ func buildMockupApp(input string) (p services.SecretsService, mapp app.App, err 
 	if err = RegisterDependencies(mapp.DependencyProvider()); err != nil {
 		return nil, nil, err
 	}
+	if err = template.RegisterDependencies(mapp.DependencyProvider()); err != nil {
+		return nil, nil, err
+	}
 	var deps struct {
-		Secrets services.PropertiesService `dependency:"SecretsService"`
+		Secrets services.SecretsService `dependency:"SecretsService"`
 	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		return nil, nil, err

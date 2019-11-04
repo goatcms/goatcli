@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -64,6 +65,9 @@ func NewGeneratedFilesFromStream(reader io.Reader) (instance *GeneratedFiles, er
 
 // All return all generated files list
 func (generated *GeneratedFiles) All() []*services.GeneratedFile {
+	sort.Slice(generated.rows, func(i, j int) bool {
+		return generated.rows[i].Path < generated.rows[j].Path
+	})
 	return generated.rows
 }
 

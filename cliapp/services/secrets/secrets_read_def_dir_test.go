@@ -5,8 +5,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/services/template"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
@@ -23,7 +25,7 @@ func TestDataDefFromDirectory(t *testing.T) {
 		mapp    app.App
 		secrets []*config.Property
 		deps    struct {
-			Secrets services.PropertiesService `dependency:"SecretsService"`
+			Secrets services.SecretsService `dependency:"SecretsService"`
 		}
 	)
 	t.Parallel()
@@ -51,12 +53,17 @@ func TestDataDefFromDirectory(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	if err = template.RegisterDependencies(mapp.DependencyProvider()); err != nil {
+		t.Error(err)
+		return
+	}
 	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
 		t.Error(err)
 		return
 	}
 	// test
-	if secrets, err = deps.Secrets.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	appData := am.NewApplicationData(map[string]string{})
+	if secrets, err = deps.Secrets.ReadDefFromFS(mapp.RootFilespace(), map[string]string{}, appData); err != nil {
 		t.Error(err)
 		return
 	}

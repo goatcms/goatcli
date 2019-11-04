@@ -38,7 +38,7 @@ func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 		data           map[string]string
 		interactive    bool
 		fs             filesystem.Filespace
-		appModel       *am.ApplicationModel
+		appData        services.ApplicationData
 	)
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
@@ -65,8 +65,13 @@ func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 			return err
 		}
 	}
+	// load data
+	if data, err = deps.DataService.ReadDataFromFS(fs); err != nil {
+		return err
+	}
+	appData = am.NewApplicationData(data)
 	// load secrets
-	if secretsDef, err = deps.SecretsService.ReadDefFromFS(fs); err != nil {
+	if secretsDef, err = deps.SecretsService.ReadDefFromFS(fs, propertiesData, appData); err != nil {
 		return err
 	}
 	if secretsData, err = deps.SecretsService.ReadDataFromFS(fs); err != nil {
@@ -80,10 +85,6 @@ func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 			return err
 		}
 	}
-	// load data
-	if data, err = deps.DataService.ReadDataFromFS(fs); err != nil {
-		return err
-	}
 	// Clone modules (if required)
 	deps.Output.Printf("start clone modules... ")
 	propertiesResult := result.NewPropertiesResult(propertiesData)
@@ -93,8 +94,7 @@ func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 	deps.Output.Printf("cloned\n")
 	// Build
 	deps.Output.Printf("start build... ")
-	appModel = am.NewApplicationModel(data)
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, data, propertiesData, secretsData)
+	buildContext := deps.BuilderService.NewContext(ctxScope, appData, propertiesData, secretsData)
 	if err = buildContext.Build(fs); err != nil {
 		return err
 	}

@@ -24,12 +24,13 @@ func TestMainNoCacheChanges(t *testing.T) {
 			return
 		}
 		// create test data
-		if err = fs.WriteFile("views/test/main.tmpl", []byte("42"), 0777); err != nil {
+		if err = fs.WriteFile("templates/test/main.tmpl", []byte("42"), 0777); err != nil {
 			t.Error(err)
 			return
 		}
-		provider := NewProvider(fs, goattext.HelpersPath, goattext.LayoutPath, goattext.ViewPath, nil, false)
-		if view, err = provider.View(goattext.DefaultLayout, "test"); err != nil {
+		assetsProvider := NewAssetsProvider(fs, goattext.HelpersPath, goattext.LayoutPath, nil, true)
+		provider := NewTemplatesProvider(assetsProvider, fs, "templates/{name}/", false)
+		if view, err = provider.Template(goattext.DefaultLayout, "test"); err != nil {
 			t.Errorf("Errors: %v", err)
 			return
 		}
@@ -43,11 +44,11 @@ func TestMainNoCacheChanges(t *testing.T) {
 			t.Errorf("Before changes Result should be equals to 42 and it is %s", result)
 			return
 		}
-		if err = fs.WriteFile("views/test/main.tmpl", []byte("2018"), 0777); err != nil {
+		if err = fs.WriteFile("templates/test/main.tmpl", []byte("2018"), 0777); err != nil {
 			t.Error(err)
 			return
 		}
-		if view, err = provider.View(goattext.DefaultLayout, "test"); err != nil {
+		if view, err = provider.Template(goattext.DefaultLayout, "test"); err != nil {
 			t.Errorf("Errors: %v", err)
 			return
 		}

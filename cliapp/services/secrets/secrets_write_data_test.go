@@ -10,7 +10,7 @@ import (
 func TestSecretsWriteDataFromDataFile(t *testing.T) {
 	var (
 		err     error
-		service services.PropertiesService
+		service services.SecretsService
 		mapp    app.App
 		data    map[string]string
 	)

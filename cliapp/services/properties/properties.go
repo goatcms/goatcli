@@ -17,7 +17,7 @@ import (
 // Properties provide project properties data
 type Properties struct {
 	deps struct {
-		FS     filesystem.Filespace `filespace:"root"`
+		FS     filesystem.Filespace `filespace:"current"`
 		Input  app.Input            `dependency:"InputService"`
 		Output app.Output           `dependency:"OutputService"`
 	}

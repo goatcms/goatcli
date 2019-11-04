@@ -58,6 +58,35 @@ func TestNewGeneratedFilesFromStream(t *testing.T) {
 	}
 }
 
+func TestGeneratedFilesGelAllOrder(t *testing.T) {
+	var (
+		instance *GeneratedFiles
+		err      error
+	)
+	t.Parallel()
+	if instance, err = NewGeneratedFilesFromStream(strings.NewReader(`
+		2009-11-10T23:00:00Z;/some/b.go
+		2009-11-10T23:00:00Z;/some/a.go
+		2009-11-10T23:00:00Z;/some/c.go
+	`)); err != nil {
+		t.Error(err)
+		return
+	}
+	result := instance.All()
+	if len(result) != 3 {
+		t.Errorf("Expect two generated files and take %d", len(instance.All()))
+	}
+	if result[0].Path != "/some/a.go" {
+		t.Errorf("Expected /some/a.go as first")
+	}
+	if result[1].Path != "/some/b.go" {
+		t.Errorf("Expected /some/b.go as second")
+	}
+	if result[2].Path != "/some/c.go" {
+		t.Errorf("Expected /some/c.go as third")
+	}
+}
+
 func TestGeneratedWrite(t *testing.T) {
 	var (
 		instance *GeneratedFiles

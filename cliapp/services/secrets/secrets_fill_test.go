@@ -10,7 +10,7 @@ import (
 func TesSecretsFillDataFile(t *testing.T) {
 	var (
 		err       error
-		service   services.PropertiesService
+		service   services.SecretsService
 		data      = map[string]string{}
 		isChanged bool
 	)
@@ -53,7 +53,7 @@ func TesSecretsFillDataFile(t *testing.T) {
 func TestPropertieFillDataFileOmnit(t *testing.T) {
 	var (
 		err     error
-		service services.PropertiesService
+		service services.SecretsService
 		data    = map[string]string{
 			"key1": "value1",
 			"key2": "value2",

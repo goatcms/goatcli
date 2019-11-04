@@ -26,7 +26,6 @@ const (
 		File Content
 	{{- end -}}`
 	testBuilderTemplate = `
-	{{$ctx := .}}
 	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}`
 	testBuilderConfig = `[{
 	  "from":"ignore",
@@ -54,7 +53,7 @@ func TestBuilder(t *testing.T) {
 	rootFS := mapp.RootFilespace()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		rootFS.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testBuilderLayout), 0766),
-		rootFS.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testBuilderTemplate), 0766),
+		rootFS.WriteFile(".goat/build/templates/names/main.ctrl", []byte(testBuilderTemplate), 0766),
 		rootFS.WriteFile(".goat/build.def.json", []byte(testBuilderConfig), 0766))); err != nil {
 		t.Error(err)
 		return
@@ -82,8 +81,8 @@ func TestBuilder(t *testing.T) {
 	}
 	fs := mapp.RootFilespace()
 	ctxScope := scope.NewScope("test")
-	appModel := am.NewApplicationModel(map[string]string{})
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, map[string]string{}, map[string]string{}, map[string]string{})
+	appData := am.NewApplicationData(map[string]string{})
+	buildContext := deps.BuilderService.NewContext(ctxScope, appData, map[string]string{}, map[string]string{})
 	if err = buildContext.Build(fs); err != nil {
 		t.Error(err)
 		return

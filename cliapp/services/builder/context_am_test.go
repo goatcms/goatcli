@@ -35,7 +35,6 @@ const (
 		{{- end -}}
 	{{- end}}`
 	testCTXAMTemplate = `
-	{{$ctx := .}}
 	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}
 	`
 	testCTXAMConfig = `[{
@@ -99,7 +98,7 @@ func TestCTXBuilderAfterBuild(t *testing.T) {
 	fs := mapp.RootFilespace()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXAMLayout), 0766),
-		fs.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXAMTemplate), 0766),
+		fs.WriteFile(".goat/build/templates/names/main.ctrl", []byte(testCTXAMTemplate), 0766),
 		fs.WriteFile(".goat/data/model/user.json", []byte(testCTXAMData), 0766),
 		fs.WriteFile(".goat/build.def.json", []byte(testCTXAMConfig), 0766))); err != nil {
 		t.Error(err)
@@ -132,8 +131,8 @@ func TestCTXBuilderAfterBuild(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	appModel := am.NewApplicationModel(ctxData)
-	buildContext := deps.BuilderService.NewContext(ctxScope, appModel, ctxData, map[string]string{}, map[string]string{})
+	appData := am.NewApplicationData(ctxData)
+	buildContext := deps.BuilderService.NewContext(ctxScope, appData, map[string]string{}, map[string]string{})
 	if err = buildContext.Build(fs); err != nil {
 		t.Error(err)
 		return

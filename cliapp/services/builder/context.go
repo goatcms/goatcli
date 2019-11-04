@@ -84,14 +84,14 @@ func (c *Context) Build(fs filesystem.Filespace) (err error) {
 // Build project files and directories from data
 func (c *Context) build(fs filesystem.Filespace, subPath string, buildConfigs []*config.Build) (err error) {
 	var (
-		templateExecutor  services.TemplateExecutor
+		templatesExecutor services.TemplatesExecutor
 		generatorExecutor *executor.GeneratorExecutor
 	)
 	// build modules
 	if err = c.buildModules(fs, subPath); err != nil {
 		return err
 	}
-	if templateExecutor, err = c.service.deps.TemplateService.Build(fs); err != nil {
+	if templatesExecutor, err = c.service.deps.TemplateService.TemplatesExecutor(); err != nil {
 		return err
 	}
 	if generatorExecutor, err = executor.NewGeneratorExecutor(c.scope, executor.SharedData{
@@ -103,7 +103,7 @@ func (c *Context) build(fs filesystem.Filespace, subPath string, buildConfigs []
 		},
 		FS:      fs,
 		VCSData: c.vcsData,
-	}, c.service.limit, templateExecutor); err != nil {
+	}, c.service.limit, templatesExecutor); err != nil {
 		return err
 	}
 	c.generatorExecutors = append(c.generatorExecutors, generatorExecutor)
@@ -114,22 +114,12 @@ func (c *Context) build(fs filesystem.Filespace, subPath string, buildConfigs []
 				CMD:  config.AfterBuild,
 			})
 		}
-		/*generatorExecutor.ExecuteTask(executor.Task{
-			Template: executor.TemplateHandler{
-				Layout: config.Layout,
-				Path:   config.Template,
-			},
-			DotData: TaskData{
-				From: config.From,
-				To:   config.To,
-			},
-			BuildProperties: config.Properties,
-			FSPath:          "",
-		})*/
-		generatorExecutor.ExecuteView(config.Layout, config.Template, config.Properties, TaskData{
+		if err = generatorExecutor.ExecuteView(config.Layout, config.Template, config.Properties, TaskData{
 			From: config.From,
 			To:   config.To,
-		})
+		}); err != nil {
+			return err
+		}
 	}
 	return nil
 }
