@@ -28,7 +28,6 @@ const (
 		{{- index $ctx.Properties.Secrets "secretkey" }}
 	{{- end}}`
 	testCTXBuilderTemplate = `
-	{{$ctx := .}}
 	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}
 	`
 	testCTXBuilderConfig = `[{
@@ -57,7 +56,7 @@ func TestCTXBuilderAM(t *testing.T) {
 	fs := mapp.RootFilespace()
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXBuilderLayout), 0766),
-		fs.WriteFile(".goat/build/templates/names/main.tmpl", []byte(testCTXBuilderTemplate), 0766),
+		fs.WriteFile(".goat/build/templates/names/main.ctrl", []byte(testCTXBuilderTemplate), 0766),
 		fs.WriteFile(".goat/build.def.json", []byte(testCTXBuilderConfig), 0766))); err != nil {
 		t.Error(err)
 		return

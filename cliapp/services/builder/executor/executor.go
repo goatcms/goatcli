@@ -47,16 +47,6 @@ func (e *GeneratorExecutor) Scope() app.Scope {
 // ExecuteView run single executor template
 func (e *GeneratorExecutor) ExecuteView(layout, viewPath string, properties map[string]string, dotData interface{}) (err error) {
 	var list []string
-	// Execute main task
-	e.ExecuteTask(Task{
-		Template: TemplateHandler{
-			Layout: layout,
-			Path:   viewPath,
-		},
-		DotData:         dotData,
-		BuildProperties: properties,
-		FSPath:          "",
-	})
 	// Execute all single template
 	if list, err = e.templatesExecutor.Templates(layout, viewPath); err != nil {
 		return err

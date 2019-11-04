@@ -20,7 +20,6 @@ import (
 
 const (
 	masterHook = `
-		{{ $ctx := . }}
 		{{$ctx.RenderOnce "dir/result.txt" "" "" "testf" $ctx.DotData}}
 	`
 	testfHook = `
@@ -55,7 +54,7 @@ func TestContextExecute(t *testing.T) {
 		}
 		fs = mapp.RootFilespace()
 		if err = goaterr.ToErrors(goaterr.AppendError(nil,
-			fs.WriteFile(".goat/build/templates/hook/testHook/git/master.tmpl", []byte(masterHook), filesystem.DefaultUnixFileMode),
+			fs.WriteFile(".goat/build/templates/hook/testHook/git/master.ctrl", []byte(masterHook), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/testf.tmpl", []byte(testfHook), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/overlay.tmpl", []byte(overlayHook), filesystem.DefaultUnixFileMode),
 			templates.RegisterDependencies(mapp.DependencyProvider()),

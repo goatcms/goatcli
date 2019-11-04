@@ -71,6 +71,7 @@ type TemplateService interface {
 
 // TemplatesExecutor render data for view tree
 type TemplatesExecutor interface {
+	IsEmpty(layoutName, templatePath string) (is bool, err error)
 	Templates(layoutName, templatePath string) (list []string, err error)
 	Execute(layoutName, templatePath string, wr io.Writer, data interface{}) (err error)
 	ExecuteTemplate(layoutName, templatePath, templateName string, wr io.Writer, data interface{}) (err error)

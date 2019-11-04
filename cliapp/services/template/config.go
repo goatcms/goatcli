@@ -13,7 +13,7 @@ import (
 type Config struct {
 	deps struct {
 		Cache string               `argument:"?template.cache"`
-		FS    filesystem.Filespace `filespace:"root"`
+		FS    filesystem.Filespace `filespace:"current"`
 	}
 	funcs  template.FuncMap
 	cached bool

@@ -114,22 +114,12 @@ func (c *Context) build(fs filesystem.Filespace, subPath string, buildConfigs []
 				CMD:  config.AfterBuild,
 			})
 		}
-		/*generatorExecutor.ExecuteTask(executor.Task{
-			Template: executor.TemplateHandler{
-				Layout: config.Layout,
-				Path:   config.Template,
-			},
-			DotData: TaskData{
-				From: config.From,
-				To:   config.To,
-			},
-			BuildProperties: config.Properties,
-			FSPath:          "",
-		})*/
-		generatorExecutor.ExecuteView(config.Layout, config.Template, config.Properties, TaskData{
+		if err = generatorExecutor.ExecuteView(config.Layout, config.Template, config.Properties, TaskData{
 			From: config.From,
 			To:   config.To,
-		})
+		}); err != nil {
+			return err
+		}
 	}
 	return nil
 }
