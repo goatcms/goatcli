@@ -11,12 +11,7 @@ import (
 	"github.com/goatcms/goatcore/workers"
 )
 
-const (
-	masterRenderTemplate  = `Names: {{template "/file1.txt.render" .}}`
-	overlayRenderTemplate = `{{join . ", "}}`
-)
-
-func TestLoadDefFile(t *testing.T) {
+func TestLoadRenderFile(t *testing.T) {
 	t.Parallel()
 	var (
 		funcs     = template.FuncMap{"join": strings.Join}
@@ -31,11 +26,11 @@ func TestLoadDefFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err := fs.WriteFile("layouts/default/main.tmpl", []byte(masterRenderTemplate), 0777); err != nil {
+	if err := fs.WriteFile("layouts/default/main.tmpl", []byte(`Names: {{template "/file1.txt.def" .}}`), 0777); err != nil {
 		t.Error(err)
 		return
 	}
-	if err := fs.WriteFile("templates/myview/file1.txt.render", []byte(overlayRenderTemplate), 0777); err != nil {
+	if err := fs.WriteFile("templates/myview/file1.txt.def", []byte(`{{join . ", "}}`), 0777); err != nil {
 		t.Error(err)
 		return
 	}

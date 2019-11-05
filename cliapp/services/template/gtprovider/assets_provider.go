@@ -64,7 +64,8 @@ func (provider *AssetsProvider) base() (baseTemplate *template.Template, err err
 		return nil, err
 	}
 	if err = fsloop.WalkFS(subFS, "", func(currentPath string, info os.FileInfo) (err error) {
-		return provider.load(templateLoader, subFS, currentPath)
+		_, err = templateLoader.LoadByExtension(subFS, currentPath)
+		return err
 	}, nil); err != nil {
 		return nil, err
 	}
@@ -116,7 +117,8 @@ func (provider *AssetsProvider) layout(name string) (layoutTemplate *template.Te
 		return nil, err
 	}
 	if err = fsloop.WalkFS(subFS, "", func(currentPath string, info os.FileInfo) (err error) {
-		return provider.load(templateLoader, subFS, currentPath)
+		_, err = templateLoader.LoadByExtension(subFS, currentPath)
+		return err
 	}, nil); err != nil {
 		return nil, err
 	}
@@ -124,17 +126,4 @@ func (provider *AssetsProvider) layout(name string) (layoutTemplate *template.Te
 		provider.layouts[name] = layoutTemplate
 	}
 	return layoutTemplate, nil
-}
-
-func (provider *AssetsProvider) load(loader *TemplateLoader, fs filesystem.Filespace, subPath string) error {
-	if strings.HasSuffix(subPath, TemplateExtension) {
-		return loader.LoadFullTemplate(fs, subPath)
-	} else if strings.HasSuffix(subPath, OnceTemplateExtension) {
-		return loader.LoadSingleFileTemplate(fs, subPath)
-	} else if strings.HasSuffix(subPath, RenderTemplateExtension) {
-		return loader.LoadSingleFileTemplate(fs, subPath)
-	} else if strings.HasSuffix(subPath, CtrlTemplateExtension) {
-		return loader.LoadSingleFileTemplate(fs, subPath)
-	}
-	return nil
 }

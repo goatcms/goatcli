@@ -32,6 +32,8 @@ func (loader *TemplateLoader) LoadByExtension(fs filesystem.Filespace, subPath s
 		return true, loader.LoadSingleFileTemplate(fs, subPath)
 	} else if strings.HasSuffix(subPath, CtrlTemplateExtension) {
 		return true, loader.LoadSingleFileTemplate(fs, subPath)
+	} else if strings.HasSuffix(subPath, DefTemplateExtension) {
+		return true, loader.LoadSingleFileTemplate(fs, subPath)
 	}
 	return false, nil
 }
