@@ -3,6 +3,7 @@ package buildc
 import (
 	"strings"
 
+	"github.com/goatcms/goatcli/cliapp/commands/vcsc"
 	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/prevents"
@@ -40,6 +41,9 @@ func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 		fs             filesystem.Filespace
 		appData        services.ApplicationData
 	)
+	if err = vcsc.RunScan(a, ctxScope); err != nil {
+		return nil
+	}
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
 		ctxScope.InjectTo(&deps))); err != nil {

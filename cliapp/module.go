@@ -75,6 +75,7 @@ func (m *Module) registerCommands(a app.App) error {
 		app.RegisterCommand(a, "secrets:set", secretsc.RunSetSecretValue, commands.SetSecretValueDep),
 		app.RegisterCommand(a, "secrets:get", secretsc.RunGetSecretValue, commands.GetSecretValueDep),
 		app.RegisterCommand(a, "vcs:clean", vcsc.RunClean, commands.VCSClean),
+		app.RegisterCommand(a, "vcs:scan", vcsc.RunScan, commands.VCSScan),
 		app.RegisterCommand(a, "vcs:ignored:add", vcsc.RunIgnoredAdd, commands.VCSIgnoredAdd),
 		app.RegisterCommand(a, "vcs:ignored:remove", vcsc.RunIgnoredRemove, commands.VCSIgnoredRemove),
 		app.RegisterCommand(a, "vcs:ignored:list", vcsc.RunIgnoredList, commands.VCSIgnoredList),
