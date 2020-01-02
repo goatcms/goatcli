@@ -8,7 +8,10 @@ import (
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/bootstrap"
 	"github.com/goatcms/goatcore/app/goatapp"
+	"github.com/goatcms/goatcore/app/modules/commonm"
+	"github.com/goatcms/goatcore/app/modules/pipelinem"
 	"github.com/goatcms/goatcore/app/modules/terminalm"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 func main() {
@@ -23,11 +26,13 @@ func main() {
 		return
 	}
 	boot = bootstrap.NewBootstrap(gapp)
-	if err = boot.Register(terminalm.NewModule()); err != nil {
-		errLogs.Println(err)
-		return
-	}
-	if err = boot.Register(cliapp.NewModule()); err != nil {
+
+	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		boot.Register(terminalm.NewModule()),
+		boot.Register(commonm.NewModule()),
+		boot.Register(pipelinem.NewModule()),
+		boot.Register(cliapp.NewModule()),
+	)); err != nil {
 		errLogs.Println(err)
 		return
 	}
