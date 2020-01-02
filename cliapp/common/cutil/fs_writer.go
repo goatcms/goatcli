@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/filesystem"
 )
 
@@ -22,7 +22,7 @@ func NewFSWriter(fs filesystem.Filespace, hash string) *FSWriter {
 	return &FSWriter{
 		fs:       fs,
 		hash:     hash,
-		openTag:  regexp.MustCompile("\n\n" + hash + services.StremDataSeparator + "[A-Za-z0-9/_\\.-]+" + services.StremDataSeparator + "\n\n"),
+		openTag:  regexp.MustCompile("\n\n" + hash + gcliservices.StremDataSeparator + "[A-Za-z0-9/_\\.-]+" + gcliservices.StremDataSeparator + "\n\n"),
 		closeTag: regexp.MustCompile("\n\n--" + hash + "\n\n"),
 	}
 }
@@ -40,7 +40,7 @@ func (w *FSWriter) Write(data []byte) (n int, err error) {
 		}
 		content := w.buffor[openLoc[1]:closeLoc[0]]
 		openStr := w.buffor[openLoc[0]+len(w.hash)+3 : openLoc[1]]
-		path := openStr[:strings.Index(openStr, services.StremDataSeparator)]
+		path := openStr[:strings.Index(openStr, gcliservices.StremDataSeparator)]
 		if err = w.fs.WriteFile(path, []byte(content), 0766); err != nil {
 			return 0, err
 		}

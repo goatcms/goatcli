@@ -3,18 +3,18 @@ package mockups
 import (
 	"fmt"
 
-	"github.com/goatcms/goatcli/cliapp/services"
+	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/repositories"
 )
 
-// RepositoriesService is a simple mockup for  services.Repositories
+// RepositoriesService is a simple mockup for  gcliservices.Repositories
 type RepositoriesService struct {
 	data map[string]filesystem.Filespace
 }
 
-// NewRepositoriesService create mockup for services.Repositories
-func NewRepositoriesService(data map[string]filesystem.Filespace) services.RepositoriesService {
+// NewRepositoriesService create mockup for gcliservices.Repositories
+func NewRepositoriesService(data map[string]filesystem.Filespace) gcliservices.RepositoriesService {
 	return RepositoriesService{
 		data: data,
 	}
