@@ -20,8 +20,6 @@ import (
 type Secrets struct {
 	deps struct {
 		FS              filesystem.Filespace         `filespace:"current"`
-		Input           app.Input                    `dependency:"InputService"`
-		Output          app.Output                   `dependency:"OutputService"`
 		TemplateService gcliservices.TemplateService `dependency:"TemplateService"`
 	}
 }
@@ -128,8 +126,9 @@ func (p *Secrets) ReadDataFromFS(fs filesystem.Filespace) (data map[string]strin
 }
 
 // FillData read lost secrets data to curent data map
-func (p *Secrets) FillData(def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (isChanged bool, err error) {
-	return cio.ReadProperties("", p.deps.Input, p.deps.Output, def, data, defaultData, interactive)
+func (p *Secrets) FillData(ctx app.IOContext, def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (isChanged bool, err error) {
+	io := ctx.IO()
+	return cio.ReadProperties("", io.In(), io.Out(), def, data, defaultData, interactive)
 }
 
 // WriteDataToFS write secrets data to fs file

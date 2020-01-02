@@ -1,6 +1,5 @@
 package secretsc
 
-
 const (
 	// FirstKeyParameterIsRequired is error message for lost key
 	FirstKeyParameterIsRequired = "First parameter key is required"

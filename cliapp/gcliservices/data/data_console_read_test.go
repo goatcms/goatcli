@@ -64,7 +64,7 @@ func TestConsoleRead(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if data, err = deps.Data.ConsoleReadData(dataSet); err != nil {
+	if data, err = deps.Data.ConsoleReadData(mapp.IOContext(), dataSet); err != nil {
 		t.Error(err)
 		return
 	}

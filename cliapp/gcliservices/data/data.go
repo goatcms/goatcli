@@ -25,8 +25,6 @@ var (
 // Data provider
 type Data struct {
 	deps struct {
-		Input  app.Input  `dependency:"InputService"`
-		Output app.Output `dependency:"OutputService"`
 	}
 }
 
@@ -99,9 +97,10 @@ func (d *Data) ReadDataFromFS(fs filesystem.Filespace) (data map[string]string, 
 }
 
 // ConsoleReadData create new data from Filespace
-func (d *Data) ConsoleReadData(def *config.DataSet) (data map[string]string, err error) {
+func (d *Data) ConsoleReadData(ctx app.IOContext, def *config.DataSet) (data map[string]string, err error) {
 	data = make(map[string]string)
-	if _, err = cio.ReadDataSet("", d.deps.Input, d.deps.Output, def, data); err != nil {
+	io := ctx.IO()
+	if _, err = cio.ReadDataSet("", io.In(), io.Out(), def, data); err != nil {
 		return nil, err
 	}
 	return data, nil

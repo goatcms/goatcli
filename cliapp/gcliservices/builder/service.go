@@ -6,6 +6,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
+	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 )
@@ -20,7 +21,6 @@ type Service struct {
 		Dependencies    gcliservices.DependenciesService `dependency:"DependenciesService"`
 		Repositories    gcliservices.RepositoriesService `dependency:"RepositoriesService"`
 		VCSService      gcliservices.VCSService          `dependency:"VCSService"`
-		Output          app.Output                       `dependency:"OutputService"`
 	}
 	limit int64
 }
@@ -45,16 +45,22 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 	return gcliservices.BuilderService(instance), nil
 }
 
-// NewContext create new Context instance
-func (s *Service) NewContext(scope app.Scope, appData gcliservices.ApplicationData, properties, secrets map[string]string) gcliservices.BuildContext {
-	return &Context{
-		scope:      scope,
+// Build build filesystem in context
+func (s *Service) Build(ctx app.IOContext, fs filesystem.Filespace, appData gcliservices.ApplicationData, properties, secrets map[string]string) (err error) {
+	childIOCtx := gio.NewChildIOContext(ctx, nil, nil, nil, nil)
+	defer childIOCtx.Scope().Close()
+	buildContext := &Context{
+		ctx:        childIOCtx,
 		data:       appData.Plain,
 		properties: properties,
 		secrets:    secrets,
 		service:    s,
 		appModel:   appData.AM,
 	}
+	if err = buildContext.Build(fs); err != nil {
+		return err
+	}
+	return childIOCtx.Scope().Wait()
 }
 
 // ReadDefFromFS return data definition

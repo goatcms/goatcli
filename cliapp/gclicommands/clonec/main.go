@@ -62,7 +62,7 @@ func Run(a app.App, ctx app.IOContext) (err error) {
 	if propertiesData, err = deps.PropertiesService.ReadDataFromFS(repofs); err != nil {
 		return err
 	}
-	if isChanged, err = deps.PropertiesService.FillData(propertiesDef, propertiesData, map[string]string{}, interactive); err != nil {
+	if isChanged, err = deps.PropertiesService.FillData(ctx, propertiesDef, propertiesData, map[string]string{}, interactive); err != nil {
 		return err
 	}
 	if err = deps.RootFilespace.MkdirAll(deps.DestPath, 0766); err != nil {

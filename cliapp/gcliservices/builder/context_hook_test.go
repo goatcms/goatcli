@@ -15,7 +15,6 @@ import (
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
-	"github.com/goatcms/goatcore/app/scope"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -73,18 +72,17 @@ func TestCTXHook(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	ctxScope := scope.NewScope("test")
+	ctx := mapp.IOContext()
 	appData := am.NewApplicationData(map[string]string{})
-	buildContext := deps.BuilderService.NewContext(ctxScope, appData, map[string]string{}, map[string]string{})
-	if err = buildContext.Build(fs); err != nil {
+	if err = deps.BuilderService.Build(ctx, fs, appData, map[string]string{}, map[string]string{}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = ctxScope.Wait(); err != nil {
+	if err = ctx.Scope().Wait(); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = ctxScope.Trigger(app.CommitEvent, nil); err != nil {
+	if err = ctx.Scope().Trigger(app.CommitEvent, nil); err != nil {
 		t.Error(err)
 		return
 	}

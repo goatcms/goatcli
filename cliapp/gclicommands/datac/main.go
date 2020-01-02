@@ -54,7 +54,7 @@ func RunAdd(a app.App, ctx app.IOContext) (err error) {
 	if def == nil {
 		return fmt.Errorf("Incorrect type '%s' (add your type to '.goat/data.def.json' file)", deps.TypeName)
 	}
-	if datamap, err = deps.DataService.ConsoleReadData(def); err != nil {
+	if datamap, err = deps.DataService.ConsoleReadData(ctx, def); err != nil {
 		return err
 	}
 	if err = deps.DataService.WriteDataToFS(deps.CurrentFS, prefix, datamap); err != nil {

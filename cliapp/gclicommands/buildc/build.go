@@ -57,7 +57,7 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	if propertiesData, err = deps.PropertiesService.ReadDataFromFS(fs); err != nil {
 		return err
 	}
-	if isChanged, err = deps.PropertiesService.FillData(propertiesDef, propertiesData, map[string]string{}, interactive); err != nil {
+	if isChanged, err = deps.PropertiesService.FillData(ctx, propertiesDef, propertiesData, map[string]string{}, interactive); err != nil {
 		return err
 	}
 	if isChanged {
@@ -77,7 +77,7 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	if secretsData, err = deps.SecretsService.ReadDataFromFS(fs); err != nil {
 		return err
 	}
-	if isChanged, err = deps.SecretsService.FillData(secretsDef, secretsData, map[string]string{}, interactive); err != nil {
+	if isChanged, err = deps.SecretsService.FillData(ctx, secretsDef, secretsData, map[string]string{}, interactive); err != nil {
 		return err
 	}
 	if isChanged {
@@ -94,8 +94,7 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	ctx.IO().Out().Printf("cloned\n")
 	// Build
 	ctx.IO().Out().Printf("start build... ")
-	buildContext := deps.BuilderService.NewContext(ctx.Scope(), appData, propertiesData, secretsData)
-	if err = buildContext.Build(fs); err != nil {
+	if err = deps.BuilderService.Build(ctx, fs, appData, propertiesData, secretsData); err != nil {
 		return err
 	}
 	if err = ctx.Scope().Wait(); err != nil {

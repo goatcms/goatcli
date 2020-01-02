@@ -13,6 +13,7 @@ import (
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/fscache"
 	"github.com/goatcms/goatcore/varutil"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 // Command is command to run
@@ -23,7 +24,7 @@ type Command struct {
 
 // Context contains build process data
 type Context struct {
-	scope      app.Scope
+	ctx        app.IOContext
 	appModel   interface{}
 	data       map[string]string
 	properties map[string]string
@@ -65,12 +66,12 @@ func (c *Context) Build(fs filesystem.Filespace) (err error) {
 		return err
 	}
 	// bind commit event
-	c.scope.On(app.CommitEvent, c.commit)
+	c.ctx.Scope().On(app.CommitEvent, c.commit)
 	// build
 	if err = c.build(c.cache, "", buildConfigs); err != nil {
 		return err
 	}
-	if err = c.scope.Wait(); err != nil {
+	if err = c.ctx.Scope().Wait(); err != nil {
 		return err
 	}
 	for _, executor := range c.generatorExecutors {
@@ -94,7 +95,7 @@ func (c *Context) build(fs filesystem.Filespace, subPath string, buildConfigs []
 	if templatesExecutor, err = c.service.deps.TemplateService.TemplatesExecutor(); err != nil {
 		return err
 	}
-	if generatorExecutor, err = executor.NewGeneratorExecutor(c.scope, executor.SharedData{
+	if generatorExecutor, err = executor.NewGeneratorExecutor(c.ctx.Scope(), executor.SharedData{
 		AM:        c.appModel,
 		PlainData: c.data,
 		Properties: executor.GlobalProperties{
@@ -169,9 +170,9 @@ func (c *Context) runCommand(command Command) (err error) {
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	if err = cmd.Run(); err != nil {
-		return c.service.deps.Output.Printf("external app fail %v: %v %v", args, err, string(out.Bytes()))
+		return goaterr.Errorf("external app fail %v: %v %v", args, err, string(out.Bytes()))
 	}
-	c.service.deps.Output.Printf("%s", out.Bytes())
+	c.ctx.IO().Out().Printf("%s", out.Bytes())
 	return nil
 }
 
@@ -189,7 +190,7 @@ func (c *Context) buildModules(fs filesystem.Filespace, subPath string) (err err
 			buildConfigs []*config.Build
 		)
 		if !fs.IsExist(module.SourceDir) {
-			return c.service.deps.Output.Printf("builder.buildModules: Module '%s' is not exist", module.SourceDir)
+			return goaterr.Errorf("builder.buildModules: Module '%s' is not exist", module.SourceDir)
 		}
 		if err = fs.MkdirAll(module.SourceDir, 0766); err != nil {
 			return err

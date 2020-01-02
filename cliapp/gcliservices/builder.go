@@ -6,13 +6,8 @@ import (
 	"github.com/goatcms/goatcore/filesystem"
 )
 
-// BuildContext is data for builer
-type BuildContext interface {
-	Build(fs filesystem.Filespace) error
-}
-
 // BuilderService build project structure
 type BuilderService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Build, error)
-	NewContext(scope app.Scope, appData ApplicationData, properties, secrets map[string]string) BuildContext
+	Build(ctx app.IOContext, fs filesystem.Filespace, appData ApplicationData, properties, secrets map[string]string) (err error)
 }

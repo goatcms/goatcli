@@ -6,6 +6,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/repositories"
 )
@@ -30,7 +31,7 @@ type ClonerService interface {
 type PropertiesService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.Property, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
-	FillData(def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (bool, error)
+	FillData(ctx app.IOContext, def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (bool, error)
 	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
 }
 
@@ -38,7 +39,7 @@ type PropertiesService interface {
 type SecretsService interface {
 	ReadDefFromFS(fs filesystem.Filespace, properties map[string]string, data ApplicationData) ([]*config.Property, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
-	FillData(def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (bool, error)
+	FillData(ctx app.IOContext, def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (bool, error)
 	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error
 }
 
@@ -60,7 +61,7 @@ type DataService interface {
 	ReadDefFromFS(fs filesystem.Filespace) ([]*config.DataSet, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
 	WriteDataToFS(fs filesystem.Filespace, prefix string, data map[string]string) error
-	ConsoleReadData(def *config.DataSet) (map[string]string, error)
+	ConsoleReadData(ctx app.IOContext, def *config.DataSet) (map[string]string, error)
 }
 
 // TemplateService provide template api

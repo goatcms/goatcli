@@ -5,17 +5,19 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
+	"github.com/goatcms/goatcore/app"
 )
 
 func TesSecretsFillDataFile(t *testing.T) {
 	var (
+		mapp      app.App
 		err       error
 		service   gcliservices.SecretsService
 		data      = map[string]string{}
 		isChanged bool
 	)
 	t.Parallel()
-	if service, _, err = buildMockupApp("my_insert_value1\nmy_insert_value2"); err != nil {
+	if service, mapp, err = buildMockupApp("my_insert_value1\nmy_insert_value2"); err != nil {
 		t.Error(err)
 		return
 	}
@@ -32,7 +34,7 @@ func TesSecretsFillDataFile(t *testing.T) {
 			Min:  1,
 			Max:  22,
 		}}
-	if isChanged, err = service.FillData(propertiesDef, data, map[string]string{}, true); err != nil {
+	if isChanged, err = service.FillData(mapp.IOContext(), propertiesDef, data, map[string]string{}, true); err != nil {
 		t.Error(err)
 		return
 	}
@@ -52,6 +54,7 @@ func TesSecretsFillDataFile(t *testing.T) {
 
 func TestPropertieFillDataFileOmnit(t *testing.T) {
 	var (
+		mapp    app.App
 		err     error
 		service gcliservices.SecretsService
 		data    = map[string]string{
@@ -61,11 +64,11 @@ func TestPropertieFillDataFileOmnit(t *testing.T) {
 		isChanged bool
 	)
 	t.Parallel()
-	if service, _, err = buildMockupApp(""); err != nil {
+	if service, mapp, err = buildMockupApp(""); err != nil {
 		t.Error(err)
 		return
 	}
-	if isChanged, err = service.FillData([]*config.Property{
+	if isChanged, err = service.FillData(mapp.IOContext(), []*config.Property{
 		&config.Property{
 			Key:  "key1",
 			Type: "alnum",
