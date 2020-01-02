@@ -22,10 +22,8 @@ func TestServiceTemplateExecute(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	output := new(bytes.Buffer)
 	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(output),
+		Input: gio.NewInput(strings.NewReader("")),
 	})
 	if err != nil {
 		t.Error(err)
@@ -80,10 +78,8 @@ func TestServiceViewsExecute(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	output := new(bytes.Buffer)
 	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(output),
+		Input: gio.NewInput(strings.NewReader("")),
 	})
 	if err != nil {
 		t.Error(err)

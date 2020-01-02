@@ -1,7 +1,6 @@
 package builder
 
 import (
-	"bytes"
 	"strings"
 	"testing"
 
@@ -89,8 +88,7 @@ func TestCTXBuilderAfterBuild(t *testing.T) {
 	t.Parallel()
 	// prepare mockup application & data
 	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(new(bytes.Buffer)),
+		Input: gio.NewInput(strings.NewReader("")),
 	}); err != nil {
 		t.Error(err)
 		return

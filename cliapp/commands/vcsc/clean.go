@@ -9,21 +9,18 @@ import (
 )
 
 // RunClean run vcs:clean command. It remove path from ignored files foreach doeas't exist file
-func RunClean(a app.App, ctxScope app.Scope) (err error) {
+func RunClean(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			CurrentFS filesystem.Filespace `filespace:"current"`
-
-			VCSService services.VCSService `dependency:"VCSService"`
-			Input      app.Input           `dependency:"InputService"`
-			Output     app.Output          `dependency:"OutputService"`
+			CurrentFS  filesystem.Filespace `filespace:"current"`
+			VCSService services.VCSService  `dependency:"VCSService"`
 		}
 		vcsData services.VCSData
 		ignored = vcs.NewIgnoredFiles(true)
 	)
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
-		ctxScope.InjectTo(&deps))); err != nil {
+		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err
 	}
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
@@ -33,17 +30,16 @@ func RunClean(a app.App, ctxScope app.Scope) (err error) {
 		if deps.CurrentFS.IsFile(path) {
 			ignored.AddPath(path)
 		} else {
-			deps.Output.Printf(" Deleted from ignored: %s\n", path)
+			ctx.IO().Out().Printf(" Deleted from ignored: %s\n", path)
 		}
 	}
 	if len(ignored.All()) == len(vcsData.VCSIgnoredFiles().All()) {
-		deps.Output.Printf("ignored files are clean\n")
+		ctx.IO().Out().Printf("ignored files are clean\n")
 		return nil
 	}
 	vcsData = vcs.NewData(vcsData.VCSGeneratedFiles(), ignored)
 	if err = deps.VCSService.WriteDataToFS(deps.CurrentFS, vcsData); err != nil {
 		return err
 	}
-	deps.Output.Printf("cleaned\n")
-	return nil
+	return ctx.IO().Out().Printf("cleaned\n")
 }

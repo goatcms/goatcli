@@ -157,7 +157,7 @@ func (c *Context) runCommand(command Command) (err error) {
 		out  bytes.Buffer
 		args []string
 	)
-	if args, err = varutil.SplitArguments(command.CMD); err != nil {
+	if args, _, err = varutil.SplitArguments(command.CMD); err != nil {
 		return err
 	}
 	cwd := c.service.deps.CWD + command.Path

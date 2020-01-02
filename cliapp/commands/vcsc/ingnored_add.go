@@ -8,22 +8,18 @@ import (
 )
 
 // RunIgnoredAdd run vcs:ignored:add command
-func RunIgnoredAdd(a app.App, ctxScope app.Scope) (err error) {
+func RunIgnoredAdd(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			Path string `argument:"?$2" ,command:"?$2"`
-
-			CurrentFS filesystem.Filespace `filespace:"current"`
-
-			VCSService services.VCSService `dependency:"VCSService"`
-			Input      app.Input           `dependency:"InputService"`
-			Output     app.Output          `dependency:"OutputService"`
+			Path       string               `argument:"?$2" ,command:"?$2"`
+			CurrentFS  filesystem.Filespace `filespace:"current"`
+			VCSService services.VCSService  `dependency:"VCSService"`
 		}
 		vcsData services.VCSData
 	)
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
-		ctxScope.InjectTo(&deps))); err != nil {
+		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err
 	}
 	if deps.Path == "" {
@@ -36,6 +32,5 @@ func RunIgnoredAdd(a app.App, ctxScope app.Scope) (err error) {
 	if err = deps.VCSService.WriteDataToFS(deps.CurrentFS, vcsData); err != nil {
 		return err
 	}
-	deps.Output.Printf("Path added\n")
-	return nil
+	return ctx.IO().Out().Printf("Path added\n")
 }

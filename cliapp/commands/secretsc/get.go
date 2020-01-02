@@ -1,22 +1,19 @@
 package secretsc
 
 import (
-	"fmt"
-
 	"github.com/goatcms/goatcli/cliapp/services"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 // RunGetSecretValue run command return secret value
-func RunGetSecretValue(a app.App, ctxScope app.Scope) (err error) {
+func RunGetSecretValue(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
 			Key            string                  `command:"?$1"`
 			CurrentFS      filesystem.Filespace    `filespace:"current"`
 			SecretsService services.SecretsService `dependency:"SecretsService"`
-			Input          app.Input               `dependency:"InputService"`
-			Output         app.Output              `dependency:"OutputService"`
 		}
 		secretsData map[string]string
 		ok          bool
@@ -25,18 +22,17 @@ func RunGetSecretValue(a app.App, ctxScope app.Scope) (err error) {
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
 		return err
 	}
-	if err = ctxScope.InjectTo(&deps); err != nil {
+	if err = ctx.Scope().InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.Key == "" {
-		deps.Output.Printf(FirstKeyParameterIsRequired)
-		return fmt.Errorf(FirstKeyParameterIsRequired)
+		return goaterr.Errorf(FirstKeyParameterIsRequired)
 	}
 	if secretsData, err = deps.SecretsService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
 	if value, ok = secretsData[deps.Key]; !ok {
-		return fmt.Errorf("Unknow Value for %s key", deps.Key)
+		return goaterr.Errorf("Unknow Value for %s key", deps.Key)
 	}
-	return deps.Output.Printf(value)
+	return ctx.IO().Out().Printf(value)
 }

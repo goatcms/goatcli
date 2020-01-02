@@ -1,7 +1,6 @@
 package modules
 
 import (
-	"bytes"
 	"strings"
 	"testing"
 
@@ -19,10 +18,8 @@ func TestModulesFromFile(t *testing.T) {
 	var err error
 	t.Parallel()
 	// prepare mockup application & data
-	output := new(bytes.Buffer)
 	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("my_insert_value\n")),
-		Output: gio.NewOutput(output),
+		Input: gio.NewInput(strings.NewReader("my_insert_value\n")),
 	})
 	if err != nil {
 		t.Error(err)
@@ -59,10 +56,8 @@ func TestModulesDefaultEmpty(t *testing.T) {
 	var err error
 	t.Parallel()
 	// prepare mockup application & data
-	output := new(bytes.Buffer)
 	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(output),
+		Input: gio.NewInput(strings.NewReader("")),
 	})
 	if err != nil {
 		t.Error(err)

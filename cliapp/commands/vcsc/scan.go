@@ -12,15 +12,12 @@ import (
 )
 
 // RunScan run vcs:scan command. It is looking for changes in generated files and add it do ignore if required
-func RunScan(a app.App, ctxScope app.Scope) (err error) {
+func RunScan(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
 			CurrentFS       filesystem.Filespace `filespace:"current"`
 			InteractiveFlag string               `argument:"?interactive" ,command:"?interactive"`
-
-			VCSService services.VCSService `dependency:"VCSService"`
-			Input      app.Input           `dependency:"InputService"`
-			Output     app.Output          `dependency:"OutputService"`
+			VCSService      services.VCSService  `dependency:"VCSService"`
 		}
 		vcsData         services.VCSData
 		ignored         services.VCSIgnoredFiles
@@ -29,11 +26,11 @@ func RunScan(a app.App, ctxScope app.Scope) (err error) {
 	)
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
-		ctxScope.InjectTo(&deps))); err != nil {
+		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err
 	}
 	interactiveMode = strings.ToLower(deps.InteractiveFlag) != "false"
-	deps.Output.Printf("Scan generated files for changes...\n")
+	ctx.IO().Out().Printf("Scan generated files for changes...\n")
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
@@ -54,8 +51,8 @@ func RunScan(a app.App, ctxScope app.Scope) (err error) {
 			}
 			response := ""
 			for response != "y" && response != "n" {
-				deps.Output.Printf("File %s (generated at %s) was modified (at %s). Do you want persist it (by add to .goat/vcs/ignored)? (y/n)\n", row.Path, generatedTime, filespaceTime)
-				if response, err = deps.Input.ReadLine(); err != nil {
+				ctx.IO().Out().Printf("File %s (generated at %s) was modified (at %s). Do you want persist it (by add to .goat/vcs/ignored)? (y/n)\n", row.Path, generatedTime, filespaceTime)
+				if response, err = ctx.IO().In().ReadLine(); err != nil {
 					return err
 				}
 				response = strings.ToLower(response)
@@ -66,8 +63,5 @@ func RunScan(a app.App, ctxScope app.Scope) (err error) {
 			}
 		}
 	}
-	if err = deps.VCSService.WriteDataToFS(deps.CurrentFS, vcsData); err != nil {
-		return err
-	}
-	return nil
+	return deps.VCSService.WriteDataToFS(deps.CurrentFS, vcsData)
 }

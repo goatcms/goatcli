@@ -1,7 +1,6 @@
 package builder
 
 import (
-	"bytes"
 	"strings"
 	"testing"
 
@@ -35,15 +34,13 @@ const (
 
 func TestCTXBuilder(t *testing.T) {
 	var (
-		mapp app.App
+		mapp *mockupapp.App
 		err  error
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	output := new(bytes.Buffer)
 	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(output),
+		Input: gio.NewInput(strings.NewReader("")),
 	}); err != nil {
 		t.Error(err)
 		return
@@ -94,8 +91,9 @@ func TestCTXBuilder(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if !strings.Contains(output.String(), "TestOK") {
-		t.Errorf("expected TestOK in afterBuild command output and take '%s'", output.String())
+	outBuffer := mapp.OutputBuffer()
+	if !strings.Contains(outBuffer.String(), "TestOK") {
+		t.Errorf("expected TestOK in afterBuild command output and take '%s'", outBuffer.String())
 		return
 	}
 }

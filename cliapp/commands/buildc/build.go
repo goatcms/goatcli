@@ -15,21 +15,17 @@ import (
 )
 
 // RunBuild run build command
-func RunBuild(a app.App, ctxScope app.Scope) (err error) {
+func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			Interactive string `argument:"?interactive" ,command:"?interactive"`
-
-			CurrentFS filesystem.Filespace `filespace:"current"`
-
+			Interactive       string                     `argument:"?interactive" ,command:"?interactive"`
+			CurrentFS         filesystem.Filespace       `filespace:"current"`
 			VCSService        services.VCSService        `dependency:"VCSService"`
 			PropertiesService services.PropertiesService `dependency:"PropertiesService"`
 			SecretsService    services.SecretsService    `dependency:"SecretsService"`
 			BuilderService    services.BuilderService    `dependency:"BuilderService"`
 			ClonerService     services.ClonerService     `dependency:"ClonerService"`
 			DataService       services.DataService       `dependency:"DataService"`
-			Input             app.Input                  `dependency:"InputService"`
-			Output            app.Output                 `dependency:"OutputService"`
 		}
 		propertiesDef  []*config.Property
 		propertiesData map[string]string
@@ -41,12 +37,12 @@ func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 		fs             filesystem.Filespace
 		appData        services.ApplicationData
 	)
-	if err = vcsc.RunScan(a, ctxScope); err != nil {
+	if err = vcsc.RunScan(a, ctx); err != nil {
 		return nil
 	}
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
-		ctxScope.InjectTo(&deps))); err != nil {
+		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err
 	}
 	interactive = strings.ToLower(deps.Interactive) != "false"
@@ -90,28 +86,27 @@ func RunBuild(a app.App, ctxScope app.Scope) (err error) {
 		}
 	}
 	// Clone modules (if required)
-	deps.Output.Printf("start clone modules... ")
+	ctx.IO().Out().Printf("start clone modules... ")
 	propertiesResult := result.NewPropertiesResult(propertiesData)
 	if err = deps.ClonerService.CloneModules(fs, fs, propertiesResult); err != nil {
 		return err
 	}
-	deps.Output.Printf("cloned\n")
+	ctx.IO().Out().Printf("cloned\n")
 	// Build
-	deps.Output.Printf("start build... ")
-	buildContext := deps.BuilderService.NewContext(ctxScope, appData, propertiesData, secretsData)
+	ctx.IO().Out().Printf("start build... ")
+	buildContext := deps.BuilderService.NewContext(ctx.Scope(), appData, propertiesData, secretsData)
 	if err = buildContext.Build(fs); err != nil {
 		return err
 	}
-	if err = ctxScope.Wait(); err != nil {
+	if err = ctx.Scope().Wait(); err != nil {
 		return goaterr.ToErrors(goaterr.AppendError(nil,
 			err,
-			ctxScope.Trigger(app.RollbackEvent, nil)))
+			ctx.Scope().Trigger(app.RollbackEvent, nil)))
 	}
-	deps.Output.Printf("builded\n")
-	deps.Output.Printf("start commit... ")
-	if err = ctxScope.Trigger(app.CommitEvent, nil); err != nil {
+	ctx.IO().Out().Printf("builded\n")
+	ctx.IO().Out().Printf("start commit... ")
+	if err = ctx.Scope().Trigger(app.CommitEvent, nil); err != nil {
 		return err
 	}
-	deps.Output.Printf("commited\n")
-	return nil
+	return ctx.IO().Out().Printf("commited\n")
 }

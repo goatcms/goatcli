@@ -1,7 +1,6 @@
 package dependencies
 
 import (
-	"bytes"
 	"strings"
 	"testing"
 
@@ -16,14 +15,12 @@ import (
 func TestDependenciesFromFile(t *testing.T) {
 	t.Parallel()
 	var (
-		err    error
-		mapp   app.App
-		output = new(bytes.Buffer)
+		err  error
+		mapp app.App
 	)
 	// prepare mockup application & data
 	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("my_insert_value\n")),
-		Output: gio.NewOutput(output),
+		Input: gio.NewInput(strings.NewReader("my_insert_value\n")),
 	}); err != nil {
 		t.Error(err)
 		return
@@ -68,10 +65,8 @@ func TestDependenciesDefaultEmpty(t *testing.T) {
 	var err error
 	t.Parallel()
 	// prepare mockup application & data
-	output := new(bytes.Buffer)
 	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("")),
-		Output: gio.NewOutput(output),
+		Input: gio.NewInput(strings.NewReader("")),
 	})
 	if err != nil {
 		t.Error(err)

@@ -11,15 +11,13 @@ import (
 )
 
 // RunAdd run data:add command
-func RunAdd(a app.App, ctxScope app.Scope) (err error) {
+func RunAdd(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
 			TypeName    string               `command:"?$1"`
 			DataName    string               `command:"?$2"`
 			CurrentFS   filesystem.Filespace `filespace:"current"`
 			DataService services.DataService `dependency:"DataService"`
-			Input       app.Input            `dependency:"InputService"`
-			Output      app.Output           `dependency:"OutputService"`
 		}
 		defs    []*config.DataSet
 		def     *config.DataSet
@@ -28,7 +26,7 @@ func RunAdd(a app.App, ctxScope app.Scope) (err error) {
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
 		return err
 	}
-	if err = ctxScope.InjectTo(&deps); err != nil {
+	if err = ctx.Scope().InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.TypeName == "" {
@@ -62,6 +60,6 @@ func RunAdd(a app.App, ctxScope app.Scope) (err error) {
 	if err = deps.DataService.WriteDataToFS(deps.CurrentFS, prefix, datamap); err != nil {
 		return err
 	}
-	deps.Output.Printf("finish.")
+	ctx.IO().Out().Printf("finish.")
 	return nil
 }

@@ -13,10 +13,10 @@ import (
 )
 
 // Run run command in app.App context
-func Run(a app.App, ctxScope app.Scope) (err error) {
+func Run(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			Interactive string `argument:"?interactive",command:"?interactive"`
+			Interactive string `argument:"?interactive" ,command:"?interactive"`
 
 			RepositoryURL      string `command:"?$1"`
 			DestPath           string `command:"?$2"`
@@ -28,8 +28,6 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 			RepositoriesService services.RepositoriesService `dependency:"RepositoriesService"`
 			PropertiesService   services.PropertiesService   `dependency:"PropertiesService"`
 			CloneService        services.ClonerService       `dependency:"ClonerService"`
-			Input               app.Input                    `dependency:"InputService"`
-			Output              app.Output                   `dependency:"OutputService"`
 		}
 		repofs         filesystem.Filespace
 		propertiesDef  []*config.Property
@@ -41,7 +39,7 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
 		return err
 	}
-	if err = ctxScope.InjectTo(&deps); err != nil {
+	if err = ctx.Scope().InjectTo(&deps); err != nil {
 		return err
 	}
 	interactive = strings.ToLower(deps.Interactive) != "false"
@@ -82,6 +80,5 @@ func Run(a app.App, ctxScope app.Scope) (err error) {
 	if err = deps.CloneService.Clone(deps.RepositoryURL, version, destfs, propertiesResult); err != nil {
 		return err
 	}
-	deps.Output.Printf("cloned")
-	return nil
+	return ctx.IO().Out().Printf("cloned")
 }

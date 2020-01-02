@@ -6,9 +6,9 @@ import (
 )
 
 // RunRebuild run rebuild command
-func RunRebuild(a app.App, ctxScope app.Scope) (err error) {
-	if err = cleanc.RunCleanBuild(a, ctxScope); err != nil {
+func RunRebuild(a app.App, ctx app.IOContext) (err error) {
+	if err = cleanc.RunCleanBuild(a, ctx); err != nil {
 		return nil
 	}
-	return RunBuild(a, ctxScope)
+	return RunBuild(a, ctx)
 }

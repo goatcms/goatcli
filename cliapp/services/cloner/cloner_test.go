@@ -1,7 +1,6 @@
 package cloner
 
 import (
-	"bytes"
 	"strings"
 	"testing"
 
@@ -40,8 +39,7 @@ func TestModulesFromFile(t *testing.T) {
 	propertiesResult = buildPropertiesResult()
 	// new app
 	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader("  \t\n")),
-		Output: gio.NewOutput(new(bytes.Buffer)),
+		Input: gio.NewInput(strings.NewReader("  \t\n")),
 	}); err != nil {
 		t.Error(err)
 		return

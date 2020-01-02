@@ -5,31 +5,37 @@ import (
 	"os"
 
 	"github.com/goatcms/goatcli/cliapp"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/bootstrap"
-	"github.com/goatcms/goatcore/app/modules/terminal"
+	"github.com/goatcms/goatcore/app/goatapp"
+	"github.com/goatcms/goatcore/app/modules/terminalm"
 )
 
 func main() {
+	var (
+		gapp app.App
+		err  error
+		boot app.Bootstrap
+	)
 	errLogs := log.New(os.Stderr, "", 0)
-	app, err := cliapp.NewCLIApp(cliapp.AppName, cliapp.AppVersion)
-	if err != nil {
+	if gapp, err = goatapp.NewGoatApp(cliapp.AppName, cliapp.AppVersion, "./"); err != nil {
 		errLogs.Println(err)
 		return
 	}
-	bootstrap := bootstrap.NewBootstrap(app)
-	if err = bootstrap.Register(terminal.NewModule()); err != nil {
+	boot = bootstrap.NewBootstrap(gapp)
+	if err = boot.Register(terminalm.NewModule()); err != nil {
 		errLogs.Println(err)
 		return
 	}
-	if err = bootstrap.Register(cliapp.NewModule()); err != nil {
+	if err = boot.Register(cliapp.NewModule()); err != nil {
 		errLogs.Println(err)
 		return
 	}
-	if err := bootstrap.Init(); err != nil {
+	if err := boot.Init(); err != nil {
 		errLogs.Println(err)
 		return
 	}
-	if err := bootstrap.Run(); err != nil {
+	if err := boot.Run(); err != nil {
 		errLogs.Println(err)
 		return
 	}

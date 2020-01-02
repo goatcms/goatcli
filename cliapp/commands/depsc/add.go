@@ -11,14 +11,14 @@ import (
 )
 
 // RunAddDep run deps:add command
-func RunAddDep(a app.App, ctxScope app.Scope) (err error) {
+func RunAddDep(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
 			Path   string `command:"?$1"`
 			Repo   string `command:"?$2"`
 			Branch string `command:"?$3"`
 			Rev    string `command:"?$4"`
-			CWD    string `argument:"?cwd",command:"?cwd"`
+			CWD    string `argument:"?cwd" ,command:"?cwd"`
 
 			Dependencies services.DependenciesService `dependency:"DependenciesService"`
 		}
@@ -28,7 +28,7 @@ func RunAddDep(a app.App, ctxScope app.Scope) (err error) {
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
 		return err
 	}
-	if err = ctxScope.InjectTo(&deps); err != nil {
+	if err = ctx.Scope().InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.Path == "" {

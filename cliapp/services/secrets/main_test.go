@@ -1,7 +1,6 @@
 package secrets
 
 import (
-	"bytes"
 	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/services"
@@ -19,8 +18,7 @@ const (
 
 func buildMockupApp(input string) (p services.SecretsService, mapp app.App, err error) {
 	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input:  gio.NewInput(strings.NewReader(input)),
-		Output: gio.NewOutput(new(bytes.Buffer)),
+		Input: gio.NewInput(strings.NewReader(input)),
 	}); err != nil {
 		return nil, nil, err
 	}

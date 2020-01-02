@@ -9,23 +9,20 @@ import (
 )
 
 // RunCleanBuild run clean:build command
-func RunCleanBuild(a app.App, ctxScope app.Scope) (err error) {
+func RunCleanBuild(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			CurrentFS filesystem.Filespace `filespace:"current"`
-
-			VCSService services.VCSService `dependency:"VCSService"`
-			Input      app.Input           `dependency:"InputService"`
-			Output     app.Output          `dependency:"OutputService"`
+			CurrentFS  filesystem.Filespace `filespace:"current"`
+			VCSService services.VCSService  `dependency:"VCSService"`
 		}
 		vcsData services.VCSData
 	)
-	if err = vcsc.RunScan(a, ctxScope); err != nil {
+	if err = vcsc.RunScan(a, ctx); err != nil {
 		return nil
 	}
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
-		ctxScope.InjectTo(&deps))); err != nil {
+		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err
 	}
 	// load data
@@ -41,6 +38,5 @@ func RunCleanBuild(a app.App, ctxScope app.Scope) (err error) {
 			return err
 		}
 	}
-	deps.Output.Printf("cleaned\n")
-	return nil
+	return ctx.IO().Out().Printf("cleaned\n")
 }

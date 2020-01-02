@@ -7,22 +7,20 @@ import (
 )
 
 // RunAddGOImportsDep run deps:add:go:imports command
-func RunAddGOImportsDep(a app.App, ctxScope app.Scope) (err error) {
+func RunAddGOImportsDep(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			CWD    string `argument:"?cwd",command:"?cwd"`
-			LogLvl string `argument:"?loglvl",command:"?loglvl"`
+			CWD    string `argument:"?cwd" ,command:"?cwd"`
+			LogLvl string `argument:"?loglvl" ,command:"?loglvl"`
 
 			Dependencies services.DependenciesService `dependency:"DependenciesService"`
-			Input        app.Input                    `dependency:"InputService"`
-			Output       app.Output                   `dependency:"OutputService"`
 		}
 		importer *godependencies.Importer
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
 		return err
 	}
-	if err = ctxScope.InjectTo(&deps); err != nil {
+	if err = ctx.Scope().InjectTo(&deps); err != nil {
 		return err
 	}
 	if deps.CWD == "" {
@@ -30,10 +28,10 @@ func RunAddGOImportsDep(a app.App, ctxScope app.Scope) (err error) {
 	}
 	if importer, err = godependencies.NewImporter(deps.CWD, godependencies.ImporterLogs{
 		GOPath: func(path string) {
-			deps.Output.Printf("GOPATH: %s\n", path)
+			ctx.IO().Out().Printf("GOPATH: %s\n", path)
 		},
 		OnNewSource: func(path string) {
-			deps.Output.Printf("New source: %s\n", path)
+			ctx.IO().Out().Printf("New source: %s\n", path)
 		},
 	}, godependencies.ImporterOptions{
 		MaxDep:  godependencies.MaxImportDepth,

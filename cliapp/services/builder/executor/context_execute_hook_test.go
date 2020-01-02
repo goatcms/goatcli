@@ -1,7 +1,6 @@
 package executor
 
 import (
-	"bytes"
 	"strings"
 	"testing"
 
@@ -46,8 +45,7 @@ func TestContextExecute(t *testing.T) {
 	for ti := 0; ti < workers.AsyncTestReapeat; ti++ {
 		// prepare mockup application
 		if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-			Input:  gio.NewInput(strings.NewReader("")),
-			Output: gio.NewOutput(new(bytes.Buffer)),
+			Input: gio.NewInput(strings.NewReader("")),
 		}); err != nil {
 			t.Error(err)
 			return

@@ -8,27 +8,24 @@ import (
 )
 
 // RunIgnoredList run vcs:ignored:list command
-func RunIgnoredList(a app.App, ctxScope app.Scope) (err error) {
+func RunIgnoredList(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			CurrentFS filesystem.Filespace `filespace:"current"`
-
-			VCSService services.VCSService `dependency:"VCSService"`
-			Input      app.Input           `dependency:"InputService"`
-			Output     app.Output          `dependency:"OutputService"`
+			CurrentFS  filesystem.Filespace `filespace:"current"`
+			VCSService services.VCSService  `dependency:"VCSService"`
 		}
 		vcsData services.VCSData
 	)
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
-		ctxScope.InjectTo(&deps))); err != nil {
+		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err
 	}
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
 	for _, row := range vcsData.VCSIgnoredFiles().All() {
-		deps.Output.Printf(" %s\n", row)
+		ctx.IO().Out().Printf(" %s\n", row)
 	}
 	return nil
 }
