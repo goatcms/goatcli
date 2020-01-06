@@ -19,6 +19,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/modules"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/properties"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/repositories"
+	"github.com/goatcms/goatcli/cliapp/gcliservices/scripts"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/secrets"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/amtf"
@@ -57,6 +58,7 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 		repositories.RegisterDependencies(dp),
 		template.RegisterDependencies(dp),
 		vcs.RegisterDependencies(dp),
+		scripts.RegisterDependencies(dp),
 		gcliio.RegisterDependencies(dp)))
 }
 
