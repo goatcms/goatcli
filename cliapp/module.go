@@ -8,12 +8,14 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gclicommands/depsc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/initc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/propertiesc"
+	"github.com/goatcms/goatcli/cliapp/gclicommands/scriptsc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/secretsc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/vcsc"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/builder"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/cloner"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/data"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/dependencies"
+	"github.com/goatcms/goatcli/cliapp/gcliservices/gcliio"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/modules"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/properties"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/repositories"
@@ -54,7 +56,8 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 		secrets.RegisterDependencies(dp),
 		repositories.RegisterDependencies(dp),
 		template.RegisterDependencies(dp),
-		vcs.RegisterDependencies(dp)))
+		vcs.RegisterDependencies(dp),
+		gcliio.RegisterDependencies(dp)))
 }
 
 func (m *Module) registerCommands(a app.App) error {
@@ -80,6 +83,7 @@ func (m *Module) registerCommands(a app.App) error {
 		app.RegisterCommand(a, "vcs:ignored:remove", vcsc.RunIgnoredRemove, commands.VCSIgnoredRemove),
 		app.RegisterCommand(a, "vcs:ignored:list", vcsc.RunIgnoredList, commands.VCSIgnoredList),
 		app.RegisterCommand(a, "vcs:generated:list", vcsc.RunGeneratedList, commands.VCSGeneratedList),
+		app.RegisterCommand(a, "scripts:run", scriptsc.RunScript, commands.ScriptsRun),
 		app.RegisterArgument(a, "cwd", commands.CWDArg),
 	))
 }

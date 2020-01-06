@@ -1,16 +1,11 @@
 package buildc
 
 import (
-	"strings"
-
-	"github.com/goatcms/goatcli/cliapp/common/am"
-	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/prevents"
 	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/vcsc"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -18,24 +13,15 @@ import (
 func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			Interactive       string                         `argument:"?interactive" ,command:"?interactive"`
-			CurrentFS         filesystem.Filespace           `filespace:"current"`
-			VCSService        gcliservices.VCSService        `dependency:"VCSService"`
-			PropertiesService gcliservices.PropertiesService `dependency:"PropertiesService"`
-			SecretsService    gcliservices.SecretsService    `dependency:"SecretsService"`
-			BuilderService    gcliservices.BuilderService    `dependency:"BuilderService"`
-			ClonerService     gcliservices.ClonerService     `dependency:"ClonerService"`
-			DataService       gcliservices.DataService       `dependency:"DataService"`
+			Interactive    string                      `argument:"?interactive" ,command:"?interactive"`
+			BuilderService gcliservices.BuilderService `dependency:"BuilderService"`
+			ClonerService  gcliservices.ClonerService  `dependency:"ClonerService"`
+			GCLIInputs     gcliservices.GCLIInputs     `dependency:"GCLIInputs"`
 		}
-		propertiesDef  []*config.Property
 		propertiesData map[string]string
-		secretsDef     []*config.Property
 		secretsData    map[string]string
-		isChanged      bool
-		data           map[string]string
-		interactive    bool
-		fs             filesystem.Filespace
 		appData        gcliservices.ApplicationData
+		fs             = ctx.IO().CWD()
 	)
 	if err = vcsc.RunScan(a, ctx); err != nil {
 		return nil
@@ -45,45 +31,11 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err
 	}
-	interactive = strings.ToLower(deps.Interactive) != "false"
-	fs = deps.CurrentFS
 	if err = prevents.RequireGoatProject(fs); err != nil {
 		return err
 	}
-	// load properties
-	if propertiesDef, err = deps.PropertiesService.ReadDefFromFS(fs); err != nil {
+	if propertiesData, secretsData, appData, err = deps.GCLIInputs.Inputs(ctx); err != nil {
 		return err
-	}
-	if propertiesData, err = deps.PropertiesService.ReadDataFromFS(fs); err != nil {
-		return err
-	}
-	if isChanged, err = deps.PropertiesService.FillData(ctx, propertiesDef, propertiesData, map[string]string{}, interactive); err != nil {
-		return err
-	}
-	if isChanged {
-		if err = deps.PropertiesService.WriteDataToFS(fs, propertiesData); err != nil {
-			return err
-		}
-	}
-	// load data
-	if data, err = deps.DataService.ReadDataFromFS(fs); err != nil {
-		return err
-	}
-	appData = am.NewApplicationData(data)
-	// load secrets
-	if secretsDef, err = deps.SecretsService.ReadDefFromFS(fs, propertiesData, appData); err != nil {
-		return err
-	}
-	if secretsData, err = deps.SecretsService.ReadDataFromFS(fs); err != nil {
-		return err
-	}
-	if isChanged, err = deps.SecretsService.FillData(ctx, secretsDef, secretsData, map[string]string{}, interactive); err != nil {
-		return err
-	}
-	if isChanged {
-		if err = deps.SecretsService.WriteDataToFS(fs, secretsData); err != nil {
-			return err
-		}
 	}
 	// Clone modules (if required)
 	ctx.IO().Out().Printf("start clone modules... ")
