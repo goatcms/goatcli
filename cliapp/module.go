@@ -59,7 +59,8 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 		template.RegisterDependencies(dp),
 		vcs.RegisterDependencies(dp),
 		scripts.RegisterDependencies(dp),
-		gcliio.RegisterDependencies(dp)))
+		gcliio.RegisterDependencies(dp),
+		app.RegisterHealthChecker(a, "git", GitHealthChecker)))
 }
 
 func (m *Module) registerCommands(a app.App) error {
