@@ -87,7 +87,7 @@ func (p *Secrets) readDefFromFTemplate(fs filesystem.Filespace, properties map[s
 	var (
 		templateExecutor gcliservices.TemplateExecutor
 		secretsExecutor  *executor.SecretsExecutor
-		executorScope    = scope.NewScope("readDefFromFTemplate")
+		executorScope    = scope.NewScope(scope.Params{})
 	)
 	if templateExecutor, err = p.deps.TemplateService.TemplateExecutor(".goat/secrets.def"); err != nil {
 		return nil, err

@@ -39,7 +39,7 @@ func TestContextExecute(t *testing.T) {
 		result            string
 		templatesExecutor gcliservices.TemplatesExecutor
 		generatorExecutor *GeneratorExecutor
-		generatorScope    = scope.NewScope("generator")
+		generatorScope    = scope.NewScope(scope.Params{})
 		err               error
 	)
 	for ti := 0; ti < workers.AsyncTestReapeat; ti++ {

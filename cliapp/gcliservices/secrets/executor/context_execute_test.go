@@ -26,7 +26,7 @@ func TestContextExecute(t *testing.T) {
 		fs               filesystem.Filespace
 		templateExecutor gcliservices.TemplateExecutor
 		secretsExecutor  *SecretsExecutor
-		executorScope    = scope.NewScope("generator")
+		executorScope    = scope.NewScope(scope.Params{})
 		err              error
 		secrets          []*config.Property
 	)

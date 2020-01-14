@@ -47,7 +47,7 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 
 // Build build filesystem in context
 func (s *Service) Build(ctx app.IOContext, fs filesystem.Filespace, appData gcliservices.ApplicationData, properties, secrets map[string]string) (err error) {
-	childIOCtx := gio.NewChildIOContext(ctx, nil, nil, nil, nil)
+	childIOCtx := gio.NewChildIOContext(ctx, gio.IOContextParams{})
 	defer childIOCtx.Scope().Close()
 	buildContext := &Context{
 		ctx:        childIOCtx,

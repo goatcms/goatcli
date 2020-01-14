@@ -60,7 +60,11 @@ func (runner *Runner) Run(ctx app.IOContext, fs filesystem.Filespace, scriptName
 	}); err != nil {
 		return err
 	}
-	childCtx := gio.NewChildIOContext(ctx, gio.NewInput(buffer), nil, nil, nil)
+	childCtx := gio.NewChildIOContext(ctx, gio.IOContextParams{
+		IO: gio.IOParams{
+			In: gio.NewInput(buffer),
+		},
+	})
 	defer childCtx.Scope().Close()
 	return runner.deps.Terminal.RunLoop(childCtx)
 }

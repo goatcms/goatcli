@@ -35,7 +35,7 @@ func renderFile(fs filesystem.Filespace, deps RenderFileDeps, data, properties, 
 
 func newEmptyIOContext() (ctx app.IOContext, err error) {
 	var (
-		scp = scope.NewScope("")
+		scp = scope.NewScope(scope.Params{})
 		io  app.IO
 		cwd filesystem.Filespace
 		in  = gio.NewInput(new(bytes.Buffer))
@@ -44,6 +44,11 @@ func newEmptyIOContext() (ctx app.IOContext, err error) {
 	if cwd, err = memfs.NewFilespace(); err != nil {
 		return nil, err
 	}
-	io = gio.NewIO(in, out, out, cwd)
+	io = gio.NewIO(gio.IOParams{
+		In:  in,
+		Out: out,
+		Err: out,
+		CWD: cwd,
+	})
 	return gio.NewIOContext(scp, io), nil
 }

@@ -6,6 +6,8 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gclicommands/vcsc"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
+	"github.com/goatcms/goatcore/app/gio"
+	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -21,14 +23,22 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 		propertiesData map[string]string
 		secretsData    map[string]string
 		appData        gcliservices.ApplicationData
-		fs             = ctx.IO().CWD()
+		scope          app.Scope
+		childCtx       app.IOContext
+		out            app.Output
+		fs             filesystem.Filespace
 	)
+	childCtx = gio.NewChildIOContext(ctx, gio.IOContextParams{})
+	defer childCtx.Scope().Close()
+	scope = childCtx.Scope()
+	out = childCtx.IO().Out()
+	fs = childCtx.IO().CWD()
 	if err = vcsc.RunScan(a, ctx); err != nil {
-		return nil
+		return err
 	}
 	if err = goaterr.ToErrors(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
-		ctx.Scope().InjectTo(&deps))); err != nil {
+		scope.InjectTo(&deps))); err != nil {
 		return err
 	}
 	if err = prevents.RequireGoatProject(fs); err != nil {
@@ -38,26 +48,26 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 		return err
 	}
 	// Clone modules (if required)
-	ctx.IO().Out().Printf("start clone modules... ")
+	out.Printf("start clone modules... ")
 	propertiesResult := result.NewPropertiesResult(propertiesData)
 	if err = deps.ClonerService.CloneModules(fs, fs, propertiesResult); err != nil {
 		return err
 	}
-	ctx.IO().Out().Printf("cloned\n")
+	out.Printf("cloned\n")
 	// Build
-	ctx.IO().Out().Printf("start build... ")
+	out.Printf("start build... ")
 	if err = deps.BuilderService.Build(ctx, fs, appData, propertiesData, secretsData); err != nil {
 		return err
 	}
-	if err = ctx.Scope().Wait(); err != nil {
+	if err = scope.Wait(); err != nil {
 		return goaterr.ToErrors(goaterr.AppendError(nil,
 			err,
-			ctx.Scope().Trigger(app.RollbackEvent, nil)))
+			scope.Trigger(app.RollbackEvent, nil)))
 	}
-	ctx.IO().Out().Printf("builded\n")
-	ctx.IO().Out().Printf("start commit... ")
-	if err = ctx.Scope().Trigger(app.CommitEvent, nil); err != nil {
+	out.Printf("builded\n")
+	out.Printf("start commit... ")
+	if err = scope.Trigger(app.CommitEvent, nil); err != nil {
 		return err
 	}
-	return ctx.IO().Out().Printf("commited\n")
+	return out.Printf("commited\n")
 }
