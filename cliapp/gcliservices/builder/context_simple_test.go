@@ -51,7 +51,7 @@ func TestCTXBuilderAM(t *testing.T) {
 		return
 	}
 	fs := mapp.RootFilespace()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXBuilderLayout), 0766),
 		fs.WriteFile(".goat/build/templates/names/main.ctrl", []byte(testCTXBuilderTemplate), 0766),
 		fs.WriteFile(".goat/build.def.json", []byte(testCTXBuilderConfig), 0766))); err != nil {
@@ -59,7 +59,7 @@ func TestCTXBuilderAM(t *testing.T) {
 		return
 	}
 	dp := mapp.DependencyProvider()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		RegisterDependencies(dp),
 		modules.RegisterDependencies(dp),
 		dependencies.RegisterDependencies(dp),

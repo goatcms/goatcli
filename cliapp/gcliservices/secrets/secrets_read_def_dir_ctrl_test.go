@@ -42,7 +42,7 @@ func TestDataDefFromCtrl(t *testing.T) {
 		return
 	}
 	dp := mapp.DependencyProvider()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		RegisterDependencies(dp),
 		template.RegisterDependencies(mapp.DependencyProvider()),
 		simpletf.RegisterFunctions(dp),

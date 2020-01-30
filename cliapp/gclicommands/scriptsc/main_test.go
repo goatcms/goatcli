@@ -22,7 +22,7 @@ func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper a
 	}
 	bootstraper = bootstrap.NewBootstrap(mapp)
 	dp := mapp.DependencyProvider()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		bootstraper.Register(terminalm.NewModule()),
 		bootstraper.Register(commonm.NewModule()),
 		gcliio.RegisterDependencies(dp),

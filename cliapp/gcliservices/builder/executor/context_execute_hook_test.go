@@ -51,7 +51,7 @@ func TestContextExecute(t *testing.T) {
 			return
 		}
 		fs = mapp.RootFilespace()
-		if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		if err = goaterr.ToError(goaterr.AppendError(nil,
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/master.ctrl", []byte(masterHook), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/testf.tmpl", []byte(testfHook), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/hook/testHook/git/overlay.tmpl", []byte(overlayHook), filesystem.DefaultUnixFileMode),

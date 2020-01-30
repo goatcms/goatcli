@@ -21,7 +21,7 @@ func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper a
 	}
 	dp := mapp.DependencyProvider()
 	bootstraper = bootstrap.NewBootstrap(mapp)
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		bootstraper.Register(terminalm.NewModule()),
 		bootstraper.Register(commonm.NewModule()),
 		RegisterDependencies(dp),

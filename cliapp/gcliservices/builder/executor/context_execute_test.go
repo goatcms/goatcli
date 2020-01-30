@@ -52,7 +52,7 @@ func TestContextExecuteHook(t *testing.T) {
 			return
 		}
 		fs = mapp.RootFilespace()
-		if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		if err = goaterr.ToError(goaterr.AppendError(nil,
 			fs.WriteFile(".goat/build/templates/testTemplate/master.tmpl", []byte(master), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/testTemplate/testf.tmpl", []byte(testf), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/testTemplate/overlay.tmpl", []byte(overlay), filesystem.DefaultUnixFileMode),

@@ -74,10 +74,7 @@ func (cloner *Cloner) Clone(repoURL string, verion repositories.Version, destfs 
 	}, nil)
 	loop.Run("")
 	loop.Wait()
-	if len(loop.Errors()) != 0 {
-		return goaterr.NewErrors(loop.Errors())
-	}
-	return err
+	return goaterr.ToError(loop.Errors())
 }
 
 // CloneModules clone project modules

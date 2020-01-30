@@ -19,7 +19,7 @@ func RunInit(a app.App, ctx app.IOContext) (err error) {
 	if deps.CurrentFS.IsDir(".goat") {
 		return ctx.IO().Err().Printf("already inited")
 	}
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		deps.CurrentFS.MkdirAll(".goat", filesystem.DefaultUnixDirMode),
 		deps.CurrentFS.WriteFile(".goat/build.def.json", []byte(InitBildDefJSON), filesystem.DefaultUnixFileMode),
 		deps.CurrentFS.WriteFile(".goat/build/helpers/main.tmpl", []byte(InitMainBuildHelper), filesystem.DefaultUnixFileMode),

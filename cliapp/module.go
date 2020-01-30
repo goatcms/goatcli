@@ -47,7 +47,7 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 	}
 	// services
 	dp := a.DependencyProvider()
-	return goaterr.ToErrors(goaterr.AppendError(nil,
+	return goaterr.ToError(goaterr.AppendError(nil,
 		builder.RegisterDependencies(dp),
 		cloner.RegisterDependencies(dp),
 		data.RegisterDependencies(dp),
@@ -64,7 +64,7 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 }
 
 func (m *Module) registerCommands(a app.App) error {
-	return goaterr.ToErrors(goaterr.AppendError(nil,
+	return goaterr.ToError(goaterr.AppendError(nil,
 		app.RegisterCommand(a, "clone", clonec.Run, commands.Clone),
 		app.RegisterCommand(a, "init", initc.RunInit, commands.Init),
 		app.RegisterCommand(a, "build", buildc.RunBuild, commands.Build),
@@ -94,7 +94,7 @@ func (m *Module) registerCommands(a app.App) error {
 // InitDependencies is init callback to inject dependencies inside module
 func (m *Module) InitDependencies(a app.App) (err error) {
 	dp := a.DependencyProvider()
-	return goaterr.ToErrors(goaterr.AppendError(nil,
+	return goaterr.ToError(goaterr.AppendError(nil,
 		amtf.RegisterFunctions(dp),
 		simpletf.RegisterFunctions(dp),
 	))

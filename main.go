@@ -27,7 +27,7 @@ func main() {
 	}
 	boot = bootstrap.NewBootstrap(gapp)
 
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		boot.Register(terminalm.NewModule()),
 		boot.Register(commonm.NewModule()),
 		boot.Register(pipelinem.NewModule()),

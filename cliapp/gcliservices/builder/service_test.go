@@ -49,7 +49,7 @@ func TestBuilder(t *testing.T) {
 		return
 	}
 	rootFS := mapp.RootFilespace()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		rootFS.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testBuilderLayout), 0766),
 		rootFS.WriteFile(".goat/build/templates/names/main.ctrl", []byte(testBuilderTemplate), 0766),
 		rootFS.WriteFile(".goat/build.def.json", []byte(testBuilderConfig), 0766))); err != nil {
@@ -57,7 +57,7 @@ func TestBuilder(t *testing.T) {
 		return
 	}
 	dp := mapp.DependencyProvider()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		RegisterDependencies(dp),
 		modules.RegisterDependencies(dp),
 		dependencies.RegisterDependencies(dp),

@@ -36,7 +36,7 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	if err = vcsc.RunScan(a, ctx); err != nil {
 		return err
 	}
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
 		scope.InjectTo(&deps))); err != nil {
 		return err
@@ -60,7 +60,7 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 		return err
 	}
 	if err = scope.Wait(); err != nil {
-		return goaterr.ToErrors(goaterr.AppendError(nil,
+		return goaterr.ToError(goaterr.AppendError(nil,
 			err,
 			scope.Trigger(app.RollbackEvent, nil)))
 	}

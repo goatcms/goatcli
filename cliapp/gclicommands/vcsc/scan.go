@@ -24,7 +24,7 @@ func RunScan(a app.App, ctx app.IOContext) (err error) {
 		interactiveMode bool
 		info            os.FileInfo
 	)
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
 		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err

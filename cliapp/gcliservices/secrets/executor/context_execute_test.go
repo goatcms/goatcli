@@ -39,7 +39,7 @@ func TestContextExecute(t *testing.T) {
 			return
 		}
 		fs = mapp.RootFilespace()
-		if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		if err = goaterr.ToError(goaterr.AppendError(nil,
 			fs.WriteFile(".goat/secrets.def/testf.ctrl", []byte(`
 				{{- $ctx.AddSecret (dict "Key" "Key" "Type" "Type") -}}
 			`), filesystem.DefaultUnixFileMode),

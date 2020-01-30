@@ -18,7 +18,7 @@ func RunClean(a app.App, ctx app.IOContext) (err error) {
 		vcsData gcliservices.VCSData
 		ignored = vcs.NewIgnoredFiles(true)
 	)
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
 		ctx.Scope().InjectTo(&deps))); err != nil {
 		return err

@@ -57,7 +57,7 @@ func TestContextExec(t *testing.T) {
 			return
 		}
 		fs = mapp.RootFilespace()
-		if err = goaterr.ToErrors(goaterr.AppendError(nil,
+		if err = goaterr.ToError(goaterr.AppendError(nil,
 			fs.WriteFile(".goat/build/templates/testTemplate/master.tmpl", []byte(masterExec), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/testTemplate/testf.tmpl", []byte(testfExec), filesystem.DefaultUnixFileMode),
 			templates.RegisterDependencies(mapp.DependencyProvider()),

@@ -45,7 +45,7 @@ func TestCTXHook(t *testing.T) {
 		return
 	}
 	fs := mapp.RootFilespace()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXHookLayout), 0766),
 		fs.WriteFile(".goat/build/templates/hook/vcs/git/main.ctrl", []byte(testCTXHookTemplate), 0766),
 		fs.WriteFile(".goat/build.def.json", []byte(testCTXHookConfig), 0766))); err != nil {
@@ -53,7 +53,7 @@ func TestCTXHook(t *testing.T) {
 		return
 	}
 	dp := mapp.DependencyProvider()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		RegisterDependencies(dp),
 		modules.RegisterDependencies(dp),
 		dependencies.RegisterDependencies(dp),

@@ -24,7 +24,7 @@ func TestPipRunWaitStory(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = goaterr.ToErrors(goaterr.AppendError(nil, app.RegisterCommand(mapp, "testCommand", func(a app.App, ctx app.IOContext) (err error) {
+	if err = goaterr.ToError(goaterr.AppendError(nil, app.RegisterCommand(mapp, "testCommand", func(a app.App, ctx app.IOContext) (err error) {
 		time.Sleep(10 * time.Millisecond)
 		return ctx.IO().Out().Printf("test_output")
 	}, ""))); err != nil {

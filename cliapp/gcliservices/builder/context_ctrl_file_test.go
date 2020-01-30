@@ -47,7 +47,7 @@ func TestOnceFile(t *testing.T) {
 		return
 	}
 	fs := mapp.RootFilespace()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/templates/names/file.txt.tmpl", []byte(tesCtrlFileTemplate), 0766),
 		fs.WriteFile(".goat/build/templates/names/main.ctrl", []byte(tesCtrlFile), 0766),
 		fs.WriteFile(".goat/build.def.json", []byte(tesCtrlFileConfig), 0766))); err != nil {
@@ -55,7 +55,7 @@ func TestOnceFile(t *testing.T) {
 		return
 	}
 	dp := mapp.DependencyProvider()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		RegisterDependencies(dp),
 		modules.RegisterDependencies(dp),
 		dependencies.RegisterDependencies(dp),

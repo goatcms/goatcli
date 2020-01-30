@@ -7,7 +7,7 @@ import (
 
 // RegisterDependencies is init callback to register module dependencies
 func RegisterDependencies(dp dependency.Provider) (err error) {
-	return goaterr.ToErrors(goaterr.AppendError(nil,
+	return goaterr.ToError(goaterr.AppendError(nil,
 		dp.AddDefaultFactory("TemplateAssetsProvider", AssetsProviderFactory),
 		dp.AddDefaultFactory("TemplateConfig", ConfigFactory),
 		dp.AddDefaultFactory("TemplateService", ProviderFactory),

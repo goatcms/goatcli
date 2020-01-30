@@ -24,7 +24,7 @@ func TestPipRunWaitStory(t *testing.T) {
 		return
 	}
 	fs := mapp.RootFilespace()
-	if err = goaterr.ToErrors(goaterr.AppendError(nil,
+	if err = goaterr.ToError(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(`{{- define "out/file.txt"}}
 			{{- $ctx := .}}
 			expected content
