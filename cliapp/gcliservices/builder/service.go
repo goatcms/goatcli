@@ -7,6 +7,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
+	"github.com/goatcms/goatcore/app/scope"
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 )
@@ -47,7 +48,13 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 
 // Build build filesystem in context
 func (s *Service) Build(ctx app.IOContext, fs filesystem.Filespace, appData gcliservices.ApplicationData, properties, secrets map[string]string) (err error) {
-	childIOCtx := gio.NewChildIOContext(ctx, gio.IOContextParams{})
+	parentScope := ctx.Scope()
+	childIOCtx := gio.NewChildIOContext(ctx, gio.ChildIOContextParams{
+		Scope: scope.ChildParams{
+			DataScope:  parentScope,
+			EventScope: parentScope,
+		},
+	})
 	defer childIOCtx.Scope().Close()
 	buildContext := &Context{
 		ctx:        childIOCtx,

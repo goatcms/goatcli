@@ -28,7 +28,7 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 		out            app.Output
 		fs             filesystem.Filespace
 	)
-	childCtx = gio.NewChildIOContext(ctx, gio.IOContextParams{})
+	childCtx = gio.NewChildIOContext(ctx, gio.ChildIOContextParams{})
 	defer childCtx.Scope().Close()
 	scope = childCtx.Scope()
 	out = childCtx.IO().Out()

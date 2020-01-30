@@ -7,6 +7,7 @@ import (
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/modules"
+	"github.com/goatcms/goatcore/app/scope"
 	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
@@ -60,7 +61,12 @@ func (runner *Runner) Run(ctx app.IOContext, fs filesystem.Filespace, scriptName
 	}); err != nil {
 		return err
 	}
-	childCtx := gio.NewChildIOContext(ctx, gio.IOContextParams{
+	parentScope := ctx.Scope()
+	childCtx := gio.NewChildIOContext(ctx, gio.ChildIOContextParams{
+		Scope: scope.ChildParams{
+			DataScope:  parentScope,
+			EventScope: parentScope,
+		},
 		IO: gio.IOParams{
 			In: gio.NewInput(buffer),
 		},
