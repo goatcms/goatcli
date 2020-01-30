@@ -48,7 +48,7 @@ func FSDepImports(sourcefs filesystem.Filespace) (imports []string, err error) {
 	loop.Run("")
 	loop.Wait()
 	if len(loop.Errors()) != 0 {
-		return nil, goaterr.NewErrorCollection(loop.Errors())
+		return nil, goaterr.ToError(loop.Errors())
 	}
 	return imports, nil
 }
