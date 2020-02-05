@@ -39,7 +39,7 @@ Run the single command by **goatcli command_name** or open terminal by **goatcli
 * properties:get - Display a property
 * properties:set - Add or update a property with a specified key
 
-## Secrets
+### Secrets
 * secrets:get - display a secret by key
 * secrets:set - add or update a secret
 
