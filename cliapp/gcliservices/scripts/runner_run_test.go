@@ -44,7 +44,13 @@ func TestPipRunWaitStory(t *testing.T) {
 		return
 	}
 	appData := am.NewApplicationData(map[string]string{})
-	if err = deps.ScriptsRunner.Run(mapp.IOContext(), fs, "scriptName", map[string]string{}, map[string]string{}, appData); err != nil {
+	if err = deps.ScriptsRunner.RunByName(mapp.IOContext(), gcliservices.ScriptsRunnerParams{
+		FS:         fs,
+		ScriptName: "scriptName",
+		Properties: map[string]string{},
+		Secrets:    map[string]string{},
+		Data:       appData,
+	}); err != nil {
 		t.Error(err)
 		return
 	}

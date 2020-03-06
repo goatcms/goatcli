@@ -3,7 +3,8 @@ package scripts
 import "regexp"
 
 const (
-	scriptsBasePath = ".goat/scripts/"
+	scriptsBasePath    = ".goat/scripts/"
+	historyInstanceKey = "__scriptHistory"
 )
 
 var (

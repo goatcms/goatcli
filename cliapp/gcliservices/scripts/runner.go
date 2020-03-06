@@ -2,6 +2,7 @@ package scripts
 
 import (
 	"bytes"
+	"sync"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
@@ -9,7 +10,6 @@ import (
 	"github.com/goatcms/goatcore/app/modules"
 	"github.com/goatcms/goatcore/app/scope"
 	"github.com/goatcms/goatcore/dependency"
-	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -20,27 +20,31 @@ type Runner struct {
 		Template gcliservices.TemplateService `dependency:"TemplateService"`
 		Terminal modules.Terminal             `dependency:"TerminalService"`
 	}
+	runned   map[string]bool
+	runnedMU sync.RWMutex
 }
 
 // RunnerFactory create new Runner instance
 func RunnerFactory(dp dependency.Provider) (result interface{}, err error) {
-	r := &Runner{}
+	r := &Runner{
+		runned: make(map[string]bool),
+	}
 	if err = dp.InjectTo(&r.deps); err != nil {
 		return nil, err
 	}
 	return gcliservices.ScriptsRunner(r), nil
 }
 
-// Run script by name
-func (runner *Runner) Run(ctx app.IOContext, fs filesystem.Filespace, scriptName string, properties, secrets map[string]string, appData gcliservices.ApplicationData) (err error) {
+// RunByName script by name
+func (runner *Runner) RunByName(ctx app.IOContext, params gcliservices.ScriptsRunnerParams) (err error) {
 	var (
 		executor gcliservices.TemplateExecutor
 		isEmpty  bool
-		path     = scriptsBasePath + scriptName
+		path     = scriptsBasePath + params.ScriptName
 		buffer   = &bytes.Buffer{}
 	)
-	if !scriptNamePattern.MatchString(scriptName) {
-		return goaterr.Errorf("'%s' script name is incorrect", scriptName)
+	if !scriptNamePattern.MatchString(params.ScriptName) {
+		return goaterr.Errorf("'%s' script name is incorrect", params.ScriptName)
 	}
 	if executor, err = runner.deps.Template.TemplateExecutor(path); err != nil {
 		return err
@@ -52,11 +56,11 @@ func (runner *Runner) Run(ctx app.IOContext, fs filesystem.Filespace, scriptName
 		return goaterr.Errorf("The script %s is empty", path)
 	}
 	if err = executor.Execute(buffer, Context{
-		AM:        appData.AM,
-		PlainData: appData.Plain,
+		AM:        params.Data.AM,
+		PlainData: params.Data.Plain,
 		Properties: TaskProperties{
-			Project: properties,
-			Secrets: secrets,
+			Project: params.Properties,
+			Secrets: params.Secrets,
 		},
 	}); err != nil {
 		return err
@@ -72,5 +76,12 @@ func (runner *Runner) Run(ctx app.IOContext, fs filesystem.Filespace, scriptName
 		},
 	})
 	defer childCtx.Scope().Close()
+	childCtx.Scope().On(app.CommitEvent, func(interface{}) (err error) {
+		return runner.markAsExecutedPermanently(params.ScriptName)
+	})
 	return runner.deps.Terminal.RunLoop(childCtx)
+}
+
+func (runner *Runner) markAsExecutedPermanently(name string) (err error) {
+	//
 }
