@@ -32,17 +32,19 @@ const (
 	// GetPropertyValueDep is a properties:get command help
 	GetPropertyValueDep = "[key] display a specified element from a properties"
 	// VCSClean is a vcs:clean command help
-	VCSClean = "Clean vcs ignored files"
-	// VCSIgnoredAdd is a vcs:ignored:add command help
-	VCSIgnoredAdd = "Add new vcs ignored file [--path=file path to be ignored]"
-	// VCSIgnoredRemove is a vcs:ignored:remove command help
-	VCSIgnoredRemove = "Remove a vcs ignored file [--path=file path]"
-	// VCSIgnoredList is a vcs:ignored:list command help
-	VCSIgnoredList = "Show ignored files listing"
+	VCSClean = "Clean vcs persisted files"
+	// VCSPersistedAdd is a vcs:persisted:add command help
+	VCSPersistedAdd = "Add new vcs persisted file [--path=file path to be persisted]"
+	// VCSPersistedRemove is a vcs:persisted:remove command help
+	VCSPersistedRemove = "Remove a vcs persisted file [--path=file path]"
+	// VCSPersistedList is a vcs:persisted:list command help
+	VCSPersistedList = "Show persisted files listing"
 	// VCSScan is a vcs:scan command help
-	VCSScan = "Scan files for changes (and add it to vcs ignored files)"
+	VCSScan = "Scan files for changes (and add it to vcs persisted files)"
 	// VCSGeneratedList is a vcs:generated:list command help
 	VCSGeneratedList = "Show generated files listing"
+	// ScriptsRun is a scripts:run command help
+	ScriptsRun = "run script by name"
 	// CWDArg is a cwd argument description
 	CWDArg = "set Current Working Dirctory"
 )

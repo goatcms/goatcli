@@ -24,8 +24,8 @@ type VCSGeneratedFiles interface {
 	Modified() bool
 }
 
-// VCSIgnoredFiles contains ignored files
-type VCSIgnoredFiles interface {
+// VCSPersistedFiles contains persisted files
+type VCSPersistedFiles interface {
 	All() []string
 	ContainsPath(path string) bool
 	AddPath(path string)
@@ -34,10 +34,10 @@ type VCSIgnoredFiles interface {
 	Modified() bool
 }
 
-// VCSData contains vcs data like generated files list, ignored files etc
+// VCSData contains vcs data like generated and persisted files list
 type VCSData interface {
 	VCSGeneratedFiles() VCSGeneratedFiles
-	VCSIgnoredFiles() VCSIgnoredFiles
+	VCSPersistedFiles() VCSPersistedFiles
 }
 
 // VCSService contains changes controll

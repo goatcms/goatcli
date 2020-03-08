@@ -20,7 +20,7 @@ func RunScan(a app.App, ctx app.IOContext) (err error) {
 			VCSService      gcliservices.VCSService `dependency:"VCSService"`
 		}
 		vcsData         gcliservices.VCSData
-		ignored         gcliservices.VCSIgnoredFiles
+		persisted         gcliservices.VCSPersistedFiles
 		interactiveMode bool
 		info            os.FileInfo
 	)
@@ -34,9 +34,9 @@ func RunScan(a app.App, ctx app.IOContext) (err error) {
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
-	ignored = vcsData.VCSIgnoredFiles()
+	persisted = vcsData.VCSPersistedFiles()
 	for _, row := range vcsData.VCSGeneratedFiles().All() {
-		if !deps.CurrentFS.IsFile(row.Path) || vcsData.VCSIgnoredFiles().ContainsPath(row.Path) {
+		if !deps.CurrentFS.IsFile(row.Path) || vcsData.VCSPersistedFiles().ContainsPath(row.Path) {
 			continue
 		}
 		if info, err = deps.CurrentFS.Lstat(row.Path); err != nil {
@@ -46,19 +46,19 @@ func RunScan(a app.App, ctx app.IOContext) (err error) {
 		filespaceTime := info.ModTime().Format(time.RFC3339)
 		if generatedTime != filespaceTime {
 			if !interactiveMode {
-				ignored.AddPath(row.Path)
+				persisted.AddPath(row.Path)
 				continue
 			}
 			response := ""
 			for response != "y" && response != "n" {
-				ctx.IO().Out().Printf("File %s (generated at %s) was modified (at %s). Do you want persist it (by add to .goat/vcs/ignored)? (y/n)\n", row.Path, generatedTime, filespaceTime)
+				ctx.IO().Out().Printf("File %s (generated at %s) was modified (at %s). Do you want persist it (by add to .goat/vcs/persisted)? (y/n)\n", row.Path, generatedTime, filespaceTime)
 				if response, err = ctx.IO().In().ReadLine(); err != nil {
 					return err
 				}
 				response = strings.ToLower(response)
 			}
 			if response == "y" {
-				ignored.AddPath(row.Path)
+				persisted.AddPath(row.Path)
 				continue
 			}
 		}

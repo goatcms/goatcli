@@ -7,8 +7,8 @@ import (
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-// RunIgnoredAdd run vcs:ignored:add command
-func RunIgnoredAdd(a app.App, ctx app.IOContext) (err error) {
+// RunPersistedAdd run vcs:persisted:add command
+func RunPersistedAdd(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
 			Path       string                  `argument:"?$2" ,command:"?$2"`
@@ -28,7 +28,7 @@ func RunIgnoredAdd(a app.App, ctx app.IOContext) (err error) {
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
-	vcsData.VCSIgnoredFiles().AddPath(deps.Path)
+	vcsData.VCSPersistedFiles().AddPath(deps.Path)
 	if err = deps.VCSService.WriteDataToFS(deps.CurrentFS, vcsData); err != nil {
 		return err
 	}

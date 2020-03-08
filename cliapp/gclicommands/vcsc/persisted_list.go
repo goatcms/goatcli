@@ -7,8 +7,8 @@ import (
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-// RunIgnoredList run vcs:ignored:list command
-func RunIgnoredList(a app.App, ctx app.IOContext) (err error) {
+// RunPersistedList run vcs:persisted:list command
+func RunPersistedList(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
 			CurrentFS  filesystem.Filespace    `filespace:"current"`
@@ -24,7 +24,7 @@ func RunIgnoredList(a app.App, ctx app.IOContext) (err error) {
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
-	for _, row := range vcsData.VCSIgnoredFiles().All() {
+	for _, row := range vcsData.VCSPersistedFiles().All() {
 		ctx.IO().Out().Printf(" %s\n", row)
 	}
 	return nil

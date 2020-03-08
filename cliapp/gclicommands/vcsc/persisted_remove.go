@@ -7,8 +7,8 @@ import (
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-// RunIgnoredRemove run vcs:ignored:remove command
-func RunIgnoredRemove(a app.App, ctx app.IOContext) (err error) {
+// RunPersistedRemove run vcs:persisted:remove command
+func RunPersistedRemove(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
 			Path string `argument:"?$2" ,command:"?$2"`
@@ -29,7 +29,7 @@ func RunIgnoredRemove(a app.App, ctx app.IOContext) (err error) {
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
-	vcsData.VCSIgnoredFiles().RemovePath(deps.Path)
+	vcsData.VCSPersistedFiles().RemovePath(deps.Path)
 	if err = deps.VCSService.WriteDataToFS(deps.CurrentFS, vcsData); err != nil {
 		return err
 	}

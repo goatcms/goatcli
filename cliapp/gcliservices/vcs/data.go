@@ -2,17 +2,17 @@ package vcs
 
 import "github.com/goatcms/goatcli/cliapp/gcliservices"
 
-// Data contains vcs data like generated files list, ignored files etc
+// Data contains vcs data like generated files list, persisted files etc
 type Data struct {
 	generatedFiles gcliservices.VCSGeneratedFiles
-	ignoredFiles   gcliservices.VCSIgnoredFiles
+	persistedFiles gcliservices.VCSPersistedFiles
 }
 
 // NewData create new data instances
-func NewData(generatedFiles gcliservices.VCSGeneratedFiles, ignoredFiles gcliservices.VCSIgnoredFiles) (data *Data) {
+func NewData(generatedFiles gcliservices.VCSGeneratedFiles, persistedFiles gcliservices.VCSPersistedFiles) (data *Data) {
 	return &Data{
 		generatedFiles: generatedFiles,
-		ignoredFiles:   ignoredFiles,
+		persistedFiles: persistedFiles,
 	}
 }
 
@@ -21,7 +21,7 @@ func (data *Data) VCSGeneratedFiles() gcliservices.VCSGeneratedFiles {
 	return data.generatedFiles
 }
 
-// VCSIgnoredFiles return ignored file list
-func (data *Data) VCSIgnoredFiles() gcliservices.VCSIgnoredFiles {
-	return data.ignoredFiles
+// VCSPersistedFiles return persisted file list
+func (data *Data) VCSPersistedFiles() gcliservices.VCSPersistedFiles {
+	return data.persistedFiles
 }

@@ -29,9 +29,9 @@ func RunCleanBuild(a app.App, ctx app.IOContext) (err error) {
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
-	ignored := vcsData.VCSIgnoredFiles()
+	persisted := vcsData.VCSPersistedFiles()
 	for _, row := range vcsData.VCSGeneratedFiles().All() {
-		if !deps.CurrentFS.IsFile(row.Path) || ignored.ContainsPath(row.Path) {
+		if !deps.CurrentFS.IsFile(row.Path) || persisted.ContainsPath(row.Path) {
 			continue
 		}
 		if err = deps.CurrentFS.Remove(row.Path); err != nil {

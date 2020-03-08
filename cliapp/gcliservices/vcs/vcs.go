@@ -28,21 +28,21 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 // ReadDataFromFS read vcs data from filesystem
 func (vcs *VCS) ReadDataFromFS(fs filesystem.Filespace) (vcsData gcliservices.VCSData, err error) {
 	var (
-		ignoredFiles    *IgnoredFiles
-		ignoredReader   filesystem.Reader
+		persistedFiles    *PersistedFiles
+		persistedReader   filesystem.Reader
 		generatedFiles  *GeneratedFiles
 		generatedReader filesystem.Reader
 	)
-	if vcs.deps.FS.IsExist(IgnoredFilesPath) {
-		if ignoredReader, err = vcs.deps.FS.Reader(IgnoredFilesPath); err != nil {
+	if vcs.deps.FS.IsExist(PersistedFilesPath) {
+		if persistedReader, err = vcs.deps.FS.Reader(PersistedFilesPath); err != nil {
 			return nil, err
 		}
-		defer ignoredReader.Close()
-		if ignoredFiles, err = NewIgnoredFilesFromStream(ignoredReader); err != nil {
+		defer persistedReader.Close()
+		if persistedFiles, err = NewPersistedFilesFromStream(persistedReader); err != nil {
 			return nil, err
 		}
 	} else {
-		ignoredFiles = NewIgnoredFiles(false)
+		persistedFiles = NewPersistedFiles(false)
 	}
 	if vcs.deps.FS.IsExist(GeneratedFilesPath) {
 		if generatedReader, err = vcs.deps.FS.Reader(GeneratedFilesPath); err != nil {
@@ -55,13 +55,13 @@ func (vcs *VCS) ReadDataFromFS(fs filesystem.Filespace) (vcsData gcliservices.VC
 	} else {
 		generatedFiles = NewGeneratedFiles(false)
 	}
-	return NewData(generatedFiles, ignoredFiles), nil
+	return NewData(generatedFiles, persistedFiles), nil
 }
 
 // WriteDataToFS write vcs data to filespace
 func (vcs *VCS) WriteDataToFS(fs filesystem.Filespace, data gcliservices.VCSData) (err error) {
-	if data.VCSIgnoredFiles().Modified() {
-		if err = vcs.WriteIgnoredToFS(fs, data); err != nil {
+	if data.VCSPersistedFiles().Modified() {
+		if err = vcs.WritePersistedToFS(fs, data); err != nil {
 			return err
 		}
 	}
@@ -96,25 +96,25 @@ func (vcs *VCS) WriteGeneratedToFS(fs filesystem.Filespace, data gcliservices.VC
 	return data.VCSGeneratedFiles().WriteAll(generatedWriter)
 }
 
-// WriteIgnoredToFS write ignored files list to filespace
-func (vcs *VCS) WriteIgnoredToFS(fs filesystem.Filespace, data gcliservices.VCSData) (err error) {
+// WritePersistedToFS write persisted files list to filespace
+func (vcs *VCS) WritePersistedToFS(fs filesystem.Filespace, data gcliservices.VCSData) (err error) {
 	var (
-		ignoredWriter filesystem.Writer
+		persistedWriter filesystem.Writer
 	)
 	if err = vcs.deps.FS.MkdirAll(DataDirectoryPath, filesystem.DefaultUnixDirMode); err != nil {
 		return err
 	}
-	if vcs.deps.FS.IsFile(IgnoredFilesPath) {
-		if err = vcs.deps.FS.Remove(IgnoredFilesPath); err != nil {
+	if vcs.deps.FS.IsFile(PersistedFilesPath) {
+		if err = vcs.deps.FS.Remove(PersistedFilesPath); err != nil {
 			return err
 		}
 	}
-	if len(data.VCSIgnoredFiles().All()) == 0 {
+	if len(data.VCSPersistedFiles().All()) == 0 {
 		return nil
 	}
-	if ignoredWriter, err = vcs.deps.FS.Writer(IgnoredFilesPath); err != nil {
+	if persistedWriter, err = vcs.deps.FS.Writer(PersistedFilesPath); err != nil {
 		return err
 	}
-	defer ignoredWriter.Close()
-	return data.VCSIgnoredFiles().WriteAll(ignoredWriter)
+	defer persistedWriter.Close()
+	return data.VCSPersistedFiles().WriteAll(persistedWriter)
 }

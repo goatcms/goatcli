@@ -9,7 +9,7 @@ import (
 	"github.com/goatcms/goatcore/app/mockupapp"
 )
 
-func TestVCSWriteIgnoredToFS(t *testing.T) {
+func TestVCSWritePersistedToFS(t *testing.T) {
 	var (
 		err     error
 		vcsData gcliservices.VCSData
@@ -41,27 +41,27 @@ func TestVCSWriteIgnoredToFS(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if vcsData.VCSIgnoredFiles().Modified() != false {
-		t.Errorf("Ignored files should be unmodified after read")
+	if vcsData.VCSPersistedFiles().Modified() != false {
+		t.Errorf("Persisted files should be unmodified after read")
 		return
 	}
-	vcsData.VCSIgnoredFiles().AddPath("/first/ignored.file")
-	vcsData.VCSIgnoredFiles().AddPath("/second/ignored.file")
-	if vcsData.VCSIgnoredFiles().Modified() != true {
-		t.Errorf("after add paths to ignored files Modified flag must be true")
+	vcsData.VCSPersistedFiles().AddPath("/first/persisted.file")
+	vcsData.VCSPersistedFiles().AddPath("/second/persisted.file")
+	if vcsData.VCSPersistedFiles().Modified() != true {
+		t.Errorf("after add paths to persisted files Modified flag must be true")
 		return
 	}
 	if err = deps.VCSService.WriteDataToFS(mapp.RootFilespace(), vcsData); err != nil {
 		t.Error(err)
 		return
 	}
-	if data, err = mapp.RootFilespace().ReadFile(IgnoredFilesPath); err != nil {
+	if data, err = mapp.RootFilespace().ReadFile(PersistedFilesPath); err != nil {
 		t.Error(err)
 		return
 	}
 	dataStr = string(data)
-	expected := `/first/ignored.file
-/second/ignored.file
+	expected := `/first/persisted.file
+/second/persisted.file
 `
 	if dataStr != expected {
 		t.Errorf("take '%s' and expect '%s'", dataStr, expected)

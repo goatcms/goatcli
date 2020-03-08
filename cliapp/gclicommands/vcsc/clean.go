@@ -8,7 +8,7 @@ import (
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-// RunClean run vcs:clean command. It remove path from ignored files foreach doeas't exist file
+// RunClean run vcs:clean command. It remove path from persisted files foreach doeas't exist file
 func RunClean(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
@@ -16,7 +16,7 @@ func RunClean(a app.App, ctx app.IOContext) (err error) {
 			VCSService gcliservices.VCSService `dependency:"VCSService"`
 		}
 		vcsData gcliservices.VCSData
-		ignored = vcs.NewIgnoredFiles(true)
+		persisted = vcs.NewPersistedFiles(true)
 	)
 	if err = goaterr.ToError(goaterr.AppendError(nil,
 		a.DependencyProvider().InjectTo(&deps),
@@ -26,18 +26,18 @@ func RunClean(a app.App, ctx app.IOContext) (err error) {
 	if vcsData, err = deps.VCSService.ReadDataFromFS(deps.CurrentFS); err != nil {
 		return err
 	}
-	for _, path := range vcsData.VCSIgnoredFiles().All() {
+	for _, path := range vcsData.VCSPersistedFiles().All() {
 		if deps.CurrentFS.IsFile(path) {
-			ignored.AddPath(path)
+			persisted.AddPath(path)
 		} else {
-			ctx.IO().Out().Printf(" Deleted from ignored: %s\n", path)
+			ctx.IO().Out().Printf(" Deleted from persisted: %s\n", path)
 		}
 	}
-	if len(ignored.All()) == len(vcsData.VCSIgnoredFiles().All()) {
-		ctx.IO().Out().Printf("ignored files are clean\n")
+	if len(persisted.All()) == len(vcsData.VCSPersistedFiles().All()) {
+		ctx.IO().Out().Printf("persisted files are clean\n")
 		return nil
 	}
-	vcsData = vcs.NewData(vcsData.VCSGeneratedFiles(), ignored)
+	vcsData = vcs.NewData(vcsData.VCSGeneratedFiles(), persisted)
 	if err = deps.VCSService.WriteDataToFS(deps.CurrentFS, vcsData); err != nil {
 		return err
 	}

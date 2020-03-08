@@ -20,9 +20,9 @@ func TestVCSReadDataFromFS(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(IgnoredFilesPath, []byte(`
-		/first/ignored.file
-		/second/ignored.file
+	if err = mapp.RootFilespace().WriteFile(PersistedFilesPath, []byte(`
+		/first/persisted.file
+		/second/persisted.file
 		`), 0766); err != nil {
 		t.Error(err)
 		return
@@ -55,8 +55,8 @@ func TestVCSReadDataFromFS(t *testing.T) {
 		t.Errorf("expected two generated file and take %d", len(vcsData.VCSGeneratedFiles().All()))
 		return
 	}
-	if len(vcsData.VCSIgnoredFiles().All()) != 2 {
-		t.Errorf("expected two ignored file and take %d", len(vcsData.VCSIgnoredFiles().All()))
+	if len(vcsData.VCSPersistedFiles().All()) != 2 {
+		t.Errorf("expected two persisted file and take %d", len(vcsData.VCSPersistedFiles().All()))
 		return
 	}
 }

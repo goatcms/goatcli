@@ -1,6 +1,7 @@
 package cliapp
 
 import (
+	"github.com/goatcms/goatcli/cliapp/gclicommands"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/buildc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/cleanc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/clonec"
@@ -27,7 +28,6 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/vcs"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/varutil/goaterr"
-	"github.com/sebastianpozoga/stock-alerts/sapp/commands"
 )
 
 //Module is module contains all services
@@ -65,29 +65,29 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 
 func (m *Module) registerCommands(a app.App) error {
 	return goaterr.ToError(goaterr.AppendError(nil,
-		app.RegisterCommand(a, "clone", clonec.Run, commands.Clone),
-		app.RegisterCommand(a, "init", initc.RunInit, commands.Init),
-		app.RegisterCommand(a, "build", buildc.RunBuild, commands.Build),
-		app.RegisterCommand(a, "rebuild", buildc.RunRebuild, commands.Rebuild),
-		app.RegisterCommand(a, "clean", cleanc.RunClean, commands.Clean),
-		app.RegisterCommand(a, "clean:dependencies", cleanc.RunCleanDependencies, commands.CleanDependencies),
-		app.RegisterCommand(a, "clean:build", cleanc.RunCleanBuild, commands.CleanBuild),
-		app.RegisterCommand(a, "data:add", datac.RunAdd, commands.DataAdd),
-		app.RegisterCommand(a, "deps:add", depsc.RunAddDep, commands.AddDep),
-		app.RegisterCommand(a, "deps:add:go", depsc.RunAddGODep, commands.AddGODep),
-		app.RegisterCommand(a, "deps:add:go:import", depsc.RunAddGOImportsDep, commands.AddGOImportsDep),
-		app.RegisterCommand(a, "properties:set", propertiesc.RunSetPropertyValue, commands.SetPropertyValueDep),
-		app.RegisterCommand(a, "properties:get", propertiesc.RunGetPropertyValue, commands.GetPropertyValueDep),
-		app.RegisterCommand(a, "secrets:set", secretsc.RunSetSecretValue, commands.SetSecretValueDep),
-		app.RegisterCommand(a, "secrets:get", secretsc.RunGetSecretValue, commands.GetSecretValueDep),
-		app.RegisterCommand(a, "vcs:clean", vcsc.RunClean, commands.VCSClean),
-		app.RegisterCommand(a, "vcs:scan", vcsc.RunScan, commands.VCSScan),
-		app.RegisterCommand(a, "vcs:ignored:add", vcsc.RunIgnoredAdd, commands.VCSIgnoredAdd),
-		app.RegisterCommand(a, "vcs:ignored:remove", vcsc.RunIgnoredRemove, commands.VCSIgnoredRemove),
-		app.RegisterCommand(a, "vcs:ignored:list", vcsc.RunIgnoredList, commands.VCSIgnoredList),
-		app.RegisterCommand(a, "vcs:generated:list", vcsc.RunGeneratedList, commands.VCSGeneratedList),
-		app.RegisterCommand(a, "scripts:run", scriptsc.RunScript, commands.ScriptsRun),
-		app.RegisterArgument(a, "cwd", commands.CWDArg),
+		app.RegisterCommand(a, "clone", clonec.Run, gclicommands.Clone),
+		app.RegisterCommand(a, "init", initc.RunInit, gclicommands.Init),
+		app.RegisterCommand(a, "build", buildc.RunBuild, gclicommands.Build),
+		app.RegisterCommand(a, "rebuild", buildc.RunRebuild, gclicommands.Rebuild),
+		app.RegisterCommand(a, "clean", cleanc.RunClean, gclicommands.Clean),
+		app.RegisterCommand(a, "clean:dependencies", cleanc.RunCleanDependencies, gclicommands.CleanDependencies),
+		app.RegisterCommand(a, "clean:build", cleanc.RunCleanBuild, gclicommands.CleanBuild),
+		app.RegisterCommand(a, "data:add", datac.RunAdd, gclicommands.DataAdd),
+		app.RegisterCommand(a, "deps:add", depsc.RunAddDep, gclicommands.AddDep),
+		app.RegisterCommand(a, "deps:add:go", depsc.RunAddGODep, gclicommands.AddGODep),
+		app.RegisterCommand(a, "deps:add:go:import", depsc.RunAddGOImportsDep, gclicommands.AddGOImportsDep),
+		app.RegisterCommand(a, "properties:set", propertiesc.RunSetPropertyValue, gclicommands.SetPropertyValueDep),
+		app.RegisterCommand(a, "properties:get", propertiesc.RunGetPropertyValue, gclicommands.GetPropertyValueDep),
+		app.RegisterCommand(a, "secrets:set", secretsc.RunSetSecretValue, gclicommands.SetSecretValueDep),
+		app.RegisterCommand(a, "secrets:get", secretsc.RunGetSecretValue, gclicommands.GetSecretValueDep),
+		app.RegisterCommand(a, "vcs:clean", vcsc.RunClean, gclicommands.VCSClean),
+		app.RegisterCommand(a, "vcs:scan", vcsc.RunScan, gclicommands.VCSScan),
+		app.RegisterCommand(a, "vcs:persisted:add", vcsc.RunPersistedAdd, gclicommands.VCSPersistedAdd),
+		app.RegisterCommand(a, "vcs:persisted:remove", vcsc.RunPersistedRemove, gclicommands.VCSPersistedRemove),
+		app.RegisterCommand(a, "vcs:persisted:list", vcsc.RunPersistedList, gclicommands.VCSPersistedList),
+		app.RegisterCommand(a, "vcs:generated:list", vcsc.RunGeneratedList, gclicommands.VCSGeneratedList),
+		app.RegisterCommand(a, "scripts:run", scriptsc.RunScript, gclicommands.ScriptsRun),
+		app.RegisterArgument(a, "cwd", gclicommands.CWDArg),
 	))
 }
 

@@ -80,7 +80,7 @@ func TestContextExecute(t *testing.T) {
 				Secrets: map[string]string{},
 			},
 			FS:      fs,
-			VCSData: vcs.NewData(vcs.NewGeneratedFiles(true), vcs.NewIgnoredFiles(true)),
+			VCSData: vcs.NewData(vcs.NewGeneratedFiles(true), vcs.NewPersistedFiles(true)),
 		}, 10, templatesExecutor); err != nil {
 			t.Error(err)
 			return

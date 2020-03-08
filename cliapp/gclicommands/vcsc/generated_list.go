@@ -9,7 +9,7 @@ import (
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-// RunGeneratedList run vcs:ignored:list command
+// RunGeneratedList run vcs:persisted:list command
 func RunGeneratedList(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
