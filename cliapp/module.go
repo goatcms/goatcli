@@ -1,6 +1,7 @@
 package cliapp
 
 import (
+	"github.com/goatcms/goatcli/cliapp/common/uefs"
 	"github.com/goatcms/goatcli/cliapp/gclicommands"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/buildc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/cleanc"
@@ -27,6 +28,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/vcs"
 	"github.com/goatcms/goatcore/app"
+	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -45,6 +47,10 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 	if err = m.registerCommands(a); err != nil {
 		return err
 	}
+	// filespaces
+	if err = m.registerFilespaces(a); err != nil {
+		return err
+	}
 	// services
 	dp := a.DependencyProvider()
 	return goaterr.ToError(goaterr.AppendError(nil,
@@ -61,6 +67,23 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 		scripts.RegisterDependencies(dp),
 		gcliio.RegisterDependencies(dp),
 		app.RegisterHealthChecker(a, "git", GitHealthChecker)))
+}
+
+func (m *Module) registerFilespaces(a app.App) (err error) {
+	var (
+		gefs filesystem.Filespace
+		fs   filesystem.Filespace
+	)
+	if err = a.HomeFilespace().MkdirAll(".goatcli/efs"); err != nil {
+		return err
+	}
+	if fs, err = a.HomeFilespace().Filespace(".goatcli/efs"); err != nil {
+		return err
+	}
+	if gefs, err = uefs.BuildEFS(fs, true, true, []byte{}); err != nil {
+		return err
+	}
+	return a.FilespaceScope().Set("gefs", gefs)
 }
 
 func (m *Module) registerCommands(a app.App) error {
