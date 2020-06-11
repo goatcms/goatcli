@@ -12,6 +12,7 @@ debug
 
 .idea/
 *.log
+.vscode
 
 /vendor
 
