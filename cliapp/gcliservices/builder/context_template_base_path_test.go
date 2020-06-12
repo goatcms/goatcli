@@ -34,9 +34,7 @@ func TestCTXTemplateBasePath(t *testing.T) {
 	}
 	fs := mapp.RootFilespace()
 	if err = goaterr.ToError(goaterr.AppendError(nil,
-		fs.WriteFile(".goat/build/templates/tname/main.def", []byte(`
-		correct result
-		`), 0766),
+		fs.WriteFile(".goat/build/templates/tname/main.def", []byte(`correct result`), 0766),
 		fs.WriteFile(".goat/build/templates/tname/main.ctrl", []byte(`
 		{{- $ctx.RenderOnce "out/file.txt" "" "" "/main.def" $ctx.DotData -}}
 		`), 0766),
