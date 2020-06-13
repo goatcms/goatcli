@@ -7,16 +7,23 @@ import (
 
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/modules/pipelinem/pipservices"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-func TestPipRunPrintSumamryStory(t *testing.T) {
+func TestPipRunBufferOutputStory(t *testing.T) {
 	t.Parallel()
 	var (
 		err         error
 		mapp        *mockupapp.App
 		bootstraper app.Bootstrap
+		deps        struct {
+			TasksUnit pipservices.TasksUnit `dependency:"PipTasksUnit"`
+		}
+		taskManager pipservices.TasksManager
+		task        pipservices.Task
+		ok          bool
 	)
 	if mapp, bootstraper, err = newApp(mockupapp.MockupOptions{
 		Args: []string{`appname`, `scripts:run`, `scriptName`},
@@ -45,9 +52,21 @@ func TestPipRunPrintSumamryStory(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	result := mapp.OutputBuffer().String()
-	if strings.Index(result, "MAIN") == -1 {
-		t.Errorf("expected log about 'MAIN' task in application output and take: %v", result)
+	if mapp.DependencyProvider().InjectTo(&deps); err != nil {
+		t.Error(err)
+		return
+	}
+	if taskManager, err = deps.TasksUnit.FromScope(mapp.AppScope()); err != nil {
+		t.Error(err)
+		return
+	}
+	if task, ok = taskManager.Get("MAIN"); !ok {
+		t.Errorf("Expected main task")
+		return
+	}
+	result := task.Logs()
+	if strings.Index(result, "test_output") == -1 {
+		t.Errorf("expected 'test_output' in application output and take: %v", result)
 		return
 	}
 }

@@ -48,8 +48,16 @@ func TestPipRunWaitStory(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	if err = mapp.AppScope().Wait(); err != nil {
+		t.Error(err)
+		return
+	}
+	// Output should contains task summaries without task output
 	output := mapp.OutputBuffer().String()
-	if strings.Index(output, "test_output") == -1 {
-		t.Errorf("expected output contains 'test_output' and take: %s", output)
+	if strings.Index(output, "test_output") != -1 {
+		t.Errorf("Terminal output should not contains tasks output. And it is '%s'", output)
+	}
+	if strings.Index(output, "MAIN") == -1 {
+		t.Errorf("expected output contains MAIN task summary. And it is '%s'", output)
 	}
 }
