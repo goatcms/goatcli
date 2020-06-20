@@ -46,8 +46,8 @@ func TestPipRunPrintSumamryStory(t *testing.T) {
 		return
 	}
 	result := mapp.OutputBuffer().String()
-	if strings.Index(result, "MAIN") == -1 {
-		t.Errorf("expected log about 'MAIN' task in application output and take: %v", result)
+	if strings.Index(result, "scriptName") == -1 {
+		t.Errorf("expected log about 'scriptName' task in application output and take: %v", result)
 		return
 	}
 }

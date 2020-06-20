@@ -21,9 +21,6 @@ func TestPipRunPromptStory(t *testing.T) {
 		deps        struct {
 			TasksUnit pipservices.TasksUnit `dependency:"PipTasksUnit"`
 		}
-		taskManager pipservices.TasksManager
-		task        pipservices.Task
-		ok          bool
 	)
 	if mapp, bootstraper, err = newApp(mockupapp.MockupOptions{
 		Args: []string{`appname`, `scripts:run`, `scriptName`},
@@ -56,15 +53,7 @@ func TestPipRunPromptStory(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if taskManager, err = deps.TasksUnit.FromScope(mapp.AppScope()); err != nil {
-		t.Error(err)
-		return
-	}
-	if task, ok = taskManager.Get("MAIN"); !ok {
-		t.Errorf("Expected main task")
-		return
-	}
-	result := task.Logs()
+	result := mapp.OutputBuffer().String()
 	if strings.Index(result, "\n>\n") != -1 {
 		t.Errorf("output should not contains prompt character and it is: %s", result)
 		return

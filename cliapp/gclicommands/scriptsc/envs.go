@@ -1,6 +1,8 @@
 package scriptsc
 
 import (
+	"sort"
+
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/modules/commonm/commservices"
@@ -38,8 +40,14 @@ func RunScriptsEnvs(a app.App, ctx app.IOContext) (err error) {
 	if envs, err = deps.EnvironmentsUnit.Envs(ctxScope); err != nil {
 		return err
 	}
-	for name := range envs.All() {
-		ctx.IO().Out().Printf("%s\n", name)
+	allEnvs := envs.All()
+	keys := make([]string, 0, len(allEnvs))
+	for key := range allEnvs {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		ctx.IO().Out().Printf("%s\n", key)
 	}
 	return nil
 }

@@ -18,7 +18,7 @@ func TestPipRunLogsStory(t *testing.T) {
 		mapp           *mockupapp.App
 		bootstraper    app.Bootstrap
 		dirInfo        []os.FileInfo
-		logsPath       string
+		ioLogsPath     string
 		logsContent    []byte
 		summaryPath    string
 		summaryContent []byte
@@ -30,7 +30,6 @@ func TestPipRunLogsStory(t *testing.T) {
 		return
 	}
 	if err = goaterr.ToError(goaterr.AppendError(nil, app.RegisterCommand(mapp, "testCommand", func(a app.App, ctx app.IOContext) (err error) {
-		//time.Sleep(10 * time.Millisecond)
 		return ctx.IO().Out().Printf("test_output")
 	}, ""))); err != nil {
 		t.Error(err)
@@ -61,13 +60,13 @@ func TestPipRunLogsStory(t *testing.T) {
 	}
 	for _, node := range dirInfo {
 		name := node.Name()
-		if strings.Contains(name, ".logs.txt") {
-			logsPath = ".goat/tmp/logs/scripts/" + name
-		} else if strings.Contains(name, ".summary.txt") {
+		if strings.Contains(name, ".io.log") {
+			ioLogsPath = ".goat/tmp/logs/scripts/" + name
+		} else if strings.Contains(name, ".summary.log") {
 			summaryPath = ".goat/tmp/logs/scripts/" + name
 		}
 	}
-	if logsPath == "" {
+	if ioLogsPath == "" {
 		t.Errorf("expected single logs files")
 		return
 	}
@@ -76,7 +75,7 @@ func TestPipRunLogsStory(t *testing.T) {
 		return
 	}
 	// test logs content
-	if logsContent, err = cwd.ReadFile(logsPath); err != nil {
+	if logsContent, err = cwd.ReadFile(ioLogsPath); err != nil {
 		t.Error(err)
 		return
 	}

@@ -9,6 +9,8 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/modules/pipelinem/pipservices"
+	"github.com/goatcms/goatcore/app/modules/pipelinem/pipservices/namespaces"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
@@ -21,6 +23,7 @@ func TestPipRunWaitStory(t *testing.T) {
 		deps struct {
 			ScriptsRunner gcliservices.ScriptsRunner `dependency:"ScriptsRunner"`
 		}
+		taskManager pipservices.TasksManager
 	)
 	if mapp, _, err = newApp(mockupapp.MockupOptions{}); err != nil {
 		t.Error(err)
@@ -44,20 +47,37 @@ func TestPipRunWaitStory(t *testing.T) {
 		return
 	}
 	appData := am.NewApplicationData(map[string]string{})
-	if err = deps.ScriptsRunner.Run(mapp.IOContext(), fs, "scriptName", map[string]string{}, map[string]string{}, appData); err != nil {
+	if taskManager, err = deps.ScriptsRunner.Run(gcliservices.ScriptsContext{
+		Scope: mapp.IOContext().Scope(),
+		CWD:   mapp.IOContext().IO().CWD(),
+		Namespaces: namespaces.NewNamespaces(pipservices.NamasepacesParams{
+			Task: "",
+			Lock: "",
+		}),
+	}, fs, "scriptName", map[string]string{}, map[string]string{}, appData); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.AppScope().Wait(); err != nil {
+	if err = taskManager.Wait(); err != nil {
 		t.Error(err)
 		return
 	}
-	// Output should contains task summaries without task output
+	// Expect empty context output
 	output := mapp.OutputBuffer().String()
-	if strings.Index(output, "test_output") != -1 {
-		t.Errorf("Terminal output should not contains tasks output. And it is '%s'", output)
+	if output != "" {
+		t.Errorf("Expected empty output")
 	}
-	if strings.Index(output, "MAIN") == -1 {
-		t.Errorf("expected output contains MAIN task summary. And it is '%s'", output)
+	// Output broadcast should contains tasks output
+	oString := taskManager.OBroadcast().String()
+	if strings.Index(oString, "test_output") == -1 {
+		t.Errorf("Output broadcast should contains tasks output. And it is '%s'", oString)
+	}
+	// StatusBroadcast should contains task summary without task output
+	sString := taskManager.StatusBroadcast().String()
+	if strings.Index(sString, "[scriptName]") == -1 {
+		t.Errorf("StatusBroadcast should contains '[scriptName]' task status. And it is '%s'", sString)
+	}
+	if strings.Index(sString, "test_output") != -1 {
+		t.Errorf("StatusBroadcast should not contains tasks output. And it is '%s'", sString)
 	}
 }
