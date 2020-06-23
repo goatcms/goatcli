@@ -110,6 +110,7 @@ func (m *Module) registerCommands(a app.App) error {
 		app.RegisterCommand(a, "vcs:persisted:list", vcsc.RunPersistedList, gclicommands.VCSPersistedList),
 		app.RegisterCommand(a, "vcs:generated:list", vcsc.RunGeneratedList, gclicommands.VCSGeneratedList),
 		app.RegisterCommand(a, "scripts:run", scriptsc.RunScript, gclicommands.ScriptsRun),
+		app.RegisterCommand(a, "scripts:envs", scriptsc.RunScriptsEnvs, gclicommands.ScriptsEnvs),
 		app.RegisterArgument(a, "cwd", gclicommands.CWDArg),
 	))
 }

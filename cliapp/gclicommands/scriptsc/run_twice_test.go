@@ -51,13 +51,4 @@ func TestPipRunTwiceStory(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	result := mapp.OutputBuffer().String()
-	if strings.Index(result, "test_output1") == -1 {
-		t.Errorf("expected 'test_output1' in application output and take: %v", result)
-		return
-	}
-	if strings.Index(result, "test_output1") == -1 {
-		t.Errorf("expected 'test_output2' in application output and take: %v", result)
-		return
-	}
 }

@@ -1,28 +1,30 @@
-package scripts
+package scriptsc
 
 import (
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/goatcms/goatcli/cliapp/common/am"
-	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/modules/pipelinem/pipservices"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-func TestPipRunWaitStory(t *testing.T) {
+func TestPipRunPromptStory(t *testing.T) {
 	t.Parallel()
 	var (
-		err  error
-		mapp *mockupapp.App
-		deps struct {
-			ScriptsRunner gcliservices.ScriptsRunner `dependency:"ScriptsRunner"`
+		err         error
+		mapp        *mockupapp.App
+		bootstraper app.Bootstrap
+		deps        struct {
+			TasksUnit pipservices.TasksUnit `dependency:"PipTasksUnit"`
 		}
 	)
-	if mapp, _, err = newApp(mockupapp.MockupOptions{}); err != nil {
+	if mapp, bootstraper, err = newApp(mockupapp.MockupOptions{
+		Args: []string{`appname`, `scripts:run`, `scriptName`},
+	}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -39,17 +41,21 @@ func TestPipRunWaitStory(t *testing.T) {
 		return
 	}
 	// test
-	if err = mapp.DependencyProvider().InjectTo(&deps); err != nil {
+	if err = bootstraper.Run(); err != nil {
 		t.Error(err)
 		return
 	}
-	appData := am.NewApplicationData(map[string]string{})
-	if err = deps.ScriptsRunner.Run(mapp.IOContext(), fs, "scriptName", map[string]string{}, map[string]string{}, appData); err != nil {
+	if err = mapp.AppScope().Wait(); err != nil {
 		t.Error(err)
 		return
 	}
-	output := mapp.OutputBuffer().String()
-	if strings.Index(output, "test_output") == -1 {
-		t.Errorf("expected output contains 'test_output' and take: %s", output)
+	if mapp.DependencyProvider().InjectTo(&deps); err != nil {
+		t.Error(err)
+		return
+	}
+	result := mapp.OutputBuffer().String()
+	if strings.Index(result, "\n>\n") != -1 {
+		t.Errorf("output should not contains prompt character and it is: %s", result)
+		return
 	}
 }

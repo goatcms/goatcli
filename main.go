@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -17,8 +18,9 @@ import (
 func main() {
 	var (
 		gapp app.App
+		boot *bootstrap.Bootstrap
 		err  error
-		boot app.Bootstrap
+		code int
 	)
 	errLogs := log.New(os.Stderr, "", 0)
 	if gapp, err = goatapp.NewGoatApp(cliapp.AppName, cliapp.AppVersion, "./"); err != nil {
@@ -34,14 +36,20 @@ func main() {
 		boot.Register(cliapp.NewModule()),
 	)); err != nil {
 		errLogs.Println(err)
+		os.Exit(11)
 		return
 	}
-	if err := boot.Init(); err != nil {
+	if err = boot.Init(); err != nil {
 		errLogs.Println(err)
+		os.Exit(11)
 		return
 	}
-	if err := boot.Run(); err != nil {
-		errLogs.Println(err)
-		return
+	if err = boot.Run(); err != nil {
+		fmt.Printf("\n")
+		if code, err = boot.ShowError(err); err != nil {
+			errLogs.Println(err)
+		}
+		os.Exit(code)
 	}
+	fmt.Printf("\n\n")
 }

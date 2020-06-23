@@ -11,7 +11,7 @@ import (
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-func TestPipRunWaitStory(t *testing.T) {
+func TestPipRunPrintSumamryStory(t *testing.T) {
 	t.Parallel()
 	var (
 		err         error
@@ -46,8 +46,8 @@ func TestPipRunWaitStory(t *testing.T) {
 		return
 	}
 	result := mapp.OutputBuffer().String()
-	if strings.Index(result, "test_output") == -1 {
-		t.Errorf("expected 'test_output' in application output and take: %v", result)
+	if strings.Index(result, "scriptName") == -1 {
+		t.Errorf("expected log about 'scriptName' task in application output and take: %v", result)
 		return
 	}
 }

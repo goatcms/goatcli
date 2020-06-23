@@ -11,6 +11,7 @@ import (
 	"github.com/goatcms/goatcore/app/bootstrap"
 	"github.com/goatcms/goatcore/app/mockupapp"
 	"github.com/goatcms/goatcore/app/modules/commonm"
+	"github.com/goatcms/goatcore/app/modules/pipelinem"
 	"github.com/goatcms/goatcore/app/modules/terminalm"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 	"github.com/sebastianpozoga/stock-alerts/sapp/commands"
@@ -25,6 +26,7 @@ func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper a
 	if err = goaterr.ToError(goaterr.AppendError(nil,
 		bootstraper.Register(terminalm.NewModule()),
 		bootstraper.Register(commonm.NewModule()),
+		bootstraper.Register(pipelinem.NewModule()),
 		gcliio.RegisterDependencies(dp),
 		data.RegisterDependencies(dp),
 		properties.RegisterDependencies(dp),

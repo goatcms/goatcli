@@ -45,6 +45,8 @@ const (
 	VCSGeneratedList = "Show generated files listing"
 	// ScriptsRun is a scripts:run command help
 	ScriptsRun = "run script by name"
+	// ScriptsEnvs is a scripts:envs command help
+	ScriptsEnvs = "list scripts environments"
 	// CWDArg is a cwd argument description
 	CWDArg = "set Current Working Dirctory"
 )
