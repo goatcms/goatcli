@@ -12,16 +12,15 @@ import (
 func RunScriptsEnvs(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			Name             string                        `command:"?$1"`
-			ScriptsRunner    gcliservices.ScriptsRunner    `dependency:"ScriptsRunner"`
-			GCLIInputs       gcliservices.GCLIInputs       `dependency:"GCLIInputs"`
-			GCLIEnvironment  gcliservices.GCLIEnvironment  `dependency:"GCLIEnvironment"`
-			EnvironmentsUnit commservices.EnvironmentsUnit `dependency:"CommonEnvironmentsUnit"`
+			Name               string                          `command:"?$1"`
+			ScriptsRunner      gcliservices.ScriptsRunner      `dependency:"ScriptsRunner"`
+			GCLIProjectManager gcliservices.GCLIProjectManager `dependency:"GCLIProjectManager"`
+			GCLIEnvironment    gcliservices.GCLIEnvironment    `dependency:"GCLIEnvironment"`
+			EnvironmentsUnit   commservices.EnvironmentsUnit   `dependency:"CommonEnvironmentsUnit"`
 		}
-		propertiesData map[string]string
-		secretsData    map[string]string
-		envs           commservices.Environments
-		ctxScope       = ctx.Scope()
+		project  *gcliservices.Project
+		envs     commservices.Environments
+		ctxScope = ctx.Scope()
 	)
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
 		return err
@@ -30,10 +29,10 @@ func RunScriptsEnvs(a app.App, ctx app.IOContext) (err error) {
 		return err
 	}
 	// load variables and envs
-	if propertiesData, secretsData, _, err = deps.GCLIInputs.Inputs(ctx); err != nil {
+	if project, err = deps.GCLIProjectManager.Project(ctx); err != nil {
 		return err
 	}
-	if err = deps.GCLIEnvironment.LoadEnvs(ctxScope, propertiesData, secretsData); err != nil {
+	if err = deps.GCLIEnvironment.LoadEnvs(ctxScope, project.Properties, project.Secrets); err != nil {
 		return err
 	}
 	// list envs

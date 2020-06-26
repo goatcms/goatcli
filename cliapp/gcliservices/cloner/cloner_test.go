@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/result"
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/modules"
 	"github.com/goatcms/goatcore/app"
@@ -38,7 +39,7 @@ func TestModulesFromFile(t *testing.T) {
 	}
 	propertiesResult = buildPropertiesResult()
 	// new app
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
+	if mapp, err = gclimock.NewApp(mockupapp.MockupOptions{
 		Input: gio.NewInput(strings.NewReader("  \t\n")),
 	}); err != nil {
 		t.Error(err)

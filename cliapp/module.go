@@ -74,7 +74,7 @@ func (m *Module) registerFilespaces(a app.App) (err error) {
 		gefs filesystem.Filespace
 		fs   filesystem.Filespace
 	)
-	if err = a.HomeFilespace().MkdirAll(".goatcli/efs"); err != nil {
+	if err = a.HomeFilespace().MkdirAll(".goatcli/efs", filesystem.SafeDirPermissions); err != nil {
 		return err
 	}
 	if fs, err = a.HomeFilespace().Filespace(".goatcli/efs"); err != nil {

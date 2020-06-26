@@ -3,6 +3,7 @@ package properties
 import (
 	"strings"
 
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
@@ -16,7 +17,7 @@ const (
 )
 
 func buildMockupApp(input string) (p gcliservices.PropertiesService, mapp app.App, err error) {
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
+	if mapp, err = gclimock.NewApp(mockupapp.MockupOptions{
 		Input: gio.NewInput(strings.NewReader(input)),
 	}); err != nil {
 		return nil, nil, err

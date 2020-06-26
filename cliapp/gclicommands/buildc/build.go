@@ -15,18 +15,16 @@ import (
 func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			Interactive    string                      `argument:"?interactive" ,command:"?interactive"`
-			BuilderService gcliservices.BuilderService `dependency:"BuilderService"`
-			ClonerService  gcliservices.ClonerService  `dependency:"ClonerService"`
-			GCLIInputs     gcliservices.GCLIInputs     `dependency:"GCLIInputs"`
+			Interactive        string                          `argument:"?interactive" ,command:"?interactive"`
+			BuilderService     gcliservices.BuilderService     `dependency:"BuilderService"`
+			ClonerService      gcliservices.ClonerService      `dependency:"ClonerService"`
+			GCLIProjectManager gcliservices.GCLIProjectManager `dependency:"GCLIProjectManager"`
 		}
-		propertiesData map[string]string
-		secretsData    map[string]string
-		appData        gcliservices.ApplicationData
-		scope          app.Scope
-		childCtx       app.IOContext
-		out            app.Output
-		fs             filesystem.Filespace
+		project  *gcliservices.Project
+		scope    app.Scope
+		childCtx app.IOContext
+		out      app.Output
+		fs       filesystem.Filespace
 	)
 	childCtx = gio.NewChildIOContext(ctx, gio.ChildIOContextParams{})
 	defer childCtx.Scope().Close()
@@ -44,19 +42,19 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	if err = prevents.RequireGoatProject(fs); err != nil {
 		return err
 	}
-	if propertiesData, secretsData, appData, err = deps.GCLIInputs.Inputs(ctx); err != nil {
+	if project, err = deps.GCLIProjectManager.Project(ctx); err != nil {
 		return err
 	}
 	// Clone modules (if required)
 	out.Printf("start clone modules... ")
-	propertiesResult := result.NewPropertiesResult(propertiesData)
+	propertiesResult := result.NewPropertiesResult(project.Properties)
 	if err = deps.ClonerService.CloneModules(fs, fs, propertiesResult); err != nil {
 		return err
 	}
 	out.Printf("cloned\n")
 	// Build
 	out.Printf("start build... ")
-	if err = deps.BuilderService.Build(ctx, fs, appData, propertiesData, secretsData); err != nil {
+	if err = deps.BuilderService.Build(ctx, fs, project.Data, project.Properties, project.Secrets); err != nil {
 		return err
 	}
 	if err = scope.Wait(); err != nil {

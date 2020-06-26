@@ -47,6 +47,7 @@ func ProjectManagerFactory(dp dependency.Provider) (result interface{}, err erro
 func (pm *ProjectManager) Project(ctx app.IOContext) (project *gcliservices.Project, err error) {
 	var (
 		propertiesDef []*config.Property
+		secretsDef    []*config.Property
 		isChanged     bool
 		data          map[string]string
 	)
@@ -80,9 +81,18 @@ func (pm *ProjectManager) Project(ctx app.IOContext) (project *gcliservices.Proj
 	}
 	project.Data = am.NewApplicationData(data)
 	// load secrets
+	if secretsDef, err = pm.deps.SecretsService.ReadDefFromFS(project.FS, project.Properties, project.Data); err != nil {
+		return nil, err
+	}
 	if pm.HasSecretsProfile(project, pm.deps.ProfileName) {
 		if err = pm.LoadSecretsProfile(ctx, project, pm.deps.ProfileName); err != nil {
 			return nil, err
+		}
+	} else {
+		if len(secretsDef) != 0 {
+			if err = pm.CreateSecretsProfile(ctx, project, pm.deps.ProfileName); err != nil {
+				return nil, err
+			}
 		}
 	}
 	return project, nil
@@ -131,13 +141,14 @@ func (pm *ProjectManager) HasSecretsProfile(project *gcliservices.Project, profi
 }
 
 // CreateSecretsProfile create new secrets profile
-func (pm *ProjectManager) CreateSecretsProfile(project *gcliservices.Project, profileName string) (err error) {
+func (pm *ProjectManager) CreateSecretsProfile(ctx app.IOContext, project *gcliservices.Project, profileName string) (err error) {
 	var passwordHash []byte
 	propmpt := fmt.Sprintf("Insert passowrd for new '%s' profile: ", profileName)
-	if passwordHash, err = pm.deps.Keystorage.Password(project.Local.ID+passwordHashPK, propmpt); err != nil {
+	rePropmpt := fmt.Sprintf("Repeat passowrd for '%s' profile: ", profileName)
+	if passwordHash, err = pm.deps.Keystorage.RePassword(project.Local.ID+passwordHashPK, propmpt, rePropmpt); err != nil {
 		return err
 	}
-	if err = pm.createSecretsProfile(project, profileName, passwordHash); err != nil {
+	if err = pm.createSecretsProfile(ctx, project, profileName, passwordHash); err != nil {
 		return err
 	}
 	data := map[string][]byte{}
@@ -146,10 +157,11 @@ func (pm *ProjectManager) CreateSecretsProfile(project *gcliservices.Project, pr
 	return pm.deps.Keystorage.Sets(data)
 }
 
-func (pm *ProjectManager) createSecretsProfile(project *gcliservices.Project, profileName string, passwordHash []byte) (err error) {
+func (pm *ProjectManager) createSecretsProfile(ctx app.IOContext, project *gcliservices.Project, profileName string, passwordHash []byte) (err error) {
 	var (
-		bPath = secretProfileBasePath + profileName
-		fs    filesystem.Filespace
+		bPath      = secretProfileBasePath + profileName
+		fs         filesystem.Filespace
+		secretsDef []*config.Property
 	)
 	if project.FS.IsDir(bPath) {
 		return goaterr.Errorf("Project profile %s exists", profileName)
@@ -166,8 +178,13 @@ func (pm *ProjectManager) createSecretsProfile(project *gcliservices.Project, pr
 		return err
 	}
 	project.Secrets = map[string]string{}
-	if err = pm.deps.SecretsService.WriteDataToFS(project.EncryptFS, project.Secrets); err != nil {
-		pm.RemoveSecretProfile(project, profileName)
+	if secretsDef, err = pm.deps.SecretsService.ReadDefFromFS(project.EncryptFS, project.Properties, project.Data); err != nil {
+		return err
+	}
+	if _, err = pm.deps.SecretsService.FillData(ctx, secretsDef, project.Secrets, map[string]string{}, pm.interactive); err != nil {
+		return err
+	}
+	if err = pm.deps.SecretsService.WriteDataToFS(fs, project.Secrets); err != nil {
 		return err
 	}
 	return nil

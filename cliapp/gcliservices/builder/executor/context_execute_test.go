@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	templates "github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
@@ -45,7 +46,7 @@ func TestContextExecuteHook(t *testing.T) {
 	)
 	for ti := 0; ti < workers.AsyncTestReapeat; ti++ {
 		// prepare mockup application
-		if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
+		if mapp, err = gclimock.NewApp(mockupapp.MockupOptions{
 			Input: gio.NewInput(strings.NewReader("")),
 		}); err != nil {
 			t.Error(err)

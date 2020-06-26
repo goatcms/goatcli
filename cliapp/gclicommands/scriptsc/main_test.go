@@ -1,6 +1,7 @@
 package scriptsc
 
 import (
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/data"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/gcliio"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/properties"
@@ -18,7 +19,7 @@ import (
 )
 
 func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper app.Bootstrap, err error) {
-	if mapp, err = mockupapp.NewApp(options); err != nil {
+	if mapp, err = gclimock.NewApp(options); err != nil {
 		return nil, nil, err
 	}
 	bootstraper = bootstrap.NewBootstrap(mapp)

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
@@ -20,7 +21,7 @@ func TestVCSWriteGeneratedToFS(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
+	mapp, err := gclimock.NewApp(mockupapp.MockupOptions{
 		Input: gio.NewInput(strings.NewReader("")),
 	})
 	if err != nil {

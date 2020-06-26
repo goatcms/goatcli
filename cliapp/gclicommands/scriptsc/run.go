@@ -15,18 +15,16 @@ import (
 func RunScript(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			Name            string                       `command:"?$1"`
-			ScriptsRunner   gcliservices.ScriptsRunner   `dependency:"ScriptsRunner"`
-			GCLIInputs      gcliservices.GCLIInputs      `dependency:"GCLIInputs"`
-			GCLIEnvironment gcliservices.GCLIEnvironment `dependency:"GCLIEnvironment"`
-			NamespacesUnit  pipservices.NamespacesUnit   `dependency:"PipNamespacesUnit"`
+			Name               string                          `command:"?$1"`
+			ScriptsRunner      gcliservices.ScriptsRunner      `dependency:"ScriptsRunner"`
+			GCLIProjectManager gcliservices.GCLIProjectManager `dependency:"GCLIProjectManager"`
+			GCLIEnvironment    gcliservices.GCLIEnvironment    `dependency:"GCLIEnvironment"`
+			NamespacesUnit     pipservices.NamespacesUnit      `dependency:"PipNamespacesUnit"`
 		}
-		propertiesData map[string]string
-		secretsData    map[string]string
-		appData        gcliservices.ApplicationData
-		ctxScope       = ctx.Scope()
-		taskManager    pipservices.TasksManager
-		scpNamespaces  pipservices.Namespaces
+		project       *gcliservices.Project
+		ctxScope      = ctx.Scope()
+		taskManager   pipservices.TasksManager
+		scpNamespaces pipservices.Namespaces
 
 		now          = time.Now()
 		cwd          = ctx.IO().CWD()
@@ -61,10 +59,10 @@ func RunScript(a app.App, ctx app.IOContext) (err error) {
 		return err
 	}
 	// load variables
-	if propertiesData, secretsData, appData, err = deps.GCLIInputs.Inputs(ctx); err != nil {
+	if project, err = deps.GCLIProjectManager.Project(ctx); err != nil {
 		return err
 	}
-	if err = deps.GCLIEnvironment.LoadEnvs(ctxScope, propertiesData, secretsData); err != nil {
+	if err = deps.GCLIEnvironment.LoadEnvs(ctxScope, project.Properties, project.Secrets); err != nil {
 		return err
 	}
 	// run script
@@ -72,7 +70,7 @@ func RunScript(a app.App, ctx app.IOContext) (err error) {
 		Scope:      ctx.Scope(),
 		CWD:        ctx.IO().CWD(),
 		Namespaces: scpNamespaces,
-	}, cwd, deps.Name, propertiesData, secretsData, appData); err != nil {
+	}, cwd, deps.Name, project.Properties, project.Secrets, project.Data); err != nil {
 		return err
 	}
 	if err = taskManager.StatusBroadcast().Add(ctx.IO().Out()); err != nil {

@@ -1,6 +1,7 @@
 package buildc
 
 import (
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/builder"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/cloner"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/data"
@@ -22,7 +23,7 @@ import (
 )
 
 func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper app.Bootstrap, err error) {
-	if mapp, err = mockupapp.NewApp(options); err != nil {
+	if mapp, err = gclimock.NewApp(options); err != nil {
 		return nil, nil, err
 	}
 	bootstraper = bootstrap.NewBootstrap(mapp)

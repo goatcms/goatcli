@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/dependencies"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/modules"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/repositories"
@@ -40,7 +41,7 @@ func TestOnceFile(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
+	if mapp, err = gclimock.NewApp(mockupapp.MockupOptions{
 		Input: gio.NewInput(strings.NewReader("")),
 	}); err != nil {
 		t.Error(err)

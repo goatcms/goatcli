@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/repositories"
 	"github.com/goatcms/goatcore/app"
@@ -19,7 +20,7 @@ func TestDependenciesFromFile(t *testing.T) {
 		mapp app.App
 	)
 	// prepare mockup application & data
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
+	if mapp, err = gclimock.NewApp(mockupapp.MockupOptions{
 		Input: gio.NewInput(strings.NewReader("my_insert_value\n")),
 	}); err != nil {
 		t.Error(err)
@@ -65,7 +66,7 @@ func TestDependenciesDefaultEmpty(t *testing.T) {
 	var err error
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
+	mapp, err := gclimock.NewApp(mockupapp.MockupOptions{
 		Input: gio.NewInput(strings.NewReader("")),
 	})
 	if err != nil {

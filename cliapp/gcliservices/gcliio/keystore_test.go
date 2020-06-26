@@ -76,6 +76,14 @@ func TestKeystoreSetAndRemoveStory(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	if result, err = deps.Keystorage.Get("key"); err != nil {
+		t.Error(err)
+		return
+	}
+	if result != nil {
+		t.Errorf("Expected nil before set key and take %v", result)
+		return
+	}
 	if err = deps.Keystorage.Set("key", expected); err != nil {
 		t.Error(err)
 		return

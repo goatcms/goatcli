@@ -34,6 +34,7 @@ type GCLIEnvironment interface {
 // GCLIKeystorageService storage project keys (like saved hashed passowrds)
 type GCLIKeystorageService interface {
 	Password(key string, prompt string) (passwordHash []byte, err error)
+	RePassword(key string, prompt, rePrompt string) (passwordHash []byte, err error)
 	Set(key string, value []byte) (err error)
 	Sets(kv map[string][]byte) (err error)
 	Get(key string) (value []byte, err error)

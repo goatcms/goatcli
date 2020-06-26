@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/repositories"
 	"github.com/goatcms/goatcore/app"
@@ -21,7 +22,7 @@ func TestWriteDefToFS(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
+	if mapp, err = gclimock.NewApp(mockupapp.MockupOptions{
 		Input: gio.NewInput(strings.NewReader("")),
 	}); err != nil {
 		t.Error(err)

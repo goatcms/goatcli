@@ -1,9 +1,10 @@
 package gcliio
 
 import (
-	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 
+	"github.com/goatcms/goatcli/cliapp/gclimock"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/data"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/properties"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/secrets"
@@ -12,8 +13,7 @@ import (
 )
 
 func newMockupApp(opt mockupapp.MockupOptions) (mapp app.App, err error) {
-	var gefs filesystem.Filespace
-	if mapp, err = mockupapp.NewApp(opt); err != nil {
+	if mapp, err = gclimock.NewApp(opt); err != nil {
 		return nil, err
 	}
 	dp := mapp.DependencyProvider()
@@ -21,16 +21,8 @@ func newMockupApp(opt mockupapp.MockupOptions) (mapp app.App, err error) {
 		RegisterDependencies(dp),
 		secrets.RegisterDependencies(dp),
 		properties.RegisterDependencies(dp),
+		template.RegisterDependencies(dp),
 		data.RegisterDependencies(dp))); err != nil {
-		return nil, err
-	}
-	if mapp.RootFilespace().MkdirAll(".goatcli/efs", filesystem.DefaultUnixDirMode); err != nil {
-		return nil, err
-	}
-	if gefs, err = mapp.RootFilespace().Filespace(".goatcli/efs"); err != nil {
-		return nil, err
-	}
-	if err = mapp.FilespaceScope().Set("gefs", gefs); err != nil {
 		return nil, err
 	}
 	return mapp, nil
