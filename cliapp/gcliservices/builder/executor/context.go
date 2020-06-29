@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcore/filesystem"
 )
 
@@ -13,7 +15,7 @@ import (
 type Context struct {
 	Template   TemplateHandler
 	DotData    interface{}
-	PlainData  map[string]string
+	Data       common.ElasticData
 	Properties TaskProperties
 	AM         interface{}
 

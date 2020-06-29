@@ -4,7 +4,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/am"
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/data"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/dependencies"
@@ -23,9 +25,9 @@ const (
 	testCTXAMLayout = `{{- define "out/file.txt"}}
 		{{- $ctx := .}}
 		{{- $entities := $ctx.AM.Entities }}
-		{{- index $ctx.PlainData "datakey" }}
-		{{- index $ctx.Properties.Project "propkey" }}
-		{{- index $ctx.Properties.Secrets "secretkey" }}
+		{{- index $ctx.Data.Plain "datakey" }}
+		{{- index $ctx.Properties.Project.Plain "propkey" }}
+		{{- index $ctx.Properties.Secrets.Plain "secretkey" }}
 
 		Entities:
 		{{- range $index, $entity := $entities }}
@@ -79,10 +81,12 @@ const (
 
 func TestCTXBuilderAfterBuild(t *testing.T) {
 	var (
-		mapp      app.App
-		err       error
-		fileBytes []byte
-		ctxData   map[string]string
+		mapp             app.App
+		err              error
+		fileBytes        []byte
+		ctxData          map[string]string
+		appData          gcliservices.ApplicationData
+		emptyElasticData common.ElasticData
 	)
 	t.Parallel()
 	// prepare mockup application & data
@@ -128,8 +132,15 @@ func TestCTXBuilderAfterBuild(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	appData := am.NewApplicationData(ctxData)
-	if err = deps.BuilderService.Build(ctx, fs, appData, map[string]string{}, map[string]string{}); err != nil {
+	if appData, err = am.NewApplicationData(ctxData); err != nil {
+		t.Error(err)
+		return
+	}
+	if emptyElasticData, err = gclivarutil.NewElasticData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = deps.BuilderService.Build(ctx, fs, appData, emptyElasticData, emptyElasticData); err != nil {
 		t.Error(err)
 		return
 	}

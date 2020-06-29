@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/filesystem"
 )
@@ -12,7 +13,7 @@ type Task struct {
 	// external data
 	DotData interface{}
 	// External properties
-	BuildProperties map[string]string
+	BuildProperties common.ElasticData
 	// destination filesystem
 	FSPath string
 }
@@ -27,7 +28,7 @@ type TemplateHandler struct {
 // SharedData contains shared data for all executor tasks
 type SharedData struct {
 	VCSData    gcliservices.VCSData
-	PlainData  map[string]string
+	Data       common.ElasticData
 	Properties GlobalProperties
 	FS         filesystem.Filespace
 	AM         interface{}
@@ -35,13 +36,13 @@ type SharedData struct {
 
 // GlobalProperties contains task properties
 type GlobalProperties struct {
-	Project map[string]string
-	Secrets map[string]string
+	Project common.ElasticData
+	Secrets common.ElasticData
 }
 
 // TaskProperties contains task properties
 type TaskProperties struct {
-	Build   map[string]string
-	Project map[string]string
-	Secrets map[string]string
+	Build   common.ElasticData
+	Project common.ElasticData
+	Secrets common.ElasticData
 }

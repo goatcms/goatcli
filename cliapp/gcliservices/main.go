@@ -37,7 +37,7 @@ type PropertiesService interface {
 
 // SecretsService provide project secret properties data (like passwords, credentials etc)
 type SecretsService interface {
-	ReadDefFromFS(fs filesystem.Filespace, properties map[string]string, data ApplicationData) ([]*config.Property, error)
+	ReadDefFromFS(fs filesystem.Filespace, properties common.ElasticData, data ApplicationData) ([]*config.Property, error)
 	ReadDataFromFS(fs filesystem.Filespace) (map[string]string, error)
 	FillData(ctx app.IOContext, def []*config.Property, data map[string]string, defaultData map[string]string, interactive bool) (bool, error)
 	WriteDataToFS(fs filesystem.Filespace, data map[string]string) error

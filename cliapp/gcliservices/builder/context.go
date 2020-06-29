@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/builder/executor"
@@ -24,12 +25,11 @@ type Command struct {
 
 // Context contains build process data
 type Context struct {
-	ctx        app.IOContext
-	appModel   interface{}
-	data       map[string]string
-	properties map[string]string
-	secrets    map[string]string
-
+	ctx                app.IOContext
+	appModel           interface{}
+	data               common.ElasticData
+	properties         common.ElasticData
+	secrets            common.ElasticData
 	service            *Service
 	vcsData            gcliservices.VCSData
 	commitCommands     []Command
@@ -96,8 +96,8 @@ func (c *Context) build(fs filesystem.Filespace, subPath string, buildConfigs []
 		return err
 	}
 	if generatorExecutor, err = executor.NewGeneratorExecutor(c.ctx.Scope(), executor.SharedData{
-		AM:        c.appModel,
-		PlainData: c.data,
+		AM:   c.appModel,
+		Data: c.data,
 		Properties: executor.GlobalProperties{
 			Project: c.properties,
 			Secrets: c.secrets,

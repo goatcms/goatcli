@@ -18,9 +18,9 @@ import (
 
 const (
 	tesRenderFileContent = `{{- $ctx := .}}
-		{{- index $ctx.PlainData "datakey" }}
-		{{- index $ctx.Properties.Project "propkey" }}
-		{{- index $ctx.Properties.Secrets "secretkey" }}`
+		{{- index $ctx.Data.Plain "datakey" }}
+		{{- index $ctx.Properties.Project.Plain "propkey" }}
+		{{- index $ctx.Properties.Secrets.Plain "secretkey" }}`
 	tesRenderFileConfig = `[{
 		  "template":"names",
 		  "layout":"default"

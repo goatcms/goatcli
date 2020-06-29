@@ -4,7 +4,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/am"
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/dependencies"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/modules"
@@ -33,8 +35,10 @@ const (
 
 func TestCTXBuilder(t *testing.T) {
 	var (
-		mapp *mockupapp.App
-		err  error
+		mapp             *mockupapp.App
+		appData          gcliservices.ApplicationData
+		emptyElasticData common.ElasticData
+		err              error
 	)
 	t.Parallel()
 	// prepare mockup application & data
@@ -72,12 +76,15 @@ func TestCTXBuilder(t *testing.T) {
 		return
 	}
 	ctx := mapp.IOContext()
-	appModel := am.NewApplicationModel(map[string]string{})
-	appData := gcliservices.ApplicationData{
-		AM:    appModel,
-		Plain: map[string]string{},
+	if emptyElasticData, err = gclivarutil.NewElasticData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
 	}
-	if err = deps.BuilderService.Build(ctx, fs, appData, map[string]string{}, map[string]string{}); err != nil {
+	if appData, err = am.NewApplicationData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = deps.BuilderService.Build(ctx, fs, appData, emptyElasticData, emptyElasticData); err != nil {
 		t.Error(err)
 		return
 	}

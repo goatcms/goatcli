@@ -1,14 +1,18 @@
 package scripts
 
+import (
+	"github.com/goatcms/goatcli/cliapp/common"
+)
+
 // Context is script context data
 type Context struct {
-	PlainData  map[string]string
-	Properties TaskProperties
+	Data       common.ElasticData
 	AM         interface{}
+	Properties TaskProperties
 }
 
 // TaskProperties contains task properties
 type TaskProperties struct {
-	Project map[string]string
-	Secrets map[string]string
+	Project common.ElasticData
+	Secrets common.ElasticData
 }

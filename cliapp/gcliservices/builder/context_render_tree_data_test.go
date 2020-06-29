@@ -16,23 +16,7 @@ import (
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-const (
-	tesCtrlFile = `
-	{{$ctx := .}}
-	{{$ctx.RenderOnce "file.txt" "" "" "file.txt" $ctx.DotData}}`
-	tesCtrlFileTemplate = `{{- define "file.txt"}}
-		{{- $ctx := .}}
-		{{- index $ctx.Data.Plain "datakey" }}
-		{{- index $ctx.Properties.Project.Plain "propkey" }}
-		{{- index $ctx.Properties.Secrets.Plain "secretkey" }}
-	{{- end}}`
-	tesCtrlFileConfig = `[{
-		  "template":"names",
-		  "layout":"default"
-		}]`
-)
-
-func TestOnceFile(t *testing.T) {
+func TestRenderDataTreeFile(t *testing.T) {
 	var (
 		mapp    app.App
 		err     error
@@ -48,9 +32,15 @@ func TestOnceFile(t *testing.T) {
 	}
 	fs := mapp.RootFilespace()
 	if err = goaterr.ToError(goaterr.AppendError(nil,
-		fs.WriteFile(".goat/build/templates/names/file.txt.tmpl", []byte(tesCtrlFileTemplate), 0766),
-		fs.WriteFile(".goat/build/templates/names/main.ctrl", []byte(tesCtrlFile), 0766),
-		fs.WriteFile(".goat/build.def.json", []byte(tesCtrlFileConfig), 0766))); err != nil {
+		fs.WriteFile(".goat/build/templates/names/file.txt.render", []byte(`
+		{{- $ctx.Data.Tree.datakey }}
+		{{- $ctx.Properties.Project.Tree.propkey -}}
+		{{- $ctx.Properties.Secrets.Tree.secretkey -}}
+		`), 0766),
+		fs.WriteFile(".goat/build.def.json", []byte(`[{
+		"template":"names",
+		"layout":"default"
+		}]`), 0766))); err != nil {
 		t.Error(err)
 		return
 	}
@@ -94,7 +84,7 @@ func TestOnceFile(t *testing.T) {
 		t.Errorf("File content must be equals to 'Ala ma kota' and it is '%s'", context)
 		return
 	}
-	// It must be render once
+	// It must be render evry time
 	if err = renderFile(fs, deps, map[string]string{
 		"datakey": "Ala",
 	}, map[string]string{
@@ -113,8 +103,8 @@ func TestOnceFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if string(context) != "Ala ma kota" {
-		t.Errorf("File content must be equals to 'Ala ma kota' and it is '%s'. The context can not cahnge after re-render/re-build", context)
+	if string(context) != "Ala nie ma kota" {
+		t.Errorf("File content must be equals to 'Ala nie ma kota' and it is '%s' after re-render/re-build", context)
 		return
 	}
 }

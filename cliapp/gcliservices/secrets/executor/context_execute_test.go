@@ -4,6 +4,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
+
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
@@ -28,7 +32,9 @@ func TestContextExecute(t *testing.T) {
 		secretsExecutor  *SecretsExecutor
 		executorScope    = scope.NewScope(scope.Params{})
 		err              error
-		secrets          []*config.Property
+		resultSecretsDef []*config.Property
+		appData          gcliservices.ApplicationData
+		properties       common.ElasticData
 	)
 	for ti := 0; ti < workers.AsyncTestReapeat; ti++ {
 		// prepare mockup application
@@ -61,10 +67,18 @@ func TestContextExecute(t *testing.T) {
 			t.Error(err)
 			return
 		}
+		if appData, err = am.NewApplicationData(map[string]string{}); err != nil {
+			t.Error(err)
+			return
+		}
+		if properties, err = gclivarutil.NewElasticData(map[string]string{}); err != nil {
+			t.Error(err)
+			return
+		}
 		if secretsExecutor, err = NewSecretsExecutor(executorScope, SharedData{
-			AppData: am.NewApplicationData(map[string]string{}),
+			AppData: appData,
 			Properties: GlobalProperties{
-				Project: map[string]string{},
+				Project: properties,
 			},
 			DotData: guardians,
 		}, 10, templateExecutor); err != nil {
@@ -79,11 +93,11 @@ func TestContextExecute(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		if secrets, err = secretsExecutor.Secrets(); err != nil {
+		if resultSecretsDef, err = secretsExecutor.Secrets(); err != nil {
 			t.Error(err)
 			return
 		}
-		if len(secrets) != 1 {
+		if len(resultSecretsDef) != 1 {
 			t.Errorf("expected one generated secret definition")
 			return
 		}

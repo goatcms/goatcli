@@ -4,7 +4,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/am"
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/dependencies"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/modules"
@@ -21,9 +23,9 @@ import (
 const (
 	testCTXBuilderLayout = `{{- define "out/file.txt"}}
 		{{- $ctx := .}}
-		{{- index $ctx.PlainData "datakey" }}
-		{{- index $ctx.Properties.Project "propkey" }}
-		{{- index $ctx.Properties.Secrets "secretkey" }}
+		{{- index $ctx.Data.Plain "datakey" }}
+		{{- index $ctx.Properties.Project.Plain "propkey" }}
+		{{- index $ctx.Properties.Secrets.Plain "secretkey" }}
 	{{- end}}`
 	testCTXBuilderTemplate = `
 	{{$ctx.RenderOnce "out/file.txt" "" "" "out/file.txt" $ctx.DotData}}
@@ -38,9 +40,12 @@ const (
 
 func TestCTXBuilderAM(t *testing.T) {
 	var (
-		mapp    app.App
-		err     error
-		context []byte
+		mapp       app.App
+		err        error
+		context    []byte
+		appData    gcliservices.ApplicationData
+		properties common.ElasticData
+		secrets    common.ElasticData
 	)
 	t.Parallel()
 	// prepare mockup application & data
@@ -79,14 +84,25 @@ func TestCTXBuilderAM(t *testing.T) {
 		return
 	}
 	ctx := mapp.IOContext()
-	appData := am.NewApplicationData(map[string]string{
+	if appData, err = am.NewApplicationData(map[string]string{
 		"datakey": "Ala",
-	})
-	if err = deps.BuilderService.Build(ctx, fs, appData, map[string]string{
+	}); err != nil {
+		t.Error(err)
+		return
+	}
+	if properties, err = gclivarutil.NewElasticData(map[string]string{
 		"propkey": " ma",
-	}, map[string]string{
+	}); err != nil {
+		t.Error(err)
+		return
+	}
+	if secrets, err = gclivarutil.NewElasticData(map[string]string{
 		"secretkey": " kota",
 	}); err != nil {
+		t.Error(err)
+		return
+	}
+	if err = deps.BuilderService.Build(ctx, fs, appData, properties, secrets); err != nil {
 		t.Error(err)
 		return
 	}

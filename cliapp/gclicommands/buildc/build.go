@@ -1,6 +1,8 @@
 package buildc
 
 import (
+	"github.com/goatcms/goatcli/cliapp/common"
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
 	"github.com/goatcms/goatcli/cliapp/common/prevents"
 	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/vcsc"
@@ -27,6 +29,8 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 		childCtx       app.IOContext
 		out            app.Output
 		fs             filesystem.Filespace
+		properties     common.ElasticData
+		secrets        common.ElasticData
 	)
 	childCtx = gio.NewChildIOContext(ctx, gio.ChildIOContextParams{})
 	defer childCtx.Scope().Close()
@@ -56,7 +60,13 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	out.Printf("cloned\n")
 	// Build
 	out.Printf("start build... ")
-	if err = deps.BuilderService.Build(ctx, fs, appData, propertiesData, secretsData); err != nil {
+	if properties, err = gclivarutil.NewElasticData(propertiesData); err != nil {
+		return err
+	}
+	if secrets, err = gclivarutil.NewElasticData(secretsData); err != nil {
+		return err
+	}
+	if err = deps.BuilderService.Build(ctx, fs, appData, properties, secrets); err != nil {
 		return err
 	}
 	if err = scope.Wait(); err != nil {

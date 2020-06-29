@@ -10,3 +10,9 @@ type PropertiesResult interface {
 	StringInjector
 	Get(string) (string, error)
 }
+
+// ElasticData provide plain data and tree data structures
+type ElasticData struct {
+	Plain map[string]string
+	Tree  map[string]interface{}
+}

@@ -3,6 +3,12 @@ package gcliio
 import (
 	"strings"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
+
+	"github.com/goatcms/goatcore/varutil/goaterr"
+
 	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/common/prevents"
@@ -33,12 +39,13 @@ func InputsFactory(dp dependency.Provider) (result interface{}, err error) {
 // Inputs return goat cli app inputs
 func (inputs *Inputs) Inputs(ctx app.IOContext) (propertiesData, secretsData map[string]string, appData gcliservices.ApplicationData, err error) {
 	var (
-		propertiesDef []*config.Property
-		secretsDef    []*config.Property
-		isChanged     bool
-		interactive   bool
-		fs            = ctx.IO().CWD()
-		data          map[string]string
+		propertiesDef     []*config.Property
+		secretsDef        []*config.Property
+		isChanged         bool
+		interactive       bool
+		fs                = ctx.IO().CWD()
+		data              map[string]string
+		elasticProperties common.ElasticData
 	)
 	interactive = strings.ToLower(inputs.deps.Interactive) != "false"
 	if err = prevents.RequireGoatProject(fs); err != nil {
@@ -63,9 +70,14 @@ func (inputs *Inputs) Inputs(ctx app.IOContext) (propertiesData, secretsData map
 	if data, err = inputs.deps.DataService.ReadDataFromFS(fs); err != nil {
 		return nil, nil, appData, err
 	}
-	appData = am.NewApplicationData(data)
+	if appData, err = am.NewApplicationData(data); err != nil {
+		return nil, nil, appData, goaterr.Wrapf("plaindata contains illegal keys or is incorrect", err)
+	}
 	// load secrets
-	if secretsDef, err = inputs.deps.SecretsService.ReadDefFromFS(fs, propertiesData, appData); err != nil {
+	if elasticProperties, err = gclivarutil.NewElasticData(propertiesData); err != nil {
+		return nil, nil, appData, err
+	}
+	if secretsDef, err = inputs.deps.SecretsService.ReadDefFromFS(fs, elasticProperties, appData); err != nil {
 		return nil, nil, appData, err
 	}
 	if secretsData, err = inputs.deps.SecretsService.ReadDataFromFS(fs); err != nil {

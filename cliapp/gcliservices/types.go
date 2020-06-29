@@ -1,7 +1,9 @@
 package gcliservices
 
+import "github.com/goatcms/goatcli/cliapp/common"
+
 // ApplicationData provide data api
 type ApplicationData struct {
-	Plain map[string]string
-	AM    interface{}
+	ElasticData common.ElasticData
+	AM          interface{}
 }

@@ -3,6 +3,8 @@ package builder
 import (
 	"strconv"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
@@ -47,7 +49,7 @@ func ServiceFactory(dp dependency.Provider) (interface{}, error) {
 }
 
 // Build build filesystem in context
-func (s *Service) Build(ctx app.IOContext, fs filesystem.Filespace, appData gcliservices.ApplicationData, properties, secrets map[string]string) (err error) {
+func (s *Service) Build(ctx app.IOContext, fs filesystem.Filespace, appData gcliservices.ApplicationData, properties, secrets common.ElasticData) (err error) {
 	parentScope := ctx.Scope()
 	childIOCtx := gio.NewChildIOContext(ctx, gio.ChildIOContextParams{
 		Scope: scope.ChildParams{
@@ -58,7 +60,7 @@ func (s *Service) Build(ctx app.IOContext, fs filesystem.Filespace, appData gcli
 	defer childIOCtx.Scope().Close()
 	buildContext := &Context{
 		ctx:        childIOCtx,
-		data:       appData.Plain,
+		data:       appData.ElasticData,
 		properties: properties,
 		secrets:    secrets,
 		service:    s,

@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
@@ -13,7 +15,7 @@ import (
 type Context struct {
 	AM         interface{}
 	DotData    interface{}
-	PlainData  map[string]string
+	Data       common.ElasticData
 	Properties GlobalProperties
 
 	// internal variables
@@ -24,9 +26,9 @@ type Context struct {
 
 func newContext(executor *SecretsExecutor, sharedData SharedData) *Context {
 	return &Context{
-		AM:        sharedData.AppData.AM,
-		DotData:   sharedData.DotData,
-		PlainData: sharedData.AppData.Plain,
+		AM:      sharedData.AppData.AM,
+		DotData: sharedData.DotData,
+		Data:    sharedData.AppData.ElasticData,
 		Properties: GlobalProperties{
 			Project: sharedData.Properties.Project,
 		},
@@ -42,7 +44,7 @@ func (c *Context) Error(msg string) (err error) {
 	return err
 }
 
-// Error return an execution error
+// AddSecret add secret definition to context
 func (c *Context) AddSecret(dict map[string]interface{}) (err error) {
 	var (
 		min, max int

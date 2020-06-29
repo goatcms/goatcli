@@ -5,6 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
+
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
@@ -23,7 +27,9 @@ func TestPipRunWaitStory(t *testing.T) {
 		deps struct {
 			ScriptsRunner gcliservices.ScriptsRunner `dependency:"ScriptsRunner"`
 		}
-		taskManager pipservices.TasksManager
+		taskManager      pipservices.TasksManager
+		appData          gcliservices.ApplicationData
+		emptyElasticData common.ElasticData
 	)
 	if mapp, _, err = newApp(mockupapp.MockupOptions{}); err != nil {
 		t.Error(err)
@@ -46,7 +52,13 @@ func TestPipRunWaitStory(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	appData := am.NewApplicationData(map[string]string{})
+	if appData, err = am.NewApplicationData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if emptyElasticData, err = gclivarutil.NewElasticData(map[string]string{}); err != nil {
+		return
+	}
 	if taskManager, err = deps.ScriptsRunner.Run(gcliservices.ScriptsContext{
 		Scope: mapp.IOContext().Scope(),
 		CWD:   mapp.IOContext().IO().CWD(),
@@ -54,7 +66,7 @@ func TestPipRunWaitStory(t *testing.T) {
 			Task: "",
 			Lock: "",
 		}),
-	}, fs, "scriptName", map[string]string{}, map[string]string{}, appData); err != nil {
+	}, fs, "scriptName", emptyElasticData, emptyElasticData, appData); err != nil {
 		t.Error(err)
 		return
 	}

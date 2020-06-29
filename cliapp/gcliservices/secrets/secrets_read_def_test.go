@@ -3,6 +3,10 @@ package secrets
 import (
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
+
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
@@ -11,10 +15,12 @@ import (
 
 func TestSecretsReadDefFromDataFile(t *testing.T) {
 	var (
-		err     error
-		service gcliservices.SecretsService
-		mapp    app.App
-		def     []*config.Property
+		err        error
+		service    gcliservices.SecretsService
+		mapp       app.App
+		def        []*config.Property
+		appData    gcliservices.ApplicationData
+		properties common.ElasticData
 	)
 	t.Parallel()
 	if service, mapp, err = buildMockupApp(""); err != nil {
@@ -25,8 +31,15 @@ func TestSecretsReadDefFromDataFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	appData := am.NewApplicationData(map[string]string{})
-	if def, err = service.ReadDefFromFS(mapp.RootFilespace(), map[string]string{}, appData); err != nil {
+	if appData, err = am.NewApplicationData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if properties, err = gclivarutil.NewElasticData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if def, err = service.ReadDefFromFS(mapp.RootFilespace(), properties, appData); err != nil {
 		t.Error(err)
 		return
 	}
@@ -46,18 +59,27 @@ func TestSecretsReadDefFromDataFile(t *testing.T) {
 
 func TestPropertiesReaDefFromNoFile(t *testing.T) {
 	var (
-		err     error
-		service gcliservices.SecretsService
-		mapp    app.App
-		def     []*config.Property
+		err              error
+		service          gcliservices.SecretsService
+		mapp             app.App
+		def              []*config.Property
+		appData          gcliservices.ApplicationData
+		emptyElasticData common.ElasticData
 	)
 	t.Parallel()
 	if service, mapp, err = buildMockupApp(""); err != nil {
 		t.Error(err)
 		return
 	}
-	appData := am.NewApplicationData(map[string]string{})
-	if def, err = service.ReadDefFromFS(mapp.RootFilespace(), map[string]string{}, appData); err != nil {
+	if appData, err = am.NewApplicationData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if emptyElasticData, err = gclivarutil.NewElasticData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if def, err = service.ReadDefFromFS(mapp.RootFilespace(), emptyElasticData, appData); err != nil {
 		t.Error(err)
 		return
 	}

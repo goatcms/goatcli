@@ -4,8 +4,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/common/am"
 	"github.com/goatcms/goatcli/cliapp/common/config"
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcore/app"
@@ -26,6 +29,8 @@ func TestDataDefFromDirectory(t *testing.T) {
 		deps    struct {
 			Secrets gcliservices.SecretsService `dependency:"SecretsService"`
 		}
+		appData          gcliservices.ApplicationData
+		emptyElasticData common.ElasticData
 	)
 	t.Parallel()
 	// prepare mockup application
@@ -60,8 +65,15 @@ func TestDataDefFromDirectory(t *testing.T) {
 		return
 	}
 	// test
-	appData := am.NewApplicationData(map[string]string{})
-	if secrets, err = deps.Secrets.ReadDefFromFS(mapp.RootFilespace(), map[string]string{}, appData); err != nil {
+	if appData, err = am.NewApplicationData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if emptyElasticData, err = gclivarutil.NewElasticData(map[string]string{}); err != nil {
+		t.Error(err)
+		return
+	}
+	if secrets, err = deps.Secrets.ReadDefFromFS(mapp.RootFilespace(), emptyElasticData, appData); err != nil {
 		t.Error(err)
 		return
 	}

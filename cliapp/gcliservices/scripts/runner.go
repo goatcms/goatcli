@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/modules"
@@ -36,7 +38,7 @@ func RunnerFactory(dp dependency.Provider) (result interface{}, err error) {
 }
 
 // Run script by name
-func (runner *Runner) Run(ctx gcliservices.ScriptsContext, fs filesystem.Filespace, scriptName string, properties, secrets map[string]string, appData gcliservices.ApplicationData) (taskManager pipservices.TasksManager, err error) {
+func (runner *Runner) Run(ctx gcliservices.ScriptsContext, fs filesystem.Filespace, scriptName string, properties, secrets common.ElasticData, appData gcliservices.ApplicationData) (taskManager pipservices.TasksManager, err error) {
 	var (
 		executor gcliservices.TemplateExecutor
 		isEmpty  bool
@@ -56,8 +58,8 @@ func (runner *Runner) Run(ctx gcliservices.ScriptsContext, fs filesystem.Filespa
 		return nil, goaterr.Errorf("The script %s is empty", path)
 	}
 	if err = executor.Execute(buffer, Context{
-		AM:        appData.AM,
-		PlainData: appData.Plain,
+		AM:   appData.AM,
+		Data: appData.ElasticData,
 		Properties: TaskProperties{
 			Project: properties,
 			Secrets: secrets,

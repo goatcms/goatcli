@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 )
 
@@ -18,5 +19,5 @@ type SharedData struct {
 
 // GlobalProperties contains task properties
 type GlobalProperties struct {
-	Project map[string]string
+	Project common.ElasticData
 }

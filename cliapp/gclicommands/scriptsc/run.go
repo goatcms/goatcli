@@ -3,6 +3,9 @@ package scriptsc
 import (
 	"time"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
+
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
@@ -23,6 +26,8 @@ func RunScript(a app.App, ctx app.IOContext) (err error) {
 		}
 		propertiesData map[string]string
 		secretsData    map[string]string
+		properties     common.ElasticData
+		secrets        common.ElasticData
 		appData        gcliservices.ApplicationData
 		ctxScope       = ctx.Scope()
 		taskManager    pipservices.TasksManager
@@ -68,11 +73,17 @@ func RunScript(a app.App, ctx app.IOContext) (err error) {
 		return err
 	}
 	// run script
+	if properties, err = gclivarutil.NewElasticData(propertiesData); err != nil {
+		return err
+	}
+	if secrets, err = gclivarutil.NewElasticData(secretsData); err != nil {
+		return err
+	}
 	if taskManager, err = deps.ScriptsRunner.Run(gcliservices.ScriptsContext{
 		Scope:      ctx.Scope(),
 		CWD:        ctx.IO().CWD(),
 		Namespaces: scpNamespaces,
-	}, cwd, deps.Name, propertiesData, secretsData, appData); err != nil {
+	}, cwd, deps.Name, properties, secrets, appData); err != nil {
 		return err
 	}
 	if err = taskManager.StatusBroadcast().Add(ctx.IO().Out()); err != nil {

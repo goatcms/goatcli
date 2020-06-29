@@ -8,7 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/common/cutil"
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
@@ -45,8 +48,14 @@ func (e *GeneratorExecutor) Scope() app.Scope {
 }
 
 // ExecuteView run single executor template
-func (e *GeneratorExecutor) ExecuteView(layout, viewPath string, properties map[string]string, dotData interface{}) (err error) {
-	var list []string
+func (e *GeneratorExecutor) ExecuteView(layout, viewPath string, plainProperties map[string]string, dotData interface{}) (err error) {
+	var (
+		list       []string
+		properties common.ElasticData
+	)
+	if properties, err = gclivarutil.NewElasticData(plainProperties); err != nil {
+		return err
+	}
 	// Execute all single template
 	if list, err = e.templatesExecutor.Templates(layout, viewPath); err != nil {
 		return err
@@ -163,10 +172,10 @@ func (e *GeneratorExecutor) executeToWriter(writer io.Writer, task Task) (err er
 	}
 	sharedData := e.sharedData
 	ctx := &Context{
-		AM:        sharedData.AM,
-		Template:  task.Template,
-		DotData:   task.DotData,
-		PlainData: sharedData.PlainData,
+		AM:       sharedData.AM,
+		Template: task.Template,
+		DotData:  task.DotData,
+		Data:     sharedData.Data,
 		Properties: TaskProperties{
 			Build:   task.BuildProperties,
 			Project: sharedData.Properties.Project,

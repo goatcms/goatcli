@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+
 	"github.com/goatcms/goatcli/cliapp/common/cio"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
@@ -35,7 +37,7 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 }
 
 // ReadDefFromFS read secrets definitions from filespace
-func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace, properties map[string]string, appData gcliservices.ApplicationData) (secrets []*config.Property, err error) {
+func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace, properties common.ElasticData, appData gcliservices.ApplicationData) (secrets []*config.Property, err error) {
 	var (
 		json  []byte
 		nodes []os.FileInfo
@@ -83,7 +85,7 @@ func (p *Secrets) ReadDefFromFS(fs filesystem.Filespace, properties map[string]s
 }
 
 // ReadDefFromFS read secrets definitions from filespace
-func (p *Secrets) readDefFromFTemplate(fs filesystem.Filespace, properties map[string]string, appData gcliservices.ApplicationData) (secrets []*config.Property, err error) {
+func (p *Secrets) readDefFromFTemplate(fs filesystem.Filespace, properties common.ElasticData, appData gcliservices.ApplicationData) (secrets []*config.Property, err error) {
 	var (
 		templateExecutor gcliservices.TemplateExecutor
 		secretsExecutor  *executor.SecretsExecutor

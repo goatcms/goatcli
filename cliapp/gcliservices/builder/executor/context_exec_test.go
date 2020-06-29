@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/goatcms/goatcli/cliapp/common"
+	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	templates "github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
@@ -46,6 +48,7 @@ func TestContextExec(t *testing.T) {
 		templatesExecutor gcliservices.TemplatesExecutor
 		generatorExecutor *GeneratorExecutor
 		generatorScope    = scope.NewScope(scope.Params{})
+		emptyElasticData  common.ElasticData
 		err               error
 	)
 	for ti := 0; ti < workers.AsyncTestReapeat; ti++ {
@@ -78,12 +81,15 @@ func TestContextExec(t *testing.T) {
 			t.Error(err)
 			return
 		}
-
+		if emptyElasticData, err = gclivarutil.NewElasticData(map[string]string{}); err != nil {
+			t.Error(err)
+			return
+		}
 		if generatorExecutor, err = NewGeneratorExecutor(generatorScope, SharedData{
-			PlainData: map[string]string{},
+			Data: emptyElasticData,
 			Properties: GlobalProperties{
-				Project: map[string]string{},
-				Secrets: map[string]string{},
+				Project: emptyElasticData,
+				Secrets: emptyElasticData,
 			},
 			FS:      fs,
 			VCSData: vcs.NewData(vcs.NewGeneratedFiles(true), vcs.NewPersistedFiles(true)),
@@ -96,7 +102,7 @@ func TestContextExec(t *testing.T) {
 				Path: "testTemplate",
 			},
 			DotData:         guardians,
-			BuildProperties: map[string]string{},
+			BuildProperties: emptyElasticData,
 			FSPath:          "",
 		}); err != nil {
 			t.Error(err)
