@@ -24,6 +24,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/secrets"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/amtf"
+	"github.com/goatcms/goatcli/cliapp/gcliservices/template/shtf"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/vcs"
 	"github.com/goatcms/goatcore/app"
@@ -98,6 +99,7 @@ func (m *Module) InitDependencies(a app.App) (err error) {
 	return goaterr.ToError(goaterr.AppendError(nil,
 		amtf.RegisterFunctions(dp),
 		simpletf.RegisterFunctions(dp),
+		shtf.RegisterFunctions(dp),
 	))
 }
 
