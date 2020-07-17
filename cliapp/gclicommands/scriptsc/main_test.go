@@ -1,6 +1,7 @@
 package scriptsc
 
 import (
+	"github.com/goatcms/goatcli/cliapp/gclicommands"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/data"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/gcliio"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/properties"
@@ -14,7 +15,6 @@ import (
 	"github.com/goatcms/goatcore/app/modules/pipelinem"
 	"github.com/goatcms/goatcore/app/modules/terminalm"
 	"github.com/goatcms/goatcore/varutil/goaterr"
-	"github.com/sebastianpozoga/stock-alerts/sapp/commands"
 )
 
 func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper app.Bootstrap, err error) {
@@ -33,7 +33,7 @@ func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper a
 		secrets.RegisterDependencies(dp),
 		scripts.RegisterDependencies(dp),
 		template.RegisterDependencies(dp),
-		app.RegisterCommand(mapp, "scripts:run", RunScript, commands.ScriptsRun),
+		app.RegisterCommand(mapp, "scripts:run", RunScript, gclicommands.ScriptsRun),
 	)); err != nil {
 		return nil, nil, err
 	}

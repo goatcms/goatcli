@@ -1,6 +1,7 @@
 package buildc
 
 import (
+	"github.com/goatcms/goatcli/cliapp/gclicommands"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/builder"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/cloner"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/data"
@@ -18,7 +19,6 @@ import (
 	"github.com/goatcms/goatcore/app/modules/commonm"
 	"github.com/goatcms/goatcore/app/modules/terminalm"
 	"github.com/goatcms/goatcore/varutil/goaterr"
-	"github.com/sebastianpozoga/stock-alerts/sapp/commands"
 )
 
 func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper app.Bootstrap, err error) {
@@ -41,8 +41,8 @@ func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper a
 		repositories.RegisterDependencies(dp),
 		cloner.RegisterDependencies(dp),
 		vcs.RegisterDependencies(dp),
-		app.RegisterCommand(mapp, "build", RunBuild, commands.Build),
-		app.RegisterCommand(mapp, "rebuild", RunRebuild, commands.Rebuild),
+		app.RegisterCommand(mapp, "build", RunBuild, gclicommands.Build),
+		app.RegisterCommand(mapp, "rebuild", RunRebuild, gclicommands.Rebuild),
 	)); err != nil {
 		return nil, nil, err
 	}
