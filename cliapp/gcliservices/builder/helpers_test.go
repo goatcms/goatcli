@@ -43,7 +43,7 @@ func renderFile(fs filesystem.Filespace, deps RenderFileDeps, data, plainPropert
 	if err = ctx.Scope().Wait(); err != nil {
 		return err
 	}
-	return ctx.Scope().Trigger(app.CommitEvent, nil)
+	return ctx.Scope().Trigger(gcliservices.BuildCommitevent, nil)
 }
 
 func newEmptyIOContext() (ctx app.IOContext, err error) {

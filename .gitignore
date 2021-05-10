@@ -15,5 +15,11 @@ debug
 .vscode
 
 /vendor
+/data
+.goat/tmp
+.goat/secrets
+.goat/secrets.json
+
+teststmp
 
 configuration.json

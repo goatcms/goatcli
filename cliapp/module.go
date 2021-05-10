@@ -5,6 +5,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gclicommands/buildc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/cleanc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/clonec"
+	"github.com/goatcms/goatcli/cliapp/gclicommands/containerc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/datac"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/depsc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/initc"
@@ -89,6 +90,7 @@ func (m *Module) registerCommands(a app.App) error {
 		app.RegisterCommand(a, "vcs:generated:list", vcsc.RunGeneratedList, gclicommands.VCSGeneratedList),
 		app.RegisterCommand(a, "scripts:run", scriptsc.RunScript, gclicommands.ScriptsRun),
 		app.RegisterCommand(a, "scripts:envs", scriptsc.RunScriptsEnvs, gclicommands.ScriptsEnvs),
+		app.RegisterCommand(a, "container:image", containerc.RunContainerImagePip, gclicommands.ContainerImage),
 		app.RegisterArgument(a, "cwd", gclicommands.CWDArg),
 	))
 }

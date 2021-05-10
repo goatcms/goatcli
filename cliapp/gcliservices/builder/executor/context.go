@@ -44,8 +44,8 @@ func (c *Context) Render(destPath, layout, path, name string, dotData interface{
 		task     Task
 		ctxScope = c.executor.Scope()
 	)
-	if ctxScope.IsKilled() {
-		return ctxScope.ToError()
+	if ctxScope.IsDone() {
+		return fmt.Errorf("Context is killed")
 	}
 	destPath = filepath.Clean(destPath)
 	if strings.HasPrefix(destPath, "hook/") || destPath == "hook" {

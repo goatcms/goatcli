@@ -14,7 +14,6 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/vcs"
-	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/mockupapp"
 	"github.com/goatcms/goatcore/varutil/goaterr"
@@ -98,7 +97,7 @@ func TestCTXHook(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = ctx.Scope().Trigger(app.CommitEvent, nil); err != nil {
+	if err = ctx.Scope().Trigger(gcliservices.BuildCommitevent, nil); err != nil {
 		t.Error(err)
 		return
 	}

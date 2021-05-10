@@ -64,7 +64,7 @@ func (e *GeneratorExecutor) ExecuteView(layout, viewPath string, plainProperties
 		var (
 			extension, destPath string
 		)
-		if e.scope.IsKilled() {
+		if e.scope.IsDone() {
 			return nil
 		}
 		extension = filepath.Ext(name)
@@ -148,7 +148,7 @@ func (e *GeneratorExecutor) consumer() (err error) {
 			if !more {
 				return
 			}
-			if e.scope.IsKilled() {
+			if e.scope.IsDone() {
 				e.scope.DoneTask()
 				continue
 			}
@@ -167,8 +167,8 @@ func (e *GeneratorExecutor) consumer() (err error) {
 }
 
 func (e *GeneratorExecutor) executeToWriter(writer io.Writer, task Task) (err error) {
-	if e.scope.IsKilled() {
-		return fmt.Errorf("Context killed")
+	if e.scope.IsDone() {
+		return fmt.Errorf("Context scope stopped")
 	}
 	sharedData := e.sharedData
 	ctx := &Context{
@@ -193,8 +193,8 @@ func (e *GeneratorExecutor) executeToWriter(writer io.Writer, task Task) (err er
 
 func (e *GeneratorExecutor) run(task Task) (err error) {
 	var writer filesystem.Writer
-	if e.scope.IsKilled() {
-		return fmt.Errorf("Context is killed")
+	if e.scope.IsDone() {
+		return fmt.Errorf("Context scope stopped")
 	}
 	if task.FSPath == "" {
 		writer = cutil.NewNilWriter()

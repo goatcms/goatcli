@@ -55,7 +55,7 @@ func (e *SecretsExecutor) Execute() (err error) {
 		return err
 	}
 	for _, name := range list {
-		if e.scope.IsKilled() {
+		if e.scope.IsDone() {
 			return nil
 		}
 		if strings.HasSuffix(name, ".ctrl") {
@@ -85,7 +85,7 @@ func (e *SecretsExecutor) consumer() (err error) {
 			if !more {
 				return
 			}
-			if e.scope.IsKilled() {
+			if e.scope.IsDone() {
 				e.scope.DoneTask()
 				continue
 			}
@@ -98,7 +98,7 @@ func (e *SecretsExecutor) consumer() (err error) {
 }
 
 func (e *SecretsExecutor) run(task Task) (err error) {
-	if e.scope.IsKilled() {
+	if e.scope.IsDone() {
 		return fmt.Errorf("Context killed")
 	}
 	writer := cutil.NewNilWriter()

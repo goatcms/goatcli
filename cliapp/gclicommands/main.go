@@ -47,6 +47,15 @@ const (
 	ScriptsRun = "run script by name"
 	// ScriptsEnvs is a scripts:envs command help
 	ScriptsEnvs = "list scripts environments"
+	// ContainerImage is a container:image command help
+	ContainerImage = "[--pip] run container image pipeline. It is sub terminal to build and push image."
 	// CWDArg is a cwd argument description
 	CWDArg = "set Current Working Dirctory"
 )
+
+// // ContainerCWDBuild is a container:cwd:build command help
+// ContainerCWDBuild = "[--steps, --dest] build container (by run 'steps') and push it to 'dest' directory"
+// // ContainerCWDPush is a container:cwd:push command help
+// ContainerCWDPush = "[--src, --login, --password, --registry, --tls-verify, --type] push container from --src directory to registry"
+// // ContainerRegistryBuild is a container:registry:build command help
+// ContainerRegistryBuild = "[--steps, --login, --password, --registry, --tls-verify, --type] build a container by run steps. Push it to a registry"

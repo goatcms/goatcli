@@ -66,7 +66,7 @@ func (c *Context) Build(fs filesystem.Filespace) (err error) {
 		return err
 	}
 	// bind commit event
-	c.ctx.Scope().On(app.CommitEvent, c.commit)
+	c.ctx.Scope().On(gcliservices.BuildCommitevent, c.commit)
 	// build
 	if err = c.build(c.cache, "", buildConfigs); err != nil {
 		return err

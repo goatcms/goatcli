@@ -76,7 +76,7 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 	}
 	out.Printf("builded\n")
 	out.Printf("start commit... ")
-	if err = scope.Trigger(app.CommitEvent, nil); err != nil {
+	if err = scope.Trigger(gcliservices.BuildCommitevent, nil); err != nil {
 		return err
 	}
 	return out.Printf("commited\n")

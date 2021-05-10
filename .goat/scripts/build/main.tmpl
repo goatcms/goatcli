@@ -1,0 +1,67 @@
+{{- $ctx := . -}}
+
+{{- $secrets := $ctx.Properties.Secrets.Tree -}}
+{{- $data := $ctx.Data.Tree -}}
+
+{{- $internalSSHUsername := $secrets.infrastructure.internal.master.username }}
+{{- $internalSSHHost := $secrets.infrastructure.internal.master.host }}
+{{- $internalSSHPort := $secrets.infrastructure.internal.master.port }}
+{{- $internalDataPath := $secrets.infrastructure.internal.data.path }}
+
+pip:run --name=vendors --description=<<DESC
+Load vendors
+DESC --sandbox=containerb:golang --body=<<BODYEOF
+#go mod vendor
+BODYEOF
+
+pip:run --name=test --wait=vendors --description=<<DESC
+Run tests
+DESC --sandbox=containerb:golang --body=<<BODYEOF
+go test ./...
+BODYEOF
+
+pip:run --name=blinuxamd64 --wait=test --description=<<DESC
+Build goatcli for linux os and amd64 arch
+DESC --sandbox=containerb:golang --body=<<BODYEOF
+mkdir -p /cwd/data/dist/linux/binary/amd64
+GOOS=linux GOARCH=amd64 go build -o /cwd/data/dist/linux/binary/amd64/goatcli
+BODYEOF
+
+pip:run --name=bdocker --wait=blinuxamd64 --description=<<DESC
+Build docker image
+DESC --sandbox=self --body=<<BODYEOF
+container:build --type=docker --registry=docker.io/spozoga/goatcli --login=container.registry.username  --password=container.registry.password --steps=<<CONTAINERFILEEOF
+FROM alpine
+COPY data/dist/linux/binary/amd64/goatcli /usr/bin/goatcli
+ENTRYPOINT ["/usr/bin/goatcli"]
+CMD ["help"]
+CONTAINERFILEEOF
+BODYEOF
+
+pip:run --name=bwinamd64 --wait=test --description=<<DESC
+Build goatcli for windows os and amd64 arch
+DESC --sandbox=containerb:golang --body=<<BODYEOF
+mkdir -p /cwd/data/dist/windows/binary/amd64
+GOOS=windows GOARCH=amd64 go build -o /cwd/data/dist/windows/binary/amd64/goatcli.exe
+BODYEOF
+
+pip:run --name=plinuxamd64 --wait=blinuxamd64 --description=<<DESC
+Prepare goatcli package for linux os and amd64 arch
+DESC --sandbox=containerb:debian --body=<<BODYEOF
+mkdir -p /cwd/data/dist/linux/debian/amd64
+mkdir -p /cwd/data/tmp/dist/linux/debian/amd64/DEBIAN 
+cd /cwd/data/tmp/dist/linux/debian
+cat >"amd64/DEBIAN/control" <<CONTROLEOF
+Package: goatcli
+Version: 0.1
+Section: custom
+Priority: optional
+Architecture: amd64
+Essential: no
+Installed-Size: 1024
+Maintainer: goatcms.com
+Description: Print goatcms.com on the screen
+CONTROLEOF
+dpkg-deb --build amd64
+mv amd64.deb goatcli-0.1-linux-amd64.deb
+BODYEOF

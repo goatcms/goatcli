@@ -68,3 +68,20 @@ Pipeline (pip) is a code block run concurrency. It is run in a sandbox (like int
 ## Presentations
 * (PL) GoatCLI on Kariera IT Poznan 21-04-2018: https://youtu.be/YX6Ne1Z83l8 and [Slides](https://docs.google.com/presentation/d/1qaqgWtXEjiPy0CljDwsvlryFVut3fm0bQ5WJpbRIXGI/edit#slide=id.p)
 * (PL) P.I.W.O (Poznańska Impreza Wolnego Oprogramowania) 28-04-2018: https://www.twitch.tv/videos/264532807 and [Slides](https://docs.google.com/presentation/d/1i4_a_G-ZvvPaZXuyajok4jlfg_lA4b8S_g3dTZv52mw/edit?usp=sharing)
+
+### Run tests
+Define the system environment to tests runs.
+ * GOATCORE_TEST_DOCKER - Run docker tests if defined and equals to "YES". The tests require docker daemon started.
+ * GOATCORE_TEST_TMPDIR - Is base filesystem directory.
+
+On Linux/Unix/macOS add environment variables and run go tests by terminal.
+```
+export GOATCORE_TEST_SMTP_FROM_ADDRESS="test@email.com"
+export GOATCORE_TEST_SMTP_TO_ADDRESS="test@email.com"
+export GOATCORE_TEST_SMTP_SERVER="smtp.gmail.com:465"
+export GOATCORE_TEST_SMTP_USERNAME="YOUR_TEST_USER"
+export GOATCORE_TEST_SMTP_PASSWORD="YOUR_TEST_USER_PASSWORD"
+export GOATCORE_TEST_SMTP_IDENTITY=""
+export GOATCORE_TEST_DOCKER="YES"
+go test ./...
+```

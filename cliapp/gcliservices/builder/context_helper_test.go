@@ -106,7 +106,7 @@ func TestCTXBuilderHelper(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = ctx.Scope().Trigger(app.CommitEvent, nil); err != nil {
+	if err = ctx.Scope().Trigger(gcliservices.BuildCommitevent, nil); err != nil {
 		t.Error(err)
 		return
 	}
