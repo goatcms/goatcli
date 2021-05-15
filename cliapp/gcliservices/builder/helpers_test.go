@@ -48,7 +48,7 @@ func renderFile(fs filesystem.Filespace, deps RenderFileDeps, data, plainPropert
 
 func newEmptyIOContext() (ctx app.IOContext, err error) {
 	var (
-		scp = scope.NewScope(scope.Params{})
+		scp = scope.New(scope.Params{})
 		io  app.IO
 		cwd filesystem.Filespace
 		in  = gio.NewInput(new(bytes.Buffer))

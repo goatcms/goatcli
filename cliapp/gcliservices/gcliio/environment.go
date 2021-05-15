@@ -7,7 +7,6 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/modules/commonm/commservices"
-	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/filespace/diskfs"
 	homedir "github.com/mitchellh/go-homedir"
@@ -26,7 +25,7 @@ type EnvironmentManager struct {
 }
 
 // EnvironmentFactory create new Environment instance
-func EnvironmentFactory(dp dependency.Provider) (result interface{}, err error) {
+func EnvironmentFactory(dp app.DependencyProvider) (result interface{}, err error) {
 	inst := &EnvironmentManager{}
 	if err = dp.InjectTo(&inst.deps); err != nil {
 		return nil, err

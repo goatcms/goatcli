@@ -1,7 +1,6 @@
 package executor
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
@@ -14,8 +13,7 @@ import (
 	templates "github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/app/scope"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
@@ -30,7 +28,7 @@ func TestContextExecute(t *testing.T) {
 		fs               filesystem.Filespace
 		templateExecutor gcliservices.TemplateExecutor
 		secretsExecutor  *SecretsExecutor
-		executorScope    = scope.NewScope(scope.Params{})
+		executorScope    = scope.New(scope.Params{})
 		err              error
 		resultSecretsDef []*config.Property
 		appData          gcliservices.ApplicationData
@@ -38,13 +36,11 @@ func TestContextExecute(t *testing.T) {
 	)
 	for ti := 0; ti < workers.AsyncTestReapeat; ti++ {
 		// prepare mockup application
-		if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-			Input: gio.NewInput(strings.NewReader("")),
-		}); err != nil {
+		if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 			t.Error(err)
 			return
 		}
-		fs = mapp.RootFilespace()
+		fs = mapp.Filespaces().CWD()
 		if err = goaterr.ToError(goaterr.AppendError(nil,
 			fs.WriteFile(".goat/secrets.def/testf.ctrl", []byte(`
 				{{- $ctx.AddSecret (dict "Key" "Key" "Type" "Type") -}}

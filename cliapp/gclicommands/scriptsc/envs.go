@@ -12,7 +12,6 @@ import (
 func RunScriptsEnvs(a app.App, ctx app.IOContext) (err error) {
 	var (
 		deps struct {
-			Name             string                        `command:"?$1"`
 			ScriptsRunner    gcliservices.ScriptsRunner    `dependency:"ScriptsRunner"`
 			GCLIInputs       gcliservices.GCLIInputs       `dependency:"GCLIInputs"`
 			GCLIEnvironment  gcliservices.GCLIEnvironment  `dependency:"GCLIEnvironment"`

@@ -20,11 +20,11 @@ func TestPropertiesReadDataFromDataFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(PropertiesDataPath, []byte(testPropFullDataJSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(PropertiesDataPath, []byte(testPropFullDataJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if data, err = service.ReadDataFromFS(mapp.RootFilespace()); err != nil {
+	if data, err = service.ReadDataFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}
@@ -55,7 +55,7 @@ func TestPropertiesReadDataFromNoFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if data, err = service.ReadDataFromFS(mapp.RootFilespace()); err != nil {
+	if data, err = service.ReadDataFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}

@@ -80,20 +80,18 @@ func (e *SecretsExecutor) ExecuteTask(task Task) (err error) {
 // ExecuteTask run single executor template
 func (e *SecretsExecutor) consumer() (err error) {
 	for {
-		select {
-		case task, more := <-e.ch:
-			if !more {
-				return
-			}
-			if e.scope.IsDone() {
-				e.scope.DoneTask()
-				continue
-			}
-			if err = e.run(task); err != nil {
-				e.scope.AppendError(err)
-			}
-			e.scope.DoneTask()
+		task, more := <-e.ch
+		if !more {
+			return
 		}
+		if e.scope.IsDone() {
+			e.scope.DoneTask()
+			continue
+		}
+		if err = e.run(task); err != nil {
+			e.scope.AppendError(err)
+		}
+		e.scope.DoneTask()
 	}
 }
 

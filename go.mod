@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/buger/jsonparser v1.1.1
+	github.com/denisbrodbeck/machineid v1.0.1 // indirect
 	github.com/go-delve/delve v1.6.0 // indirect
 	github.com/goatcms/goatcore v0.0.0-20201016093320-3e100abc87ef
 	github.com/mattn/go-colorable v0.1.8 // indirect

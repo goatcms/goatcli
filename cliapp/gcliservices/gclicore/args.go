@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 )
 
 // ArgumentsProvider provider
@@ -16,7 +16,7 @@ type ArgumentsProvider struct {
 }
 
 // ArgumentsFactory create new Arguments instance
-func ArgumentsFactory(dp dependency.Provider) (in interface{}, err error) {
+func ArgumentsFactory(dp app.DependencyProvider) (in interface{}, err error) {
 	instance := &ArgumentsProvider{}
 	if err = dp.InjectTo(&instance.deps); err != nil {
 		return nil, err

@@ -6,8 +6,7 @@ import (
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 const (
@@ -22,18 +21,17 @@ func TestServiceTemplateExecute(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	})
+	mapp, err := goatapp.NewMockupApp(goatapp.Params{})
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/helpers/main.tmpl", []byte(testLayoutContent), 0766); err != nil {
+	fs := mapp.Filespaces().CWD()
+	if err = fs.WriteFile(".goat/build/helpers/main.tmpl", []byte(testLayoutContent), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/properties.def/main.tmpl", []byte(testTemplateContent), 0766); err != nil {
+	if err = fs.WriteFile(".goat/properties.def/main.tmpl", []byte(testTemplateContent), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -78,18 +76,17 @@ func TestServiceViewsExecute(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	})
+	mapp, err := goatapp.NewMockupApp(goatapp.Params{})
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testLayoutContent), 0766); err != nil {
+	fs := mapp.Filespaces().CWD()
+	if err = fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testLayoutContent), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/templates/app/main.tmpl", []byte(testTemplateContent), 0766); err != nil {
+	if err = fs.WriteFile(".goat/build/templates/app/main.tmpl", []byte(testTemplateContent), 0766); err != nil {
 		t.Error(err)
 		return
 	}

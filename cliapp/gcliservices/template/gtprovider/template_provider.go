@@ -13,7 +13,6 @@ import (
 type TemplateProvider struct {
 	baseTemplate *template.Template
 	fs           filesystem.Filespace
-	layoutName   string
 	path         string
 	tmpl         *template.Template
 	isCached     bool

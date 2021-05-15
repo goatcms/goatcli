@@ -20,19 +20,17 @@ func TesSecretsFillNoInteractive(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	propertiesDef := []*config.Property{
-		&config.Property{
-			Key:  "key1",
-			Type: "line",
-			Min:  1,
-			Max:  22,
-		},
-		&config.Property{
-			Key:  "key2",
-			Type: "line",
-			Min:  1,
-			Max:  22,
-		}}
+	propertiesDef := []*config.Property{{
+		Key:  "key1",
+		Type: "line",
+		Min:  1,
+		Max:  22,
+	}, {
+		Key:  "key2",
+		Type: "line",
+		Min:  1,
+		Max:  22,
+	}}
 	if _, err = service.FillData(mapp.IOContext(), propertiesDef, data, map[string]string{}, false); err == nil {
 		t.Errorf("FillData should return error for no-interactive mode and no data")
 		return

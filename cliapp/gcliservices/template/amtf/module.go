@@ -2,11 +2,11 @@ package amtf
 
 import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 )
 
 // RegisterFunctions add default helper functions for templates
-func RegisterFunctions(di dependency.Injector) (err error) {
+func RegisterFunctions(di app.Injector) (err error) {
 	var deps struct {
 		Config gcliservices.TemplateConfig `dependency:"TemplateConfig"`
 	}

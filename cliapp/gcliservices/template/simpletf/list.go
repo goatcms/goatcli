@@ -73,7 +73,8 @@ func Intersect(base, intersect []string) (result []string) {
 
 // Sort order strings array
 func Sort(base []string) (result []string) {
-	result = append(base)
+	result = make([]string, len(base))
+	copy(result, base)
 	sort.Strings(result)
 	return result
 }

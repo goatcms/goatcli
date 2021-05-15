@@ -1,13 +1,11 @@
 package vcs
 
 import (
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 func TestVCSWriteGeneratedToFS(t *testing.T) {
@@ -20,9 +18,7 @@ func TestVCSWriteGeneratedToFS(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	})
+	mapp, err := goatapp.NewMockupApp(goatapp.Params{})
 	if err != nil {
 		t.Error(err)
 		return
@@ -39,7 +35,8 @@ func TestVCSWriteGeneratedToFS(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if vcsData, err = deps.VCSService.ReadDataFromFS(mapp.RootFilespace()); err != nil {
+	fs := mapp.Filespaces().CWD()
+	if vcsData, err = deps.VCSService.ReadDataFromFS(fs); err != nil {
 		t.Error(err)
 		return
 	}
@@ -63,11 +60,11 @@ func TestVCSWriteGeneratedToFS(t *testing.T) {
 		t.Errorf("after add records to generated files Modified flag must be true")
 		return
 	}
-	if err = deps.VCSService.WriteDataToFS(mapp.RootFilespace(), vcsData); err != nil {
+	if err = deps.VCSService.WriteDataToFS(fs, vcsData); err != nil {
 		t.Error(err)
 		return
 	}
-	if data, err = mapp.RootFilespace().ReadFile(GeneratedFilesPath); err != nil {
+	if data, err = fs.ReadFile(GeneratedFilesPath); err != nil {
 		t.Error(err)
 		return
 	}

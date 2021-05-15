@@ -4,22 +4,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/goatcms/goatcli/cliapp/common/cio"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/plainmap"
-)
-
-var (
-	numericReg = regexp.MustCompile("^[0-9]+$")
-	alphaReg   = regexp.MustCompile("^[A-Za-z]+$")
-	alnumReg   = regexp.MustCompile("^[A-Za-z0-9]+$")
 )
 
 // Data provider
@@ -29,7 +21,7 @@ type Data struct {
 }
 
 // BuilderFactory create new repositories instance
-func BuilderFactory(dp dependency.Provider) (interface{}, error) {
+func BuilderFactory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &Data{}
 	if err = dp.InjectTo(&instance.deps); err != nil {

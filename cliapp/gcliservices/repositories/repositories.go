@@ -6,7 +6,7 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/disk"
 	"github.com/goatcms/goatcore/filesystem/filespace/diskfs"
@@ -21,7 +21,7 @@ type Repositories struct {
 }
 
 // Factory create new repositories instance
-func Factory(dp dependency.Provider) (interface{}, error) {
+func Factory(dp app.DependencyProvider) (interface{}, error) {
 	r := &Repositories{}
 	if err := dp.InjectTo(&r.deps); err != nil {
 		return nil, err

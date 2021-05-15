@@ -1,14 +1,12 @@
 package properties
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 const (
@@ -27,17 +25,14 @@ func TestDataDefFromDirectory(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
+		return
+	}
+	if err = mapp.Filespaces().Root().WriteFile(".goat/properties.def/01_first.json", []byte(testPropetiesDefFirstJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/properties.def/01_first.json", []byte(testPropetiesDefFirstJSON), 0766); err != nil {
-		t.Error(err)
-		return
-	}
-	if err = mapp.RootFilespace().WriteFile(".goat/properties.def/02_second.json", []byte(testPropetiesDefSecondJSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(".goat/properties.def/02_second.json", []byte(testPropetiesDefSecondJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -50,7 +45,7 @@ func TestDataDefFromDirectory(t *testing.T) {
 		return
 	}
 	// test
-	if properties, err = deps.Propeties.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if properties, err = deps.Propeties.ReadDefFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}

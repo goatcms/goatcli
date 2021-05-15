@@ -1,7 +1,6 @@
 package builder
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
@@ -17,8 +16,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/vcs"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -33,13 +31,11 @@ func TestCTXBuilderHelper(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
-	fs := mapp.RootFilespace()
+	fs := mapp.Filespaces().CWD()
 	if err = goaterr.ToError(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/helpers/helper.tmpl", []byte(`{{- define "helper" -}}
 		Hello helper

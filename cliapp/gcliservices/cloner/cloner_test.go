@@ -1,15 +1,13 @@
 package cloner
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/result"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/modules"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/repositories"
 )
@@ -38,9 +36,7 @@ func TestModulesFromFile(t *testing.T) {
 	}
 	propertiesResult = buildPropertiesResult()
 	// new app
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("  \t\n")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}

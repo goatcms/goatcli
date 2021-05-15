@@ -143,25 +143,23 @@ func (e *GeneratorExecutor) ExecuteHook(name string, data interface{}) (err erro
 func (e *GeneratorExecutor) consumer() (err error) {
 	generatedFileds := e.sharedData.VCSData.VCSGeneratedFiles()
 	for {
-		select {
-		case task, more := <-e.ch:
-			if !more {
-				return
-			}
-			if e.scope.IsDone() {
-				e.scope.DoneTask()
-				continue
-			}
-			if err = e.run(task); err != nil {
-				e.scope.AppendError(err)
-			}
+		task, more := <-e.ch
+		if !more {
+			return
+		}
+		if e.scope.IsDone() {
 			e.scope.DoneTask()
-			if task.FSPath != "" {
-				generatedFileds.Add(&gcliservices.GeneratedFile{
-					Path:    task.FSPath,
-					ModTime: time.Now(),
-				})
-			}
+			continue
+		}
+		if err = e.run(task); err != nil {
+			e.scope.AppendError(err)
+		}
+		e.scope.DoneTask()
+		if task.FSPath != "" {
+			generatedFileds.Add(&gcliservices.GeneratedFile{
+				Path:    task.FSPath,
+				ModTime: time.Now(),
+			})
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package secrets
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/gclivarutil"
@@ -15,8 +14,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/amtf"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -33,13 +31,12 @@ func TestDataDefFromCtrl(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/secrets.def/script.ctrl", []byte(`
+	fs := mapp.Filespaces().CWD()
+	if err = fs.WriteFile(".goat/secrets.def/script.ctrl", []byte(`
 		{{- range $i, $key := (keys $ctx.Data.Plain "app.") -}}
 		  {{- $ctx.AddSecret (dict "Key" (print "app." $key ".secret") "Type" "line") -}}
 		{{- end -}}
@@ -72,7 +69,7 @@ func TestDataDefFromCtrl(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if secrets, err = deps.Secrets.ReadDefFromFS(mapp.RootFilespace(), emptyElasticData, appData); err != nil {
+	if secrets, err = deps.Secrets.ReadDefFromFS(fs, emptyElasticData, appData); err != nil {
 		t.Error(err)
 		return
 	}

@@ -1,7 +1,6 @@
 package cliapp
 
 import (
-	"github.com/goatcms/goatcli/cliapp/gclicommands"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/buildc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/cleanc"
 	"github.com/goatcms/goatcli/cliapp/gclicommands/clonec"
@@ -43,11 +42,31 @@ func NewModule() app.Module {
 
 //RegisterDependencies is init callback to register module dependencies
 func (m *Module) RegisterDependencies(a app.App) (err error) {
-	// commands
-	if err = m.registerCommands(a); err != nil {
-		return err
-	}
-	// services
+	m.registerCommands(a)
+	m.registerHealthCheckers(a)
+	return m.registerServices(a)
+}
+
+func (m *Module) registerCommands(a app.App) {
+	term := a.Terminal()
+	term.SetCommand(buildc.Commands()...)
+	term.SetCommand(cleanc.Commands()...)
+	term.SetCommand(clonec.Commands()...)
+	term.SetCommand(containerc.Commands()...)
+	term.SetCommand(datac.Commands()...)
+	term.SetCommand(depsc.Commands()...)
+	term.SetCommand(initc.Commands()...)
+	term.SetCommand(propertiesc.Commands()...)
+	term.SetCommand(scriptsc.Commands()...)
+	term.SetCommand(secretsc.Commands()...)
+	term.SetCommand(vcsc.Commands()...)
+}
+
+func (m *Module) registerHealthCheckers(a app.App) {
+	a.SetHealthChecker("git", GitHealthChecker)
+}
+
+func (m *Module) registerServices(a app.App) error {
 	dp := a.DependencyProvider()
 	return goaterr.ToError(goaterr.AppendError(nil,
 		builder.RegisterDependencies(dp),
@@ -62,36 +81,6 @@ func (m *Module) RegisterDependencies(a app.App) (err error) {
 		vcs.RegisterDependencies(dp),
 		scripts.RegisterDependencies(dp),
 		gcliio.RegisterDependencies(dp),
-		app.RegisterHealthChecker(a, "git", GitHealthChecker)))
-}
-
-func (m *Module) registerCommands(a app.App) error {
-	return goaterr.ToError(goaterr.AppendError(nil,
-		app.RegisterCommand(a, "clone", clonec.Run, gclicommands.Clone),
-		app.RegisterCommand(a, "init", initc.RunInit, gclicommands.Init),
-		app.RegisterCommand(a, "build", buildc.RunBuild, gclicommands.Build),
-		app.RegisterCommand(a, "rebuild", buildc.RunRebuild, gclicommands.Rebuild),
-		app.RegisterCommand(a, "clean", cleanc.RunClean, gclicommands.Clean),
-		app.RegisterCommand(a, "clean:dependencies", cleanc.RunCleanDependencies, gclicommands.CleanDependencies),
-		app.RegisterCommand(a, "clean:build", cleanc.RunCleanBuild, gclicommands.CleanBuild),
-		app.RegisterCommand(a, "data:add", datac.RunAdd, gclicommands.DataAdd),
-		app.RegisterCommand(a, "deps:add", depsc.RunAddDep, gclicommands.AddDep),
-		app.RegisterCommand(a, "deps:add:go", depsc.RunAddGODep, gclicommands.AddGODep),
-		app.RegisterCommand(a, "deps:add:go:import", depsc.RunAddGOImportsDep, gclicommands.AddGOImportsDep),
-		app.RegisterCommand(a, "properties:set", propertiesc.RunSetPropertyValue, gclicommands.SetPropertyValueDep),
-		app.RegisterCommand(a, "properties:get", propertiesc.RunGetPropertyValue, gclicommands.GetPropertyValueDep),
-		app.RegisterCommand(a, "secrets:set", secretsc.RunSetSecretValue, gclicommands.SetSecretValueDep),
-		app.RegisterCommand(a, "secrets:get", secretsc.RunGetSecretValue, gclicommands.GetSecretValueDep),
-		app.RegisterCommand(a, "vcs:clean", vcsc.RunClean, gclicommands.VCSClean),
-		app.RegisterCommand(a, "vcs:scan", vcsc.RunScan, gclicommands.VCSScan),
-		app.RegisterCommand(a, "vcs:persisted:add", vcsc.RunPersistedAdd, gclicommands.VCSPersistedAdd),
-		app.RegisterCommand(a, "vcs:persisted:remove", vcsc.RunPersistedRemove, gclicommands.VCSPersistedRemove),
-		app.RegisterCommand(a, "vcs:persisted:list", vcsc.RunPersistedList, gclicommands.VCSPersistedList),
-		app.RegisterCommand(a, "vcs:generated:list", vcsc.RunGeneratedList, gclicommands.VCSGeneratedList),
-		app.RegisterCommand(a, "scripts:run", scriptsc.RunScript, gclicommands.ScriptsRun),
-		app.RegisterCommand(a, "scripts:envs", scriptsc.RunScriptsEnvs, gclicommands.ScriptsEnvs),
-		app.RegisterCommand(a, "container:image", containerc.RunContainerImagePip, gclicommands.ContainerImage),
-		app.RegisterArgument(a, "cwd", gclicommands.CWDArg),
 	))
 }
 

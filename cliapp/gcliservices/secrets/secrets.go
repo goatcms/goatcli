@@ -13,7 +13,6 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/secrets/executor"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/scope"
-	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/plainmap"
 )
@@ -27,7 +26,7 @@ type Secrets struct {
 }
 
 // Factory create new repositories instance
-func Factory(dp dependency.Provider) (interface{}, error) {
+func Factory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &Secrets{}
 	if err = dp.InjectTo(&instance.deps); err != nil {
@@ -89,7 +88,7 @@ func (p *Secrets) readDefFromFTemplate(fs filesystem.Filespace, properties commo
 	var (
 		templateExecutor gcliservices.TemplateExecutor
 		secretsExecutor  *executor.SecretsExecutor
-		executorScope    = scope.NewScope(scope.Params{})
+		executorScope    = scope.New(scope.Params{})
 	)
 	if templateExecutor, err = p.deps.TemplateService.TemplateExecutor(".goat/secrets.def"); err != nil {
 		return nil, err
@@ -116,7 +115,7 @@ func (p *Secrets) readDefFromFTemplate(fs filesystem.Filespace, properties commo
 func (p *Secrets) ReadDataFromFS(fs filesystem.Filespace) (data map[string]string, err error) {
 	var json []byte
 	if !fs.IsFile(SecretsDataPath) {
-		return make(map[string]string, 0), nil
+		return make(map[string]string), nil
 	}
 	if json, err = fs.ReadFile(SecretsDataPath); err != nil {
 		return nil, err

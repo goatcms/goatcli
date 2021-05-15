@@ -5,7 +5,7 @@ import (
 	"text/template"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 )
 
@@ -21,7 +21,7 @@ type Config struct {
 }
 
 // ConfigFactory create new Config instance
-func ConfigFactory(dp dependency.Provider) (i interface{}, err error) {
+func ConfigFactory(dp app.DependencyProvider) (i interface{}, err error) {
 	config := &Config{
 		funcs:  template.FuncMap{},
 		locked: false,

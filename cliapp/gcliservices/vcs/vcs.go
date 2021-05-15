@@ -1,9 +1,8 @@
 package vcs
 
 import (
-	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 )
 
@@ -12,11 +11,10 @@ type VCS struct {
 	deps struct {
 		FS filesystem.Filespace `filespace:"current"`
 	}
-	config []*config.Module
 }
 
 // Factory create new repositories instance
-func Factory(dp dependency.Provider) (interface{}, error) {
+func Factory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &VCS{}
 	if err = dp.InjectTo(&instance.deps); err != nil {
@@ -28,8 +26,8 @@ func Factory(dp dependency.Provider) (interface{}, error) {
 // ReadDataFromFS read vcs data from filesystem
 func (vcs *VCS) ReadDataFromFS(fs filesystem.Filespace) (vcsData gcliservices.VCSData, err error) {
 	var (
-		persistedFiles    *PersistedFiles
-		persistedReader   filesystem.Reader
+		persistedFiles  *PersistedFiles
+		persistedReader filesystem.Reader
 		generatedFiles  *GeneratedFiles
 		generatedReader filesystem.Reader
 	)

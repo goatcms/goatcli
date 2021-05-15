@@ -2,7 +2,7 @@ package gclicore
 
 import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 )
 
 // Core provider
@@ -13,7 +13,7 @@ type Core struct {
 }
 
 // CoreFactory create new Core instance
-func CoreFactory(dp dependency.Provider) (interface{}, error) {
+func CoreFactory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &Core{}
 	if err = dp.InjectTo(&instance.deps); err != nil {

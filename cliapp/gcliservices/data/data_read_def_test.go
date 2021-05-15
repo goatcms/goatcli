@@ -1,14 +1,12 @@
 package data
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 const (
@@ -23,13 +21,11 @@ func TestDataDefFromFile(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(DataDefPath, []byte(testDataDefJSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(DataDefPath, []byte(testDataDefJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -45,7 +41,7 @@ func TestDataDefFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if dataSets, err = deps.Data.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if dataSets, err = deps.Data.ReadDefFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}
@@ -63,9 +59,7 @@ func TestDataDefDefaultEmpty(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -81,7 +75,7 @@ func TestDataDefDefaultEmpty(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if dataSets, err = deps.Data.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if dataSets, err = deps.Data.ReadDefFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}

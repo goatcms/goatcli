@@ -1,13 +1,11 @@
 package data
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/varutil/plainmap"
 )
 
@@ -20,9 +18,7 @@ func TestWriteDataToFS(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -42,16 +38,16 @@ func TestWriteDataToFS(t *testing.T) {
 		"title":   "Tytuł strony",
 		"content": "Treść strony",
 	}
-	if err = deps.DataService.WriteDataToFS(mapp.RootFilespace(), "pages.home", datamap); err != nil {
+	if err = deps.DataService.WriteDataToFS(mapp.Filespaces().Root(), "pages.home", datamap); err != nil {
 		t.Error(err)
 		return
 	}
 	destPath := ".goat/data/pages/home.json"
-	if !mapp.RootFilespace().IsExist(destPath) {
+	if !mapp.Filespaces().Root().IsExist(destPath) {
 		t.Errorf("expected %s file", destPath)
 		return
 	}
-	if filedata, err = mapp.RootFilespace().ReadFile(destPath); err != nil {
+	if filedata, err = mapp.Filespaces().Root().ReadFile(destPath); err != nil {
 		t.Error(err)
 		return
 	}

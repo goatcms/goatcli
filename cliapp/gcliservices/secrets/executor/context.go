@@ -58,7 +58,7 @@ func (c *Context) AddSecret(dict map[string]interface{}) (err error) {
 		return goaterr.Errorf("cliapp/services/secrets/executor/context.go.AddSecret: Type is required")
 	}
 	if _, ok := dict["Min"]; ok {
-		max = dict["Min"].(int)
+		min = dict["Min"].(int)
 	}
 	if _, ok := dict["Max"]; ok {
 		max = dict["Max"].(int)

@@ -1,16 +1,10 @@
 package modules
 
 import (
-	"fmt"
-
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
-)
-
-var (
-	errInitRequired = fmt.Errorf("ModulesService: Init is required before use dependency")
 )
 
 const (
@@ -23,11 +17,10 @@ type Modules struct {
 	deps struct {
 		FS filesystem.Filespace `filespace:"current"`
 	}
-	config []*config.Module
 }
 
 // Factory create new repositories instance
-func Factory(dp dependency.Provider) (interface{}, error) {
+func Factory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &Modules{}
 	if err = dp.InjectTo(&instance.deps); err != nil {

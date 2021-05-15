@@ -5,25 +5,25 @@ import (
 	"testing"
 
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 func TestPipRunWaitStory(t *testing.T) {
 	t.Parallel()
 	var (
-		err         error
-		mapp        *mockupapp.App
 		bootstraper app.Bootstrap
+		err         error
+		mapp        *goatapp.MockupApp
 		resultBytes []byte
 	)
-	if mapp, bootstraper, err = newApp(mockupapp.MockupOptions{
-		Args: []string{`appname`, `build`},
+	if mapp, bootstraper, err = newApp(goatapp.Params{
+		Arguments: []string{`appname`, `build`},
 	}); err != nil {
 		t.Error(err)
 		return
 	}
-	fs := mapp.RootFilespace()
+	fs := mapp.Filespaces().CWD()
 	if err = goaterr.ToError(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(`{{- define "out/file.txt"}}
 			{{- $ctx := .}}
@@ -42,7 +42,7 @@ func TestPipRunWaitStory(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.AppScope().Wait(); err != nil {
+	if err = mapp.Scopes().App().Wait(); err != nil {
 		t.Error(err)
 		return
 	}
@@ -51,7 +51,7 @@ func TestPipRunWaitStory(t *testing.T) {
 		return
 	}
 	result := string(resultBytes)
-	if strings.Index(result, "expected content") == -1 {
+	if !strings.Contains(result, "expected content") {
 		t.Errorf("expected 'test_output' in application output and take: %v", result)
 		return
 	}

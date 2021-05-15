@@ -170,7 +170,7 @@ func (c *Context) runCommand(command Command) (err error) {
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	if err = cmd.Run(); err != nil {
-		return goaterr.Errorf("external app fail %v: %v %v", args, err, string(out.Bytes()))
+		return goaterr.Errorf("external app fail %v: %v %v", args, err, out.String())
 	}
 	c.ctx.IO().Out().Printf("%s", out.Bytes())
 	return nil

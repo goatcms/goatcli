@@ -1,13 +1,11 @@
 package data
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 const (
@@ -24,21 +22,19 @@ func TestDataFromFile(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/data/langs/pl.json", []byte(testDataFile1JSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(".goat/data/langs/pl.json", []byte(testDataFile1JSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/data/langs/en.json", []byte(testDataFile2JSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(".goat/data/langs/en.json", []byte(testDataFile2JSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/data/pages/home.json", []byte(testDataFile3JSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(".goat/data/pages/home.json", []byte(testDataFile3JSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -54,7 +50,7 @@ func TestDataFromFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if data, err = deps.Data.ReadDataFromFS(mapp.RootFilespace()); err != nil {
+	if data, err = deps.Data.ReadDataFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}
@@ -76,9 +72,7 @@ func TestEmptyData(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -94,7 +88,7 @@ func TestEmptyData(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if data, err = deps.Data.ReadDataFromFS(mapp.RootFilespace()); err != nil {
+	if data, err = deps.Data.ReadDataFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}

@@ -20,11 +20,11 @@ func TestPropertiesReadDefFromDataFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(PropertiesDefPath, []byte(testPropDefJSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(PropertiesDefPath, []byte(testPropDefJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if def, err = service.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if def, err = service.ReadDefFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}
@@ -54,7 +54,7 @@ func TestPropertiesReaDefFromNoFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if def, err = service.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if def, err = service.ReadDefFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}

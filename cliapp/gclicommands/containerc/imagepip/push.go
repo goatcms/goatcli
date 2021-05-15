@@ -110,7 +110,7 @@ func RunPush(a app.App, ctx app.IOContext) (err error) {
 		return goaterr.Errorf("Expected destination (--dest) like 'REGISTRY/IMAGE:VERSION'. IMAGE can not be empty. ")
 	}
 	if tmpName, err = scope.GetString(ctx.Scope(), TmpImageNameKey); err != nil || tmpName == "" {
-		return goaterr.Wrapf("ImageName is required. Function must be run into image pipeline.", err)
+		return goaterr.Wrapf(err, "ImageName is required. Function must be run into image pipeline.")
 	}
 	if err = goaterr.ToError(goaterr.AppendError(nil,
 		envs.Set("REGISTRY", destRegistry),

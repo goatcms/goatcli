@@ -1,13 +1,12 @@
 package depsc
 
 import (
-	"fmt"
-
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/filespace/diskfs"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
 // RunAddGODep run deps:add:go command
@@ -32,7 +31,7 @@ func RunAddGODep(a app.App, ctx app.IOContext) (err error) {
 		return err
 	}
 	if deps.GORepo == "" {
-		return fmt.Errorf("First argument: golang repository path (like github.com/goatcms/goatcore) is required")
+		return goaterr.Errorf("first argument: golang repository path (like github.com/goatcms/goatcore) is required")
 	}
 	if deps.CWD == "" {
 		deps.CWD = "./"

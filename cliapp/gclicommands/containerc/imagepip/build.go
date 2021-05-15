@@ -56,10 +56,10 @@ func RunBuild(a app.App, ctx app.IOContext) (err error) {
 		return err
 	}
 	if tmpName, err = scope.GetString(ctx.Scope(), TmpImageNameKey); err != nil || tmpName == "" {
-		return goaterr.Wrapf("Function must be run into image pipeline.", err)
+		return goaterr.Wrapf(err, "function must be run into image pipeline")
 	}
 	if deps.Steps == "" {
-		return goaterr.Errorf("Steps argument is required")
+		return goaterr.Errorf("steps argument is required")
 	}
 	if err = goaterr.ToError(goaterr.AppendError(nil,
 		envs.Set("STEPS", deps.Steps),

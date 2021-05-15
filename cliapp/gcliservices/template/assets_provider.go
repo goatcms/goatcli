@@ -5,7 +5,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/gtprovider"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 )
 
 // AssetsProvider is global template provider
@@ -17,7 +17,7 @@ type AssetsProvider struct {
 }
 
 // AssetsProviderFactory create new AssetsProviderFactory instance
-func AssetsProviderFactory(dp dependency.Provider) (i interface{}, err error) {
+func AssetsProviderFactory(dp app.DependencyProvider) (i interface{}, err error) {
 	provider := &AssetsProvider{}
 	if err = dp.InjectTo(&provider.deps); err != nil {
 		return nil, err

@@ -6,7 +6,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/common"
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/fsloop"
 	"github.com/goatcms/goatcore/repositories"
@@ -22,7 +22,7 @@ type Cloner struct {
 }
 
 // Factory create new repositories instance
-func Factory(dp dependency.Provider) (interface{}, error) {
+func Factory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &Cloner{}
 	if err = dp.InjectTo(&instance.deps); err != nil {

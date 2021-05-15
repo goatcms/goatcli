@@ -1,7 +1,6 @@
 package builder
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common"
@@ -15,8 +14,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/vcs"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -49,13 +47,11 @@ func TestCTXBuilderAM(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
-	fs := mapp.RootFilespace()
+	fs := mapp.Filespaces().CWD()
 	if err = goaterr.ToError(goaterr.AppendError(nil,
 		fs.WriteFile(".goat/build/layouts/default/main.tmpl", []byte(testCTXBuilderLayout), 0766),
 		fs.WriteFile(".goat/build/templates/names/main.ctrl", []byte(testCTXBuilderTemplate), 0766),

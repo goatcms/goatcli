@@ -19,14 +19,14 @@ func TestSecretsWriteDataFromDataFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if err = service.WriteDataToFS(mapp.RootFilespace(), map[string]string{
+	if err = service.WriteDataToFS(mapp.Filespaces().Root(), map[string]string{
 		"key1": "value1",
 		"key2": "value2",
 	}); err != nil {
 		t.Error(err)
 		return
 	}
-	if data, err = service.ReadDataFromFS(mapp.RootFilespace()); err != nil {
+	if data, err = service.ReadDataFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}

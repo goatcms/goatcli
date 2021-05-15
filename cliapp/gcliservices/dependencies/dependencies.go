@@ -3,7 +3,7 @@ package dependencies
 import (
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/filesystem/fshelper"
 	"github.com/goatcms/goatcore/repositories"
@@ -16,11 +16,10 @@ type Dependencies struct {
 		FS           filesystem.Filespace             `filespace:"current"`
 		Repositories gcliservices.RepositoriesService `dependency:"RepositoriesService"`
 	}
-	config []*config.Dependency
 }
 
 // Factory create new repositories instance
-func Factory(dp dependency.Provider) (interface{}, error) {
+func Factory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &Dependencies{}
 	if err = dp.InjectTo(&instance.deps); err != nil {

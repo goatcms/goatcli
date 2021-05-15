@@ -7,7 +7,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 const (
@@ -15,17 +15,21 @@ const (
 )
 
 func TestModulesFromFile(t *testing.T) {
-	var err error
+	var (
+		err  error
+		mapp *goatapp.MockupApp
+	)
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("my_insert_value\n")),
-	})
-	if err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{
+		IO: goatapp.IO{
+			In: gio.NewAppInput(strings.NewReader("my_insert_value\n")),
+		},
+	}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(ModulesDefPath, []byte(testModulesDefJSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(ModulesDefPath, []byte(testModulesDefJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -42,7 +46,7 @@ func TestModulesFromFile(t *testing.T) {
 		return
 	}
 	var modules []*config.Module
-	if modules, err = deps.Modules.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if modules, err = deps.Modules.ReadDefFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}
@@ -53,13 +57,13 @@ func TestModulesFromFile(t *testing.T) {
 }
 
 func TestModulesDefaultEmpty(t *testing.T) {
-	var err error
+	var (
+		err  error
+		mapp *goatapp.MockupApp
+	)
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	})
-	if err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -76,7 +80,7 @@ func TestModulesDefaultEmpty(t *testing.T) {
 		return
 	}
 	var modules []*config.Module
-	if modules, err = deps.Modules.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if modules, err = deps.Modules.ReadDefFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}

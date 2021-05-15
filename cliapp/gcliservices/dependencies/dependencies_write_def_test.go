@@ -1,15 +1,13 @@
 package dependencies
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/repositories"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 func TestWriteDefToFS(t *testing.T) {
@@ -21,9 +19,7 @@ func TestWriteDefToFS(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
@@ -43,17 +39,17 @@ func TestWriteDefToFS(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	list = []*config.Dependency{&config.Dependency{
+	list = []*config.Dependency{{
 		Repo:   "https://github.com/goatcms/goatcore.git",
 		Branch: "master",
 		Rev:    "3eb26366749bd54f3a871ff9beb5c565195f6233",
 		Dest:   "vendor/github.com/goatcms/goatcore",
 	}}
-	if err = deps.Dependencies.WriteDefToFS(mapp.RootFilespace(), list); err != nil {
+	if err = deps.Dependencies.WriteDefToFS(mapp.Filespaces().Root(), list); err != nil {
 		t.Error(err)
 		return
 	}
-	if result, err = deps.Dependencies.ReadDefFromFS(mapp.RootFilespace()); err != nil {
+	if result, err = deps.Dependencies.ReadDefFromFS(mapp.Filespaces().Root()); err != nil {
 		t.Error(err)
 		return
 	}

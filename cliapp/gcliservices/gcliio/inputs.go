@@ -14,7 +14,6 @@ import (
 	"github.com/goatcms/goatcli/cliapp/common/prevents"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/dependency"
 )
 
 // Inputs run application scripts
@@ -28,7 +27,7 @@ type Inputs struct {
 }
 
 // InputsFactory create new Inputs instance
-func InputsFactory(dp dependency.Provider) (result interface{}, err error) {
+func InputsFactory(dp app.DependencyProvider) (result interface{}, err error) {
 	r := &Inputs{}
 	if err = dp.InjectTo(&r.deps); err != nil {
 		return nil, err
@@ -71,7 +70,7 @@ func (inputs *Inputs) Inputs(ctx app.IOContext) (propertiesData, secretsData map
 		return nil, nil, appData, err
 	}
 	if appData, err = am.NewApplicationData(data); err != nil {
-		return nil, nil, appData, goaterr.Wrapf("plaindata contains illegal keys or is incorrect", err)
+		return nil, nil, appData, goaterr.Wrapf(err, "plaindata contains illegal keys or is incorrect")
 	}
 	// load secrets
 	if elasticProperties, err = gclivarutil.NewElasticData(propertiesData); err != nil {

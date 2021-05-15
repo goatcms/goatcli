@@ -12,5 +12,5 @@ const (
 )
 
 var (
-	emptyRegexp = regexp.MustCompile("^\\s*$")
+	emptyRegexp = regexp.MustCompile(`^\\s*$`)
 )

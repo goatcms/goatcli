@@ -8,7 +8,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 func TestConsoleRead(t *testing.T) {
@@ -20,8 +20,10 @@ func TestConsoleRead(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("sdasd\n111\nSebastian\n\nPozoga\na")),
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{
+		IO: goatapp.IO{
+			In: gio.NewAppInput(strings.NewReader("sdasd\n111\nSebastian\n\nPozoga\na")),
+		},
 	}); err != nil {
 		t.Error(err)
 		return
@@ -33,21 +35,19 @@ func TestConsoleRead(t *testing.T) {
 	dataSet = &config.DataSet{
 		TypeName: "UserFixture",
 		Properties: []*config.Property{
-			&config.Property{
+			{
 				Key:    "id",
 				Min:    1,
 				Max:    20,
 				Type:   "numeric",
 				Prompt: "insert user id",
-			},
-			&config.Property{
+			}, {
 				Key:    "firstname",
 				Min:    1,
 				Max:    20,
 				Type:   "alnum",
 				Prompt: "insert user fisrtname",
-			},
-			&config.Property{
+			}, {
 				Key:    "lastname",
 				Min:    1,
 				Max:    20,

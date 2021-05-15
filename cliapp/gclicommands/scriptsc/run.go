@@ -128,7 +128,7 @@ func RunScript(a app.App, ctx app.IOContext) (err error) {
 			return err
 		}
 		if scriptErr != nil {
-			return goaterr.Wrapf("Script fail (see details at '%s' log files). ", scriptErr, errorFilePath)
+			return goaterr.Wrapf(scriptErr, "Script fail (see details at '%s' log files). ", errorFilePath)
 		}
 	}
 	return nil

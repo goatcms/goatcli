@@ -1,11 +1,11 @@
 package data
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
 	"github.com/goatcms/goatcore/filesystem"
+	"github.com/goatcms/goatcore/varutil/goaterr"
 	"github.com/goatcms/goatcore/varutil/plainmap"
 )
 
@@ -23,7 +23,7 @@ const (
 func mergeMap(dest, src map[string]string) (err error) {
 	for key, value := range src {
 		if old, ok := dest[key]; ok {
-			return fmt.Errorf("Duplicate key %s in source (%s) and destination (%s) map ", key, value, old)
+			return goaterr.Errorf("duplicate key %s in source (%s) and destination (%s) map ", key, value, old)
 		}
 		dest[key] = value
 	}

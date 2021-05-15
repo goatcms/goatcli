@@ -10,7 +10,6 @@ import (
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
 	"github.com/goatcms/goatcore/app/scope"
-	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 )
 
@@ -29,7 +28,7 @@ type Service struct {
 }
 
 // ServiceFactory create new repositories instance
-func ServiceFactory(dp dependency.Provider) (interface{}, error) {
+func ServiceFactory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &Service{}
 	if err = dp.InjectTo(&instance.deps); err != nil {
@@ -57,7 +56,7 @@ func (s *Service) Build(ctx app.IOContext, fs filesystem.Filespace, appData gcli
 			EventScope: parentScope,
 		},
 	})
-	defer childIOCtx.Scope().Close()
+	defer childIOCtx.Close()
 	buildContext := &Context{
 		ctx:        childIOCtx,
 		data:       appData.ElasticData,

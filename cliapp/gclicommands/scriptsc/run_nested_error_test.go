@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
+	"github.com/goatcms/goatcore/app/terminal"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
@@ -14,26 +15,32 @@ func TestPipRunNestedErrorStory(t *testing.T) {
 	t.Parallel()
 	var (
 		err         error
-		mapp        *mockupapp.App
+		mapp        *goatapp.MockupApp
 		bootstraper app.Bootstrap
 	)
-	if mapp, bootstraper, err = newApp(mockupapp.MockupOptions{
-		Args: []string{`appname`, `scripts:run`, `first`},
+	if mapp, bootstraper, err = newApp(goatapp.Params{
+		Arguments: []string{`appname`, `scripts:run`, `first`},
 	}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = goaterr.ToError(goaterr.AppendError(nil, app.RegisterCommand(mapp, "echoone", func(a app.App, ctx app.IOContext) (err error) {
-		time.Sleep(10 * time.Millisecond)
-		return ctx.IO().Out().Printf("1")
-	}, ""), app.RegisterCommand(mapp, "error", func(a app.App, ctx app.IOContext) (err error) {
-		time.Sleep(10 * time.Millisecond)
-		return goaterr.Errorf("error")
-	}, ""))); err != nil {
-		t.Error(err)
-		return
-	}
-	fs := mapp.RootFilespace()
+	mapp.Terminal().SetCommand(
+		terminal.NewCommand(terminal.CommandParams{
+			Callback: func(a app.App, ctx app.IOContext) (err error) {
+				time.Sleep(10 * time.Millisecond)
+				return ctx.IO().Out().Printf("1")
+			},
+			Name: "echoone",
+		}),
+		terminal.NewCommand(terminal.CommandParams{
+			Callback: func(a app.App, ctx app.IOContext) (err error) {
+				time.Sleep(10 * time.Millisecond)
+				return goaterr.Errorf("error")
+			},
+			Name: "error",
+		}),
+	)
+	fs := mapp.Filespaces().CWD()
 	if err = fs.WriteFile(".goat/scripts/first/main.tmpl", []byte(`
 {{- $ctx := . }}
 pip:run --name=echo --sandbox=self --body=<<EOF

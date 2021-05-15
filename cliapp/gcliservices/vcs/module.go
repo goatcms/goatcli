@@ -1,10 +1,10 @@
 package vcs
 
 import (
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 )
 
 // RegisterDependencies is init callback to register module dependencies
-func RegisterDependencies(dp dependency.Provider) error {
+func RegisterDependencies(dp app.DependencyProvider) error {
 	return dp.AddDefaultFactory("VCSService", Factory)
 }

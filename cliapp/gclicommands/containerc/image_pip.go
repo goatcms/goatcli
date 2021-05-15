@@ -12,8 +12,9 @@ import (
 
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/modules"
+	"github.com/goatcms/goatcore/app/modules/terminalm/termservices"
 	"github.com/goatcms/goatcore/app/scope"
+	"github.com/goatcms/goatcore/app/scope/datascope"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
@@ -28,7 +29,7 @@ func RunContainerImagePip(a app.App, ctx app.IOContext) (err error) {
 		}
 		childCtx app.IOContext
 		tmpName  string
-		terminal modules.Terminal
+		terminal termservices.Terminal
 	)
 	// valid
 	if err = a.DependencyProvider().InjectTo(&deps); err != nil {
@@ -49,7 +50,7 @@ func RunContainerImagePip(a app.App, ctx app.IOContext) (err error) {
 	// prepare scope
 	childCtx = gio.NewChildIOContext(ctx, gio.ChildIOContextParams{
 		Scope: scope.ChildParams{
-			DataScope: scope.NewDataScope(map[interface{}]interface{}{
+			DataScope: datascope.New(map[interface{}]interface{}{
 				imagepip.TmpImageNameKey: tmpName,
 			}),
 		},

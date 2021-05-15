@@ -1,12 +1,10 @@
 package vcs
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 func TestVCSWritePersistedToFS(t *testing.T) {
@@ -18,9 +16,7 @@ func TestVCSWritePersistedToFS(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	})
+	mapp, err := goatapp.NewMockupApp(goatapp.Params{})
 	if err != nil {
 		t.Error(err)
 		return
@@ -37,7 +33,8 @@ func TestVCSWritePersistedToFS(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if vcsData, err = deps.VCSService.ReadDataFromFS(mapp.RootFilespace()); err != nil {
+	fs := mapp.Filespaces().CWD()
+	if vcsData, err = deps.VCSService.ReadDataFromFS(fs); err != nil {
 		t.Error(err)
 		return
 	}
@@ -51,11 +48,11 @@ func TestVCSWritePersistedToFS(t *testing.T) {
 		t.Errorf("after add paths to persisted files Modified flag must be true")
 		return
 	}
-	if err = deps.VCSService.WriteDataToFS(mapp.RootFilespace(), vcsData); err != nil {
+	if err = deps.VCSService.WriteDataToFS(fs, vcsData); err != nil {
 		t.Error(err)
 		return
 	}
-	if data, err = mapp.RootFilespace().ReadFile(PersistedFilesPath); err != nil {
+	if data, err = fs.ReadFile(PersistedFilesPath); err != nil {
 		t.Error(err)
 		return
 	}

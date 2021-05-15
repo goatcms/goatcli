@@ -9,7 +9,6 @@ import (
 	"github.com/goatcms/goatcli/cliapp/common/config"
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/dependency"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/plainmap"
 )
@@ -22,7 +21,7 @@ type Properties struct {
 }
 
 // Factory create new repositories instance
-func Factory(dp dependency.Provider) (interface{}, error) {
+func Factory(dp app.DependencyProvider) (interface{}, error) {
 	var err error
 	instance := &Properties{}
 	if err = dp.InjectTo(&instance.deps); err != nil {
@@ -78,7 +77,7 @@ func (p *Properties) ReadDefFromFS(fs filesystem.Filespace) (properties []*confi
 func (p *Properties) ReadDataFromFS(fs filesystem.Filespace) (data map[string]string, err error) {
 	var json []byte
 	if !fs.IsFile(PropertiesDataPath) {
-		return make(map[string]string, 0), nil
+		return make(map[string]string), nil
 	}
 	if json, err = fs.ReadFile(PropertiesDataPath); err != nil {
 		return nil, err

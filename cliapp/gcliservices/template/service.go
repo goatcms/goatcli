@@ -5,7 +5,7 @@ import (
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/gtprovider"
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 )
 
 // Service is global template provider
@@ -17,7 +17,7 @@ type Service struct {
 }
 
 // ProviderFactory create new template provider
-func ProviderFactory(dp dependency.Provider) (interface{}, error) {
+func ProviderFactory(dp app.DependencyProvider) (interface{}, error) {
 	s := &Service{}
 	if err := dp.InjectTo(&s.deps); err != nil {
 		return nil, err

@@ -21,19 +21,17 @@ func TestPropertieFillDataFile(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	propertiesDef := []*config.Property{
-		&config.Property{
-			Key:  "key1",
-			Type: "line",
-			Min:  1,
-			Max:  22,
-		},
-		&config.Property{
-			Key:  "key2",
-			Type: "line",
-			Min:  1,
-			Max:  22,
-		}}
+	propertiesDef := []*config.Property{{
+		Key:  "key1",
+		Type: "line",
+		Min:  1,
+		Max:  22,
+	}, {
+		Key:  "key2",
+		Type: "line",
+		Min:  1,
+		Max:  22,
+	}}
 	if isChanged, err = service.FillData(mapp.IOContext(), propertiesDef, data, map[string]string{}, true); err != nil {
 		t.Error(err)
 		return
@@ -68,19 +66,17 @@ func TestPropertieFillDataFileOmnit(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if isChanged, err = service.FillData(mapp.IOContext(), []*config.Property{
-		&config.Property{
-			Key:  "key1",
-			Type: "alnum",
-			Min:  1,
-			Max:  22,
-		},
-		&config.Property{
-			Key:  "key2",
-			Type: "alnum",
-			Min:  1,
-			Max:  22,
-		}}, data, map[string]string{}, true); err != nil {
+	if isChanged, err = service.FillData(mapp.IOContext(), []*config.Property{{
+		Key:  "key1",
+		Type: "alnum",
+		Min:  1,
+		Max:  22,
+	}, {
+		Key:  "key2",
+		Type: "alnum",
+		Min:  1,
+		Max:  22,
+	}}, data, map[string]string{}, true); err != nil {
 		t.Error(err)
 		return
 	}

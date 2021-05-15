@@ -1,7 +1,6 @@
 package secrets
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/common"
@@ -12,8 +11,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 const (
@@ -34,21 +32,19 @@ func TestDataDefFromDirectory(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application
-	if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	}); err != nil {
+	if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/secrets.def/01_first.json", []byte(testSecretsDefFirstJSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(".goat/secrets.def/01_first.json", []byte(testSecretsDefFirstJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/secrets.def/02_second.json", []byte(testSecretsDefSecondJSON), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(".goat/secrets.def/02_second.json", []byte(testSecretsDefSecondJSON), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/data.def/wrong.ex", []byte("WRONG_FILE"), 0766); err != nil {
+	if err = mapp.Filespaces().Root().WriteFile(".goat/data.def/wrong.ex", []byte("WRONG_FILE"), 0766); err != nil {
 		t.Error(err)
 		return
 	}
@@ -73,7 +69,7 @@ func TestDataDefFromDirectory(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if secrets, err = deps.Secrets.ReadDefFromFS(mapp.RootFilespace(), emptyElasticData, appData); err != nil {
+	if secrets, err = deps.Secrets.ReadDefFromFS(mapp.Filespaces().Root(), emptyElasticData, appData); err != nil {
 		t.Error(err)
 		return
 	}

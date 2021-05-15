@@ -7,8 +7,7 @@ import (
 	"text/template"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 func TestAssetsServiceLayout(t *testing.T) {
@@ -18,20 +17,19 @@ func TestAssetsServiceLayout(t *testing.T) {
 	)
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	})
+	mapp, err := goatapp.NewMockupApp(goatapp.Params{})
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/helpers/main.tmpl", []byte(`
+	fs := mapp.Filespaces().CWD()
+	if err = fs.WriteFile(".goat/build/helpers/main.tmpl", []byte(`
 		Names:{{block "list" .}}{{"\n"}}{{range .}}{{println "-" .}}{{end}}{{end}}
 	`), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(".goat/build/layouts/layoutName/main.tmpl", []byte(`
+	if err = fs.WriteFile(".goat/build/layouts/layoutName/main.tmpl", []byte(`
 		{{define "list"}} {{join . ", "}}{{end}}
 	`), 0766); err != nil {
 		t.Error(err)

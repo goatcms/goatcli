@@ -7,8 +7,7 @@ import (
 
 // ValuesFor return values for all keys matches to pattern
 func ValuesFor(keyPattern string, source map[string]string) (result []string) {
-	var reg *regexp.Regexp
-	reg = regexp.MustCompile(keyPattern)
+	var reg = regexp.MustCompile(keyPattern)
 	result = []string{}
 	for key, value := range source {
 		if !reg.MatchString(key) {
@@ -21,8 +20,7 @@ func ValuesFor(keyPattern string, source map[string]string) (result []string) {
 
 // FindRow row match by prefix, pattern, suffix and value. Key value must be equals to expectedValue. Return key without prefix and suffix.
 func FindRow(prefix, pattern, suffix, expectedValue string, source map[string]string) (result string) {
-	var reg *regexp.Regexp
-	reg = regexp.MustCompile(pattern)
+	var reg = regexp.MustCompile(pattern)
 	for key, value := range source {
 		if !strings.HasPrefix(key, prefix) || !strings.HasSuffix(key, suffix) || value != expectedValue {
 			continue
@@ -61,7 +59,7 @@ func SubMap(baseKey, newBaseKey string, source map[string]string) (result map[st
 		if !strings.HasPrefix(key, baseKey) {
 			continue
 		}
-		newkey := newBaseKey + key[len(baseKey):len(key)]
+		newkey := newBaseKey + key[len(baseKey):]
 		result[newkey] = value
 	}
 	return result

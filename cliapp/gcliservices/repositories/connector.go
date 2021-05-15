@@ -1,13 +1,13 @@
 package repositories
 
 import (
-	"github.com/goatcms/goatcore/dependency"
+	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/repositories"
 	"github.com/goatcms/goatcore/repositories/git"
 )
 
 // ConnectorFactory create new repository connector instance
-func ConnectorFactory(dp dependency.Provider) (interface{}, error) {
+func ConnectorFactory(dp app.DependencyProvider) (interface{}, error) {
 	connector := repositories.NewMultiConnector([]repositories.ConnectorAdapter{
 		git.NewConnector(),
 	})

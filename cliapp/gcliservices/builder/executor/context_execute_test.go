@@ -12,8 +12,7 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/template/simpletf"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/vcs"
 	"github.com/goatcms/goatcore/app"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/app/scope"
 	"github.com/goatcms/goatcore/filesystem"
 	"github.com/goatcms/goatcore/varutil/goaterr"
@@ -43,19 +42,17 @@ func TestContextExecuteHook(t *testing.T) {
 		result            string
 		templatesExecutor gcliservices.TemplatesExecutor
 		generatorExecutor *GeneratorExecutor
-		generatorScope    = scope.NewScope(scope.Params{})
+		generatorScope    = scope.New(scope.Params{})
 		emptyElasticData  common.ElasticData
 		err               error
 	)
 	for ti := 0; ti < workers.AsyncTestReapeat; ti++ {
 		// prepare mockup application
-		if mapp, err = mockupapp.NewApp(mockupapp.MockupOptions{
-			Input: gio.NewInput(strings.NewReader("")),
-		}); err != nil {
+		if mapp, err = goatapp.NewMockupApp(goatapp.Params{}); err != nil {
 			t.Error(err)
 			return
 		}
-		fs = mapp.RootFilespace()
+		fs = mapp.Filespaces().CWD()
 		if err = goaterr.ToError(goaterr.AppendError(nil,
 			fs.WriteFile(".goat/build/templates/testTemplate/master.tmpl", []byte(master), filesystem.DefaultUnixFileMode),
 			fs.WriteFile(".goat/build/templates/testTemplate/testf.tmpl", []byte(testf), filesystem.DefaultUnixFileMode),

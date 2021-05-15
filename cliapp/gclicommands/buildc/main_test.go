@@ -1,7 +1,6 @@
 package buildc
 
 import (
-	"github.com/goatcms/goatcli/cliapp/gclicommands"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/builder"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/cloner"
 	"github.com/goatcms/goatcli/cliapp/gcliservices/data"
@@ -15,19 +14,20 @@ import (
 	"github.com/goatcms/goatcli/cliapp/gcliservices/vcs"
 	"github.com/goatcms/goatcore/app"
 	"github.com/goatcms/goatcore/app/bootstrap"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 	"github.com/goatcms/goatcore/app/modules/commonm"
 	"github.com/goatcms/goatcore/app/modules/ocm"
 	"github.com/goatcms/goatcore/app/modules/terminalm"
 	"github.com/goatcms/goatcore/varutil/goaterr"
 )
 
-func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper app.Bootstrap, err error) {
-	if mapp, err = mockupapp.NewApp(options); err != nil {
+func newApp(params goatapp.Params) (mapp *goatapp.MockupApp, bootstraper app.Bootstrap, err error) {
+	if mapp, err = goatapp.NewMockupApp(params); err != nil {
 		return nil, nil, err
 	}
 	bootstraper = bootstrap.NewBootstrap(mapp)
 	dp := mapp.DependencyProvider()
+	mapp.Terminal().SetCommand(Commands()...)
 	if err = goaterr.ToError(goaterr.AppendError(nil,
 		bootstraper.Register(terminalm.NewModule()),
 		bootstraper.Register(commonm.NewModule()),
@@ -43,8 +43,6 @@ func newApp(options mockupapp.MockupOptions) (mapp *mockupapp.App, bootstraper a
 		repositories.RegisterDependencies(dp),
 		cloner.RegisterDependencies(dp),
 		vcs.RegisterDependencies(dp),
-		app.RegisterCommand(mapp, "build", RunBuild, gclicommands.Build),
-		app.RegisterCommand(mapp, "rebuild", RunRebuild, gclicommands.Rebuild),
 	)); err != nil {
 		return nil, nil, err
 	}

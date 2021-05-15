@@ -44,10 +44,10 @@ func Run(a app.App, ctx app.IOContext) (err error) {
 	}
 	interactive = strings.ToLower(deps.Interactive) != "false"
 	if deps.RepositoryURL == "" {
-		return fmt.Errorf("First argument repository url is required")
+		return fmt.Errorf("first argument repository url is required")
 	}
 	if deps.DestPath == "" {
-		return fmt.Errorf("Second argument destination path is required")
+		return fmt.Errorf("second argument destination path is required")
 	}
 	version := repositories.Version{
 		Branch:   deps.RepositoryBranch,

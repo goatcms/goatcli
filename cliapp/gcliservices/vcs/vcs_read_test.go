@@ -1,33 +1,30 @@
 package vcs
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/goatcms/goatcli/cliapp/gcliservices"
-	"github.com/goatcms/goatcore/app/gio"
-	"github.com/goatcms/goatcore/app/mockupapp"
+	"github.com/goatcms/goatcore/app/goatapp"
 )
 
 func TestVCSReadDataFromFS(t *testing.T) {
 	var err error
 	t.Parallel()
 	// prepare mockup application & data
-	mapp, err := mockupapp.NewApp(mockupapp.MockupOptions{
-		Input: gio.NewInput(strings.NewReader("")),
-	})
+	mapp, err := goatapp.NewMockupApp(goatapp.Params{})
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(PersistedFilesPath, []byte(`
+	fs := mapp.Filespaces().CWD()
+	if err = fs.WriteFile(PersistedFilesPath, []byte(`
 		/first/persisted.file
 		/second/persisted.file
 		`), 0766); err != nil {
 		t.Error(err)
 		return
 	}
-	if err = mapp.RootFilespace().WriteFile(GeneratedFilesPath, []byte(`
+	if err = fs.WriteFile(GeneratedFilesPath, []byte(`
 		2009-11-10T23:00:00Z;/some/generated_file.go
 		2009-11-10T23:00:00Z;/some/other_generated_file.go
 		`), 0766); err != nil {
@@ -47,7 +44,7 @@ func TestVCSReadDataFromFS(t *testing.T) {
 		return
 	}
 	var vcsData gcliservices.VCSData
-	if vcsData, err = deps.VCSService.ReadDataFromFS(mapp.RootFilespace()); err != nil {
+	if vcsData, err = deps.VCSService.ReadDataFromFS(fs); err != nil {
 		t.Error(err)
 		return
 	}
